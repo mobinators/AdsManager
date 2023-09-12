@@ -85,7 +85,7 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-                groupId = 'https://github.com/mobinators'
+                groupId = 'com.github.mobinators'
                 artifactId = 'managers'
                 version = '1.0.0'
             }
