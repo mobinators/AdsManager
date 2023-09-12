@@ -1,0 +1,3 @@
+rootProject.name = "AdsManager"
+include ':app'
+include ':manager'

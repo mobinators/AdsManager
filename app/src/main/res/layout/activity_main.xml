@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.mobinators.ads.managers.MainActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/adContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginEnd="36dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0" />
+
+        <Button
+            android:id="@+id/loadAds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Banner"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/adContainer"
+            app:layout_constraintVertical_bias="0" />
+
+        <Button
+            android:id="@+id/nativeAds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Native"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/loadAds"
+            app:layout_constraintVertical_bias="0" />
+
+        <Button
+            android:id="@+id/nativeBannerAds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Native banner"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/nativeAds"
+            app:layout_constraintVertical_bias="0" />
+
+        <Button
+            android:id="@+id/interAds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Interstitial"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/nativeBannerAds"
+            app:layout_constraintVertical_bias="0" />
+
+        <Button
+            android:id="@+id/rewardedAds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rewarded"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/interAds"
+            app:layout_constraintVertical_bias="0" />
+
+        <Button
+            android:id="@+id/rewardedInterAds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rewarded Interstitial"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rewardedAds"
+            app:layout_constraintVertical_bias="0" />
+
+        <Button
+            android:id="@+id/openAds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Open Ads"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rewardedInterAds"
+            app:layout_constraintVertical_bias="0" />
+
+        <Button
+            android:id="@+id/maxAdActivity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Max Ads"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/openAds"
+            app:layout_constraintVertical_bias="0" />
+
+        <Button
+            android:id="@+id/billingButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_20sdp"
+            android:text="In App Purchase"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/maxAdActivity"
+            app:layout_constraintVertical_bias="0" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

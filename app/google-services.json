@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "903846469578",
+    "project_id": "manager-1c942",
+    "storage_bucket": "manager-1c942.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903846469578:android:f7a7ad2e964e6cfd8ef933",
+        "android_client_info": {
+          "package_name": "com.mobinators.ads.managers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATXwD5QVlKsmQgsLKrRqL99uFh58VtBxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

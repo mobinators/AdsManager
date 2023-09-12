@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ad_image">ad image</string>
+    <string name="advertiser_name">advertiser name</string>
+    <string name="exit">exit</string>
+    <string name="imageview">ad image</string>
+    <string name="ad_button">Install</string>
+    <string name="body_text">Tested_DualSpace for everyone. Click to install it</string>
+    <string name="exit_app">Exit App</string>
+    <string name="sure_you_want_to_exit">Sure you want to exit</string>
+    <string name="exit_">EXIT</string>
+    <string name="cancel">CANCEL</string>
+</resources>

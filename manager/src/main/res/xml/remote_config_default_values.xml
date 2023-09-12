@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap xmlns:tools="http://schemas.android.com/tools">
+    <entry>
+        <key>ADMOB_APP_ID</key>
+        <value>ca-app-pub-3940256099942544~3347511713</value>
+        <key>ADMOB_INTERSTITIAL_ADS_ID</key>
+        <value>ca-app-pub-3940256099942544/1033173712</value>
+        <key>ADMOB_BANNER_ADS_ID</key>
+        <value>ca-app-pub-3940256099942544/6300978111</value>
+        <key>ADMOB_REWARD_ADS_ID</key>
+        <value>ca-app-pub-3940256099942544/5354046379</value>
+        <key>ADMOB_REWARD_INTERSTITIAL_ADS_ID</key>
+        <value>ca-app-pub-3940256099942544/5354046379</value>
+        <key>ADMOB_NATIVE_ADS_ID</key>
+        <value>ca-app-pub-3940256099942544/2247696110</value>
+        <key>ADMOB_APP_OPEN_ADS_ID</key>
+        <value>ca-app-pub-3940256099942544/3419835294</value>
+
+        <key>ADMOB_MEDIATION_BANNER_ID</key>
+        <value>ca-app-pub-3940256099942544/3419835290</value>
+        <key>ADMOB_MEDIATION_NATIVE_ID</key>
+        <value>ca-app-pub-3940256099942544/3419835290</value>
+        <key>ADMOB_MEDIATION_REWARDED_ID</key>
+        <value>ca-app-pub-3940256099942544/3419835290</value>
+        <key>ADMOB_MEDIATION_INTERSTITIAL_ID</key>
+        <value>ca-app-pub-3940256099942544/3419835290</value>
+        <key>ADMOB_MEDIATION_KEY</key>
+        <value>false</value>
+
+        <key>ADMOB_OPEN_AD_ENABLE</key>
+        <value>false</value>
+        <key>Strategy</key>
+        <value>0</value>
+        <key>APPLOVIN_APP_ID</key>
+        <value>
+            VWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-1DcTfCWvHWTNRTTB12ENHdoQyLpX5LVcPGq9Nol8469q4z7rp1
+        </value>
+        <key>MAX_INTERSTITIAL_ADS_ID</key>
+        <value>YOUR_AD_UNIT_ID</value>
+        <key>MAX_BANNER_ADS_ID</key>
+        <value>YOUR_AD_UNIT_ID</value>
+        <key>MAX_REWARD_ADS_ID</key>
+        <value>YOUR_AD_UNIT_ID</value>
+        <key>MAX_Native_ADS_ID</key>
+        <value>YOUR_AD_UNIT_ID</value>
+        <key>MAX_APP_OPEN_ADS_ID</key>
+        <value>YOUR_AD_UNIT_ID</value>
+    </entry>
+
+</defaultsMap>

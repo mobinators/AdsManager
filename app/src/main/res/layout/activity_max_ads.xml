@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.mobinators.ads.managers.MaxAdsActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/maxContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0" />
+
+    <Button
+        android:id="@+id/maxBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Max Banner"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/maxContainer"
+        app:layout_constraintVertical_bias="0" />
+
+    <Button
+        android:id="@+id/maxNative"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Max Native"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/maxBanner"
+        app:layout_constraintVertical_bias="0" />
+
+    <Button
+        android:id="@+id/maxNativeBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Max Native Banner"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/maxNative"
+        app:layout_constraintVertical_bias="0" />
+
+    <Button
+        android:id="@+id/maxRewarded"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Max Rewarded"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/maxNativeBanner"
+        app:layout_constraintVertical_bias="0" />
+
+    <Button
+        android:id="@+id/maxInterstitial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Max Interstitial"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/maxRewarded"
+        app:layout_constraintVertical_bias="0" />
+
+    <Button
+        android:id="@+id/maxOpen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Max Open"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/maxInterstitial"
+        app:layout_constraintVertical_bias="0" />
+
+    <Button
+        android:id="@+id/testAdsEnable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Max Ads Enable"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/maxOpen"
+        app:layout_constraintVertical_bias="0" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
