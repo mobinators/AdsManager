@@ -214,7 +214,5 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
                 logD("Ads is Offline : $offline")
             }
         })
-
-        // change ads 
     }
 }
