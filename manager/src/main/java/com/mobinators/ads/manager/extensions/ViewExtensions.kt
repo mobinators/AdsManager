@@ -199,3 +199,4 @@ fun Activity.exitPanel(
     exitFragment.setListener(listener = listener)
     exitFragment.show(fragmentManager, exitFragment.tag)
 }
+

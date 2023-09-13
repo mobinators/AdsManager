@@ -1,11 +1,13 @@
 package com.mobinators.ads.manager.ui.commons.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.text.TextUtils
+import com.applovin.sdk.AppLovinSdk
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.logException
 
@@ -87,5 +89,8 @@ object AdsUtils {
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
         val netInfo = manager!!.activeNetworkInfo
         return netInfo != null && netInfo.isConnectedOrConnecting
+    }
+    fun maxTestAds(activity: Activity) {
+        AppLovinSdk.getInstance(activity).showMediationDebugger()
     }
 }

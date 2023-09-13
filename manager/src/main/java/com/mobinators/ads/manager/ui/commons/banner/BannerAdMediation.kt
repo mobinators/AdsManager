@@ -164,9 +164,9 @@ object BannerAdMediation {
         }
     }
 
-    fun maxTestAds(activity: Activity) {
+   /* fun maxTestAds(activity: Activity) {
         AppLovinSdk.getInstance(activity).showMediationDebugger()
-    }
+    }*/
 
     private fun maxBannerAds() {
         this.appLovingKey = if (AdsConstants.testMode) {

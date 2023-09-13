@@ -18,6 +18,7 @@ import com.mobinators.ads.manager.ui.commons.nativeBanner.MediationNativeBanner
 import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAd
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
+import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import com.mobinators.ads.managers.databinding.ActivityMaxAdsBinding
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.ui.commons.base.BaseActivity
@@ -45,9 +46,10 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             binding.maxRewarded.id -> rewardedAds()
             binding.maxInterstitial.id -> interstitialAds()
             binding.maxOpen.id -> openAds()
-            binding.testAdsEnable.id -> BannerAdMediation.maxTestAds(this@MaxAdsActivity)
+            binding.testAdsEnable.id -> AdsUtils.maxTestAds(this@MaxAdsActivity)
         }
     }
+//    BannerAdMediation.maxTestAds(this@MaxAdsActivity)
 
     private fun bannerAds() {
         BannerAdMediation.showBannerAds(

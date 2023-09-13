@@ -26,6 +26,7 @@ import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.mobinators.ads.manager.R
 import com.mobinators.ads.manager.applications.AdsApplication
 import com.mobinators.ads.manager.databinding.AdmobNativeAdLayoutBinding
+import com.mobinators.ads.manager.databinding.CustomNativeBinding
 import com.mobinators.ads.manager.ui.commons.listener.OnNativeAdListener
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
@@ -36,7 +37,8 @@ import pak.developer.app.managers.extensions.visible
 class MediationNativeAd(
     private var activity: Activity,
     private var isPurchased: Boolean,
-    private var itemView: ViewGroup
+    private var itemView: ViewGroup,
+    private var isCustom: Boolean = false
 ) {
     private var onNativeAdListener: OnNativeAdListener? = null
     private var nativeAdLoader: MaxNativeAdLoader? = null
@@ -122,8 +124,17 @@ class MediationNativeAd(
                 return
             }
             itemView.removeAllViews()
+
             val admobNativeAdLayoutBinding =
                 AdmobNativeAdLayoutBinding.inflate(LayoutInflater.from(activity), itemView, false)
+            if (isCustom) {
+                logD("Custom Native Ads")
+                val customNative =
+                    CustomNativeBinding.inflate(LayoutInflater.from(activity), itemView, false)
+                populateCustomNativeAdView(admobNativeAd!!, customNative)
+                return
+            }
+
             itemView.addView(admobNativeAdLayoutBinding.root)
             val nativeAdView = admobNativeAdLayoutBinding.root
             nativeAdView.mediaView = admobNativeAdLayoutBinding.adMedia
@@ -202,6 +213,78 @@ class MediationNativeAd(
             onLoadAdError(error.localizedMessage!!)
         }
     }
+
+    private fun populateCustomNativeAdView(
+        nativeAd: NativeAd,
+        unifiedAdBinding: CustomNativeBinding
+    ) {
+        itemView.addView(unifiedAdBinding.root)
+        val nativeAdView = unifiedAdBinding.root
+        nativeAdView.mediaView = unifiedAdBinding.adMedia
+        nativeAdView.headlineView = unifiedAdBinding.adHeadline
+        nativeAdView.bodyView = unifiedAdBinding.adBody
+        nativeAdView.callToActionView = unifiedAdBinding.adCallToAction
+        nativeAdView.iconView = unifiedAdBinding.adAppIcon
+        nativeAdView.priceView = unifiedAdBinding.adPrice
+        nativeAdView.starRatingView = unifiedAdBinding.adStars
+        nativeAdView.storeView = unifiedAdBinding.adStore
+        nativeAdView.advertiserView = unifiedAdBinding.adAdvertiser
+        unifiedAdBinding.adHeadline.text = nativeAd.headline
+        nativeAd.mediaContent?.let { unifiedAdBinding.adMedia.mediaContent = it }
+        if (nativeAd.callToAction == null) {
+            unifiedAdBinding.adCallToAction.gone()
+        } else {
+            unifiedAdBinding.adCallToAction.visible()
+            unifiedAdBinding.adCallToAction.text = nativeAd.callToAction
+        }
+
+        if (nativeAd.icon == null) {
+            unifiedAdBinding.adAppIcon.gone()
+        } else {
+            unifiedAdBinding.adAppIcon.setImageDrawable(nativeAd.icon?.drawable)
+            unifiedAdBinding.adAppIcon.visible()
+        }
+
+        if (nativeAd.price == null) {
+            unifiedAdBinding.adPrice.gone()
+        } else {
+            unifiedAdBinding.adPrice.visible()
+            unifiedAdBinding.adPrice.text = nativeAd.price
+        }
+        if (nativeAd.store == null) {
+            unifiedAdBinding.adStore.gone()
+        } else {
+            unifiedAdBinding.adStore.visible()
+            unifiedAdBinding.adStore.text = nativeAd.store
+        }
+        if (nativeAd.starRating == null) {
+            unifiedAdBinding.adStars.gone()
+        } else {
+            unifiedAdBinding.adStars.rating = nativeAd.starRating!!.toFloat()
+            unifiedAdBinding.adStars.visible()
+        }
+        if (nativeAd.advertiser == null) {
+            unifiedAdBinding.adAdvertiser.gone()
+        } else {
+            unifiedAdBinding.adAdvertiser.text = nativeAd.advertiser
+            unifiedAdBinding.adAdvertiser.visible()
+        }
+        nativeAdView.setNativeAd(nativeAd)
+        val vc = nativeAd.mediaContent?.videoController
+        if (vc != null && vc.hasVideoContent()) {
+            vc.videoLifecycleCallbacks =
+                object : VideoController.VideoLifecycleCallbacks() {
+                    @SuppressLint("SetTextI18n")
+                    override fun onVideoEnd() {
+                        onLoadAdError("Video status: Video playback has ended.")
+                        super.onVideoEnd()
+                    }
+                }
+        } else {
+            onLoadAdError("Video status: Ad does not contain a video asset.")
+        }
+    }
+
 
     private fun selectAdmobAd() {
         if (this.admobKey!!.isEmpty() || this.admobKey!!.isBlank()) {
