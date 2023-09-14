@@ -1,0 +1,133 @@
+{
+  "parameters": {
+    "Strategy": {
+      "defaultValue": {
+        "value": "2"
+      },
+      "valueType": "NUMBER"
+    },
+    "ADMOB_MEDIATION_KEY": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "valueType": "BOOLEAN"
+    },
+    "ADMOB_REWARD_ADS_ID": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/5224354917"
+      },
+      "valueType": "STRING"
+    },
+    "MAX_INTERSTITIAL_ADS_ID": {
+      "defaultValue": {
+        "value": "YOUR_AD_UNIT_ID"
+      },
+      "valueType": "STRING"
+    },
+    "ADMOB_MEDIATION_NATIVE_ID": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/3419835290"
+      },
+      "valueType": "STRING"
+    },
+    "ADMOB_BANNER_ADS_ID": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/6300978111"
+      },
+      "valueType": "STRING"
+    },
+    "ADMOB_INTERSTITIAL_ADS_ID": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/1033173712"
+      },
+      "valueType": "STRING"
+    },
+    "MAX_Native_ADS_ID": {
+      "defaultValue": {
+        "value": "YOUR_AD_UNIT_ID"
+      },
+      "valueType": "STRING"
+    },
+    "ADMOB_MEDIATION_REWARDED_ID": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/3419835290"
+      },
+      "valueType": "STRING"
+    },
+    "APPLOVIN_APP_ID": {
+      "defaultValue": {
+        "value": "sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-DcTfCWvHWTNRTTB12ENX5rp1LVcPGq9NoHdoQyLpl8469q4z71" 
+      },
+      "valueType": "STRING"
+    },
+    "ADMOB_APP_ID": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544~3347511713"
+      },
+      "valueType": "STRING"
+    },
+    "ADMOB_MEDIATION_BANNER_ID": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/6300978156"
+      },
+      "valueType": "STRING"
+    },
+    "MAX_APP_OPEN_ADS_ID": {
+      "defaultValue": {
+        "value": "YOUR_AD_UNIT_ID"
+      },
+      "valueType": "STRING"
+    },
+    "MAX_BANNER_ADS_ID": {
+      "defaultValue": {
+        "value": "YOUR_AD_UNIT_ID"
+      },
+      "valueType": "STRING"
+    },
+    "ADMOB_MEDIATION_INTERSTITIAL_ID": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/3419835290"
+      },
+      "valueType": "STRING"
+    },
+    "ADMOB_NATIVE_ADS_ID": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/2247696110"
+      },
+      "valueType": "STRING"
+    },
+    "ADMOB_APP_OPEN_ADS_ID": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/3419835294"
+      },
+      "valueType": "STRING"
+    },
+    "ADMOB_REWARD_INTERSTITIAL_ADS_ID": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/5354046379"
+      },
+      "valueType": "STRING"
+    },
+    "ADMOB_OPEN_AD_ENABLE": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "valueType": "BOOLEAN"
+    },
+    "MAX_REWARD_ADS_ID": {
+      "defaultValue": {
+        "value": "YOUR_AD_UNIT_ID"
+      },
+      "valueType": "STRING"
+    }
+  },
+  "version": {
+    "versionNumber": "59",
+    "updateTime": "2023-09-13T05:11:15.193614Z",
+    "updateUser": {
+      "email": "mobinators1010@gmail.com"
+    },
+    "updateOrigin": "CONSOLE",
+    "updateType": "INCREMENTAL_UPDATE"
+  }
+}
