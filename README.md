@@ -382,3 +382,51 @@
   
   remote_config_maanger_json_file is a folder which contain the remote config json file because any one create new Firebase project with remote config so import it file after that imported it then change the value of ads key 
   
+```
+
+-> Ad this line in Manifest file
+```
+    <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/app_ads_id" />
+        <meta-data
+            android:name="applovin.sdk.key"
+            android:value="@string/SDK_KEY" />
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
+            android:value="true" />
+            
+             
+```
+
+-> Ad this line String File
+
+```
+     <string name="app_ads_id">ca-app-pub-3940256099942544~3347511713</string>  provide origin App id for show original ads
+    <string name="SDK_KEY">sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-1DcTfCWvHWTNRTTB12ENHdoQyLpX5LVcPGq9Nol8469q4z7rp1</string>  provide original AppLovin Sdk id
+```
+
+-> Ad this line in Application
+```
+    AdsApplication.getValueFromConfig(
+            FirebaseRemoteConfig.getInstance(),
+            this,
+            object : FetchRemoteCallback {
+                override fun onFetchValuesSuccess() {
+                    logD("onFetchValuesSuccess")
+                }
+
+                override fun onFetchValuesFailed() {
+                    logD("onFetchValuesFailed")
+                }
+
+                override fun onUpdateSuccess(appId: String, maxAppId: String) {
+                    logD("onUpdateSuccess : App Id : $appId  : MAX App Id: $maxAppId")
+                    updateManifest(appId = appId, maxAppId = maxAppId)
+                }
+            })
+        AdsApplication.setAnalytics(FirebaseAnalytics.getInstance(this))
+        
+        This app register in Manifest file
+```
+  
