@@ -24,6 +24,7 @@ import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAd
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
+import com.mobinators.ads.manager.ui.commons.utils.ConnectionState
 import com.mobinators.ads.manager.ui.commons.utils.DeviceInfoUtils
 import com.mobinators.ads.manager.ui.commons.utils.InAppPurchaseUtils
 import com.mobinators.ads.manager.ui.commons.views.dialog.ProgressDialogUtils
@@ -66,11 +67,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             binding.rewardedInterAds.id -> rewardedInterstitialAds()
             binding.openAds.id -> openAds()
             binding.interAds.id -> interstitialAds()
-            binding.billingButton.id -> {
-                CoroutineScope(Dispatchers.Main).launch {
-                    inAppPurchaseUtils!!.inPurchase()
-                }
-            }
+            binding.billingButton.id -> inAppPurchaseUtils!!.startSubSubscription()
         }
     }
 
@@ -291,41 +288,68 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                 "product_id_example",
                 "base64_key_example",
                 object : BillingCallback {
-                    override fun onSubscribe() {
-                        logD("onSubscribe")
+                    override fun onSubscribe(msg: String) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD(msg)
+                        }
                     }
 
-                    override fun onAlreadySubscribe() {
-                        logD("onAlreadySubscribe")
+                    override fun onAlreadySubscribe(msg: String) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD(msg)
+                        }
                     }
 
                     override fun onFeatureNotSupported() {
-                        logD("onFeatureNotSupported")
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD("")
+                        }
                     }
 
                     override fun onBillingError(error: String) {
-                        logD("onBillingError: $error")
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD(" Error : $error")
+                        }
                     }
 
-                    override fun onSubscriptionPending() {
-                        logD("onSubscriptionPending")
+                    override fun onSubscriptionPending(msg: String) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD(msg)
+                        }
                     }
 
-                    override fun onUnspecifiedState() {
-                        logD("onUnspecifiedState")
+                    override fun onUnspecifiedState(msg: String) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD(msg)
+                        }
                     }
 
                     override fun onProductDetail(productDetail: InAppPurchasedModel) {
-                        logD("onProductDetail: $productDetail")
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD("Purchase Detail :${productDetail}")
+                        }
                     }
 
                     override fun isOffline(offline: Boolean) {
-                        logD("isOffline : $offline") //  if internet is not available then return true otherwise false
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD("isOffline : $offline")
+                        }
+                    }
+
+                    override fun onServiceDisConnected() {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD("ServiceDisConnected")
+                        }
+                    }
+
+                    override fun onBillingFinished(state: ConnectionState) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD("premium : ${state.premium}  : locked : ${state.locked}")
+                        }
                     }
                 })
-        CoroutineScope(Dispatchers.Main).launch {
-            inAppPurchaseUtils!!.startConnection()
-        }
+        inAppPurchaseUtils!!.startConnection()
+        inAppPurchaseUtils!!.getSubscriptionInfo()
     }
 
     override fun onBackPressed() {
@@ -355,6 +379,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        inAppPurchaseUtils!!.disConnect()
+        inAppPurchaseUtils!!.disConnected()
     }
 }

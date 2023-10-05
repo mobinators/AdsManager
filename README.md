@@ -295,52 +295,77 @@
 
 ```
     private var inAppPurchaseUtils: InAppPurchaseUtils? = null
-    inAppPurchaseUtils =
+     inAppPurchaseUtils =
             InAppPurchaseUtils(
                 this,
                 "product_id_example",
                 "base64_key_example",
                 object : BillingCallback {
-                    override fun onSubscribe() {
-                        logD("onSubscribe")
+                    override fun onSubscribe(msg: String) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD(msg)
+                        }
                     }
 
-                    override fun onAlreadySubscribe() {
-                        logD("onAlreadySubscribe")
+                    override fun onAlreadySubscribe(msg: String) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD(msg)
+                        }
                     }
 
                     override fun onFeatureNotSupported() {
-                        logD("onFeatureNotSupported")
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD("")
+                        }
                     }
 
                     override fun onBillingError(error: String) {
-                        logD("onBillingError: $error")
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD(" Error : $error")
+                        }
                     }
 
-                    override fun onSubscriptionPending() {
-                        logD("onSubscriptionPending")
+                    override fun onSubscriptionPending(msg: String) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD(msg)
+                        }
                     }
 
-                    override fun onUnspecifiedState() {
-                        logD("onUnspecifiedState")
+                    override fun onUnspecifiedState(msg: String) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD(msg)
+                        }
                     }
 
                     override fun onProductDetail(productDetail: InAppPurchasedModel) {
-                        logD("onProductDetail: $productDetail")
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD("Purchase Detail :${productDetail}")
+                        }
                     }
 
                     override fun isOffline(offline: Boolean) {
-                        logD("isOffline : $offline") //  if internet is not available then return true otherwise false
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD("isOffline : $offline")
+                        }
+                    }
+
+                    override fun onServiceDisConnected() {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD("ServiceDisConnected")
+                        }
+                    }
+
+                    override fun onBillingFinished(state: ConnectionState) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            logD("premium : ${state.premium}  : locked : ${state.locked}")
+                        }
                     }
                 })
-        CoroutineScope(Dispatchers.Main).launch {
-            inAppPurchaseUtils!!.startConnection()
-        }
+       inAppPurchaseUtils!!.startConnection()  // Create object 
+       inAppPurchaseUtils!!.getSubscriptionInfo() // get information of SubScription 
 
 
-       CoroutineScope(Dispatchers.Main).launch {
-                    inAppPurchaseUtils!!.inPurchase()
-                }
+      inAppPurchaseUtils!!.startSubSubscription() // SubScription 
 ```
 
 -> Exit Panel

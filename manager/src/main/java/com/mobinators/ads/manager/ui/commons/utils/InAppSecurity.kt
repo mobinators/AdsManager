@@ -14,18 +14,35 @@ import java.security.SignatureException
 import java.security.spec.InvalidKeySpecException
 import java.security.spec.X509EncodedKeySpec
 
-class InAppSecurity {
+object InAppSecurity {
     private val keyFactoryAlgorithm = "RSA"
     private val signatureAlgorithms = "SHA1withRSA"
-    fun verifyPurchase(base64PublicKey: String?, signedData: String, signature: String?): Boolean {
+
+    @Throws(IOException::class)
+    fun verifyPurchase(base64PublicKey: String?, signedData: String?, signature: String?): Boolean {
         if (TextUtils.isEmpty(signedData) || TextUtils.isEmpty(base64PublicKey) || TextUtils.isEmpty(
                 signature
             )
         ) {
             return false
         }
-        val key = generatePublicKey(base64PublicKey)
-        return verify(key, signedData, signature)
+        val key: PublicKey = generatePublicKey(base64PublicKey)!!
+        return verify(key, signedData!!, signature)
+    }
+
+    @Throws(IOException::class)
+    fun generatePublicKey(encodedPublicKey: String?): PublicKey? {
+        return try {
+            val decodedKey = Base64.decode(encodedPublicKey, Base64.DEFAULT)
+            val keyFactory =
+                KeyFactory.getInstance(keyFactoryAlgorithm)
+            keyFactory.generatePublic(X509EncodedKeySpec(decodedKey))
+        } catch (e: NoSuchAlgorithmException) {
+            throw RuntimeException(e)
+        } catch (e: InvalidKeySpecException) {
+            val msg = "Invalid key specification: $e"
+            throw IOException(msg)
+        }
     }
 
     private fun verify(publicKey: PublicKey?, signedData: String, signature: String?): Boolean {
@@ -35,29 +52,16 @@ class InAppSecurity {
             return false
         }
         try {
-            val signatureAlgorithm = Signature.getInstance(signatureAlgorithms)
+            val signatureAlgorithm =
+                Signature.getInstance(signatureAlgorithms)
             signatureAlgorithm.initVerify(publicKey)
             signatureAlgorithm.update(signedData.toByteArray())
             return signatureAlgorithm.verify(signatureBytes)
         } catch (e: NoSuchAlgorithmException) {
-            throw RuntimeException(e)
-        } catch (_: InvalidKeyException) {
-        } catch (_: SignatureException) {
+            throw java.lang.RuntimeException(e)
+        } catch (ignored: InvalidKeyException) {
+        } catch (ignored: SignatureException) {
         }
         return false
-    }
-
-    @Throws(IOException::class)
-    private fun generatePublicKey(encodedPublicKey: String?): PublicKey {
-        return try {
-            val decodedKey = Base64.decode(encodedPublicKey, Base64.DEFAULT)
-            val keyFactory = KeyFactory.getInstance(keyFactoryAlgorithm)
-            keyFactory.generatePublic(X509EncodedKeySpec(decodedKey))
-        } catch (e: NoSuchAlgorithmException) {
-            throw RuntimeException(e)
-        } catch (e: InvalidKeySpecException) {
-            val msg = "Invalid Key specifications : $e"
-            throw IOException(msg)
-        }
     }
 }
