@@ -49,11 +49,15 @@ class MediationNativeAd(
     private var maxKey: String? = null
 
     fun onDestroy() {
-        if (this.admobNativeAd != null) {
-            this.admobNativeAd!!.destroy()
-        }
-        if (this.nativeAdLoader != null) {
-            this.nativeAdLoader!!.destroy(nativeAd)
+        try {
+            if (this.admobNativeAd != null) {
+                this.admobNativeAd!!.destroy()
+            }
+            if (this.nativeAdLoader != null) {
+                this.nativeAdLoader!!.destroy(nativeAd)
+            }
+        } catch (error: Exception) {
+            this.onNativeAdListener!!.onError(error = "showNativeAds Error : ${error.localizedMessage}")
         }
     }
 
@@ -63,57 +67,66 @@ class MediationNativeAd(
             listener.onError("You have pro version!")
             return
         }
-        if (AdsConstants.isInit.not()) {
-            Handler(Looper.getMainLooper()).postDelayed(Runnable {
-                loadAd(listener)
-            }, 1500)
-        }
-        this.admobKey = if (AdsConstants.testMode) {
-            AdsConstants.TEST_ADMOB_NATIVE_ID
-        } else {
-            if (AdsApplication.getAdsModel()!!.admobMediation) {
-                AdsApplication.getAdsModel()!!.admobMediationNativeId
-            } else {
-                AdsApplication.getAdsModel()!!.admobNativeID
+
+        try {
+            if (AdsConstants.isInit.not()) {
+                Handler(Looper.getMainLooper()).postDelayed(Runnable {
+                    loadAd(listener)
+                }, 1500)
             }
+            this.admobKey = if (AdsConstants.testMode) {
+                AdsConstants.TEST_ADMOB_NATIVE_ID
+            } else {
+                if (AdsApplication.getAdsModel()!!.admobMediation) {
+                    AdsApplication.getAdsModel()!!.admobMediationNativeId
+                } else {
+                    AdsApplication.getAdsModel()!!.admobNativeID
+                }
+            }
+            this.maxKey = if (AdsConstants.testMode) {
+                AdsConstants.TEST_MAX_Native_ADS_ID
+            } else {
+                AdsApplication.getAdsModel()!!.maxNativeID
+            }
+            selectAd()
+        } catch (error: Exception) {
+            this.onNativeAdListener!!.onError(error = "showNativeAds Error : ${error.localizedMessage}")
         }
-        this.maxKey = if (AdsConstants.testMode) {
-            AdsConstants.TEST_MAX_Native_ADS_ID
-        } else {
-            AdsApplication.getAdsModel()!!.maxNativeID
-        }
-        selectAd()
     }
 
     private fun selectAd() {
-        when (AdsApplication.getAdsModel()!!.strategy.toInt()) {
-            AdsConstants.ADS_OFF -> {
-                this.onNativeAdListener!!.isEnableAds(false)
-            }
-
-            AdsConstants.AD_MOB_MEDIATION -> {
-                this.onNativeAdListener!!.isEnableAds(true)
-                if (this.admobNativeAd != null) {
-                    bindAdmobContentAd()
+        try {
+            when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
+                AdsConstants.ADS_OFF -> {
+                    this.onNativeAdListener!!.isEnableAds(false)
                 }
-                selectAdmobAd()
-            }
 
-            AdsConstants.AD_MOB -> {
-                this.onNativeAdListener!!.isEnableAds(true)
-                if (this.admobNativeAd != null) {
-                    bindAdmobContentAd()
+                AdsConstants.AD_MOB_MEDIATION -> {
+                    this.onNativeAdListener!!.isEnableAds(true)
+                    if (this.admobNativeAd != null) {
+                        bindAdmobContentAd()
+                    }
+                    selectAdmobAd()
                 }
-                selectAdmobAd()
-            }
 
-            AdsConstants.MAX_MEDIATION -> {
-                this.onNativeAdListener!!.isEnableAds(true)
-                if (this.maxNativeView != null) {
-                    bindMaxContentAd()
+                AdsConstants.AD_MOB -> {
+                    this.onNativeAdListener!!.isEnableAds(true)
+                    if (this.admobNativeAd != null) {
+                        bindAdmobContentAd()
+                    }
+                    selectAdmobAd()
                 }
-                selectMaxAd()
+
+                AdsConstants.MAX_MEDIATION -> {
+                    this.onNativeAdListener!!.isEnableAds(true)
+                    if (this.maxNativeView != null) {
+                        bindMaxContentAd()
+                    }
+                    selectMaxAd()
+                }
             }
+        } catch (error: Exception) {
+            this.onNativeAdListener!!.onError(error = "showNativeAds Error : ${error.localizedMessage}")
         }
     }
 
@@ -218,227 +231,243 @@ class MediationNativeAd(
         nativeAd: NativeAd,
         unifiedAdBinding: CustomNativeBinding
     ) {
-        itemView.addView(unifiedAdBinding.root)
-        val nativeAdView = unifiedAdBinding.root
-        nativeAdView.mediaView = unifiedAdBinding.adMedia
-        nativeAdView.headlineView = unifiedAdBinding.adHeadline
-        nativeAdView.bodyView = unifiedAdBinding.adBody
-        nativeAdView.callToActionView = unifiedAdBinding.adCallToAction
-        nativeAdView.iconView = unifiedAdBinding.adAppIcon
-        nativeAdView.priceView = unifiedAdBinding.adPrice
-        nativeAdView.starRatingView = unifiedAdBinding.adStars
-        nativeAdView.storeView = unifiedAdBinding.adStore
-        nativeAdView.advertiserView = unifiedAdBinding.adAdvertiser
-        unifiedAdBinding.adHeadline.text = nativeAd.headline
-        nativeAd.mediaContent?.let { unifiedAdBinding.adMedia.mediaContent = it }
-        if (nativeAd.callToAction == null) {
-            unifiedAdBinding.adCallToAction.gone()
-        } else {
-            unifiedAdBinding.adCallToAction.visible()
-            unifiedAdBinding.adCallToAction.text = nativeAd.callToAction
-        }
+        try {
+            itemView.addView(unifiedAdBinding.root)
+            val nativeAdView = unifiedAdBinding.root
+            nativeAdView.mediaView = unifiedAdBinding.adMedia
+            nativeAdView.headlineView = unifiedAdBinding.adHeadline
+            nativeAdView.bodyView = unifiedAdBinding.adBody
+            nativeAdView.callToActionView = unifiedAdBinding.adCallToAction
+            nativeAdView.iconView = unifiedAdBinding.adAppIcon
+            nativeAdView.priceView = unifiedAdBinding.adPrice
+            nativeAdView.starRatingView = unifiedAdBinding.adStars
+            nativeAdView.storeView = unifiedAdBinding.adStore
+            nativeAdView.advertiserView = unifiedAdBinding.adAdvertiser
+            unifiedAdBinding.adHeadline.text = nativeAd.headline
+            nativeAd.mediaContent?.let { unifiedAdBinding.adMedia.mediaContent = it }
+            if (nativeAd.callToAction == null) {
+                unifiedAdBinding.adCallToAction.gone()
+            } else {
+                unifiedAdBinding.adCallToAction.visible()
+                unifiedAdBinding.adCallToAction.text = nativeAd.callToAction
+            }
 
-        if (nativeAd.icon == null) {
-            unifiedAdBinding.adAppIcon.gone()
-        } else {
-            unifiedAdBinding.adAppIcon.setImageDrawable(nativeAd.icon?.drawable)
-            unifiedAdBinding.adAppIcon.visible()
-        }
+            if (nativeAd.icon == null) {
+                unifiedAdBinding.adAppIcon.gone()
+            } else {
+                unifiedAdBinding.adAppIcon.setImageDrawable(nativeAd.icon?.drawable)
+                unifiedAdBinding.adAppIcon.visible()
+            }
 
-        if (nativeAd.price == null) {
-            unifiedAdBinding.adPrice.gone()
-        } else {
-            unifiedAdBinding.adPrice.visible()
-            unifiedAdBinding.adPrice.text = nativeAd.price
-        }
-        if (nativeAd.store == null) {
-            unifiedAdBinding.adStore.gone()
-        } else {
-            unifiedAdBinding.adStore.visible()
-            unifiedAdBinding.adStore.text = nativeAd.store
-        }
-        if (nativeAd.starRating == null) {
-            unifiedAdBinding.adStars.gone()
-        } else {
-            unifiedAdBinding.adStars.rating = nativeAd.starRating!!.toFloat()
-            unifiedAdBinding.adStars.visible()
-        }
-        if (nativeAd.advertiser == null) {
-            unifiedAdBinding.adAdvertiser.gone()
-        } else {
-            unifiedAdBinding.adAdvertiser.text = nativeAd.advertiser
-            unifiedAdBinding.adAdvertiser.visible()
-        }
-        nativeAdView.setNativeAd(nativeAd)
-        val vc = nativeAd.mediaContent?.videoController
-        if (vc != null && vc.hasVideoContent()) {
-            vc.videoLifecycleCallbacks =
-                object : VideoController.VideoLifecycleCallbacks() {
-                    @SuppressLint("SetTextI18n")
-                    override fun onVideoEnd() {
-                        onLoadAdError("Video status: Video playback has ended.")
-                        super.onVideoEnd()
+            if (nativeAd.price == null) {
+                unifiedAdBinding.adPrice.gone()
+            } else {
+                unifiedAdBinding.adPrice.visible()
+                unifiedAdBinding.adPrice.text = nativeAd.price
+            }
+            if (nativeAd.store == null) {
+                unifiedAdBinding.adStore.gone()
+            } else {
+                unifiedAdBinding.adStore.visible()
+                unifiedAdBinding.adStore.text = nativeAd.store
+            }
+            if (nativeAd.starRating == null) {
+                unifiedAdBinding.adStars.gone()
+            } else {
+                unifiedAdBinding.adStars.rating = nativeAd.starRating!!.toFloat()
+                unifiedAdBinding.adStars.visible()
+            }
+            if (nativeAd.advertiser == null) {
+                unifiedAdBinding.adAdvertiser.gone()
+            } else {
+                unifiedAdBinding.adAdvertiser.text = nativeAd.advertiser
+                unifiedAdBinding.adAdvertiser.visible()
+            }
+            nativeAdView.setNativeAd(nativeAd)
+            val vc = nativeAd.mediaContent?.videoController
+            if (vc != null && vc.hasVideoContent()) {
+                vc.videoLifecycleCallbacks =
+                    object : VideoController.VideoLifecycleCallbacks() {
+                        @SuppressLint("SetTextI18n")
+                        override fun onVideoEnd() {
+                            onLoadAdError("Video status: Video playback has ended.")
+                            super.onVideoEnd()
+                        }
                     }
-                }
-        } else {
-            onLoadAdError("Video status: Ad does not contain a video asset.")
+            } else {
+                onLoadAdError("Video status: Ad does not contain a video asset.")
+            }
+        } catch (error: Exception) {
+            this.onNativeAdListener!!.onError(error = "showNativeAds Error : ${error.localizedMessage}")
         }
     }
 
 
     private fun selectAdmobAd() {
-        if (this.admobKey!!.isEmpty() || this.admobKey!!.isBlank()) {
-            onLoadAdError("Empty is found")
-            return
-        }
-        if (AdsApplication.isAdmobInLimit()) {
-            if (AdsApplication.applyLimitOnAdmob) {
-                onLoadAdError("Native admob banned due to admob in limit")
+        try {
+            if (this.admobKey!!.isEmpty() || this.admobKey!!.isBlank()) {
+                onLoadAdError("Empty is found")
                 return
             }
-        }
-        if (AdsUtils.isOnline(this.activity).not()) {
-            logD("is Offline ")
-            itemView.gone()
-            this.onNativeAdListener!!.isOffline(true)
-            return
-        }
-        if (this.admobKey == AdsConstants.TEST_ADMOB_NATIVE_ID) {
-            logD("Test Ids")
-            if (AdsConstants.testMode.not()) {
-                logD("NULL OR TEST IDS FOUND")
-                this.onNativeAdListener!!.onError("NULL OR TEST IDS FOUND")
+            if (AdsApplication.isAdmobInLimit()) {
+                if (AdsApplication.applyLimitOnAdmob) {
+                    onLoadAdError("Native admob banned due to admob in limit")
+                    return
+                }
+            }
+            if (AdsUtils.isOnline(this.activity).not()) {
+                logD("is Offline ")
+                itemView.gone()
+                this.onNativeAdListener!!.isOffline(true)
                 return
             }
+            if (this.admobKey == AdsConstants.TEST_ADMOB_NATIVE_ID) {
+                logD("Test Ids")
+                if (AdsConstants.testMode.not()) {
+                    logD("NULL OR TEST IDS FOUND")
+                    this.onNativeAdListener!!.onError("NULL OR TEST IDS FOUND")
+                    return
+                }
+            }
+            val builder = AdLoader.Builder(activity, this.admobKey!!)
+            builder.forNativeAd { nativeAd ->
+                var activityDestroyed: Boolean = false
+                activityDestroyed = activity.isDestroyed
+                if (activityDestroyed || activity.isFinishing || activity.isChangingConfigurations) {
+                    nativeAd.destroy()
+                    return@forNativeAd
+                }
+                this.admobNativeAd?.destroy()
+                this.admobNativeAd = nativeAd
+                bindAdmobContentAd()
+            }
+            val videoOptions = VideoOptions.Builder().setStartMuted(true).build()
+            val adOption = NativeAdOptions.Builder().setVideoOptions(videoOptions).build()
+            builder.withNativeAdOptions(adOption)
+            val adLoader = builder.withAdListener(object : AdListener() {
+                override fun onAdFailedToLoad(errorCode: LoadAdError) {
+                    super.onAdFailedToLoad(errorCode)
+                    onLoadAdError(errorCode.message)
+                    AdsConstants.admobRequestNativeFailed++
+                    if (AdsApplication.isAdmobInLimit()) {
+                        AdsApplication.applyLimitOnAdmob = true
+                    }
+                }
+
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+                    if (onNativeAdListener != null) {
+                        onNativeAdListener!!.onLoaded(AdsConstants.AD_MOB)
+                    }
+                }
+
+                override fun onAdOpened() {
+                    super.onAdOpened()
+                    if (onNativeAdListener != null) {
+                        onNativeAdListener!!.onAdClicked(AdsConstants.AD_MOB)
+                    }
+                }
+
+                override fun onAdClicked() {
+                    super.onAdClicked()
+                    if (onNativeAdListener != null) {
+                        onNativeAdListener!!.onAdClicked(AdsConstants.AD_MOB)
+                    }
+                }
+            }).build()
+            AdsConstants.adMobNativeAdLoad++
+            adLoader.loadAd(AdsApplication.getAdRequest())
+        } catch (error: Exception) {
+            this.onNativeAdListener!!.onError(error = "showNativeAds Error : ${error.localizedMessage}")
         }
-        val builder = AdLoader.Builder(activity, this.admobKey!!)
-        builder.forNativeAd { nativeAd ->
-            var activityDestroyed: Boolean = false
-            activityDestroyed = activity.isDestroyed
-            if (activityDestroyed || activity.isFinishing || activity.isChangingConfigurations) {
-                nativeAd.destroy()
-                return@forNativeAd
-            }
-            this.admobNativeAd?.destroy()
-            this.admobNativeAd = nativeAd
-            bindAdmobContentAd()
-        }
-        val videoOptions = VideoOptions.Builder().setStartMuted(true).build()
-        val adOption = NativeAdOptions.Builder().setVideoOptions(videoOptions).build()
-        builder.withNativeAdOptions(adOption)
-        val adLoader = builder.withAdListener(object : AdListener() {
-            override fun onAdFailedToLoad(errorCode: LoadAdError) {
-                super.onAdFailedToLoad(errorCode)
-                onLoadAdError(errorCode.message)
-                AdsConstants.admobRequestNativeFailed++
-                if (AdsApplication.isAdmobInLimit()) {
-                    AdsApplication.applyLimitOnAdmob = true
-                }
-            }
-
-            override fun onAdLoaded() {
-                super.onAdLoaded()
-                if (onNativeAdListener != null) {
-                    onNativeAdListener!!.onLoaded(AdsConstants.AD_MOB)
-                }
-            }
-
-            override fun onAdOpened() {
-                super.onAdOpened()
-                if (onNativeAdListener != null) {
-                    onNativeAdListener!!.onAdClicked(AdsConstants.AD_MOB)
-                }
-            }
-
-            override fun onAdClicked() {
-                super.onAdClicked()
-                if (onNativeAdListener != null) {
-                    onNativeAdListener!!.onAdClicked(AdsConstants.AD_MOB)
-                }
-            }
-        }).build()
-        AdsConstants.adMobNativeAdLoad++
-        adLoader.loadAd(AdsApplication.getAdRequest())
     }
 
     private fun bindMaxContentAd() {
-        val binder: MaxNativeAdViewBinder =
-            MaxNativeAdViewBinder.Builder(R.layout.max_native_ad_layout)
-                .setTitleTextViewId(R.id.title_text_view)
-                .setBodyTextViewId(R.id.body_text_view)
-                .setAdvertiserTextViewId(R.id.advertiser_textView)
-                .setIconImageViewId(R.id.icon_image_view)
-                .setMediaContentViewGroupId(R.id.media_view_container)
-                .setOptionsContentViewGroupId(R.id.options_view)
-                .setCallToActionButtonId(R.id.cta_button)
-                .build()
-        maxNativeView = MaxNativeAdView(binder, activity)
+        try {
+            val binder: MaxNativeAdViewBinder =
+                MaxNativeAdViewBinder.Builder(R.layout.max_native_ad_layout)
+                    .setTitleTextViewId(R.id.title_text_view)
+                    .setBodyTextViewId(R.id.body_text_view)
+                    .setAdvertiserTextViewId(R.id.advertiser_textView)
+                    .setIconImageViewId(R.id.icon_image_view)
+                    .setMediaContentViewGroupId(R.id.media_view_container)
+                    .setOptionsContentViewGroupId(R.id.options_view)
+                    .setCallToActionButtonId(R.id.cta_button)
+                    .build()
+            maxNativeView = MaxNativeAdView(binder, activity)
+        } catch (error: Exception) {
+            this.onNativeAdListener!!.onError(error = "showNativeAds Error : ${error.localizedMessage}")
+        }
     }
 
     private fun selectMaxAd() {
-        if (this.maxKey!!.isEmpty() || this.maxKey!!.isBlank()) {
-            onLoadAdError("Empty is found")
-            return
-        }
-        if (AdsUtils.isOnline(this.activity).not()) {
-            logD("is Offline ")
-            itemView.gone()
-            this.onNativeAdListener!!.isOffline(true)
-            return
-        }
-        if (this.maxKey == AdsConstants.TEST_MAX_Native_ADS_ID) {
-            logD("Test Ids")
-            if (AdsConstants.testMode.not()) {
-                logD("NULL OR TEST IDS FOUND")
-                this.onNativeAdListener!!.onError("NULL OR TEST IDS FOUND")
+        try {
+            if (this.maxKey!!.isEmpty() || this.maxKey!!.isBlank()) {
+                onLoadAdError("Empty is found")
                 return
             }
-        }
-        bindMaxContentAd()
-        nativeAdLoader = MaxNativeAdLoader(this.maxKey!!, activity)
-        nativeAdLoader!!.setRevenueListener { ad ->
-            val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
-            adjustAdRevenue.setRevenue(ad?.revenue, "USD")
-            adjustAdRevenue.setAdRevenueNetwork(ad?.networkName)
-            adjustAdRevenue.setAdRevenueUnit(ad?.adUnitId)
-            adjustAdRevenue.setAdRevenuePlacement(ad?.placement)
-            Adjust.trackAdRevenue(adjustAdRevenue)
-        }
-
-        nativeAdLoader!!.setNativeAdListener(object : MaxNativeAdListener() {
-            override fun onNativeAdLoaded(p0: MaxNativeAdView?, ad: MaxAd?) {
-                super.onNativeAdLoaded(p0, ad)
-                if (nativeAd != null) {
-                    nativeAdLoader!!.destroy(nativeAd)
-                }
-                nativeAd = ad
-                itemView.removeAllViews()
-                itemView.addView(p0)
-                onNativeAdListener!!.onLoaded(AdsConstants.MAX_MEDIATION)
-            }
-
-            override fun onNativeAdLoadFailed(p0: String?, p1: MaxError?) {
-                super.onNativeAdLoadFailed(p0, p1)
+            if (AdsUtils.isOnline(this.activity).not()) {
+                logD("is Offline ")
                 itemView.gone()
-                onNativeAdListener!!.onError(p1!!.message)
+                this.onNativeAdListener!!.isOffline(true)
+                return
+            }
+            if (this.maxKey == AdsConstants.TEST_MAX_Native_ADS_ID) {
+                logD("Test Ids")
+                if (AdsConstants.testMode.not()) {
+                    logD("NULL OR TEST IDS FOUND")
+                    this.onNativeAdListener!!.onError("NULL OR TEST IDS FOUND")
+                    return
+                }
+            }
+            bindMaxContentAd()
+            nativeAdLoader = MaxNativeAdLoader(this.maxKey!!, activity)
+            nativeAdLoader!!.setRevenueListener { ad ->
+                val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
+                adjustAdRevenue.setRevenue(ad?.revenue, "USD")
+                adjustAdRevenue.setAdRevenueNetwork(ad?.networkName)
+                adjustAdRevenue.setAdRevenueUnit(ad?.adUnitId)
+                adjustAdRevenue.setAdRevenuePlacement(ad?.placement)
+                Adjust.trackAdRevenue(adjustAdRevenue)
             }
 
-            override fun onNativeAdExpired(p0: MaxAd?) {
-                super.onNativeAdExpired(p0)
-            }
+            nativeAdLoader!!.setNativeAdListener(object : MaxNativeAdListener() {
+                override fun onNativeAdLoaded(p0: MaxNativeAdView?, ad: MaxAd?) {
+                    super.onNativeAdLoaded(p0, ad)
+                    if (nativeAd != null) {
+                        nativeAdLoader!!.destroy(nativeAd)
+                    }
+                    nativeAd = ad
+                    itemView.removeAllViews()
+                    itemView.addView(p0)
+                    onNativeAdListener!!.onLoaded(AdsConstants.MAX_MEDIATION)
+                }
 
-            override fun onNativeAdClicked(p0: MaxAd?) {
-                super.onNativeAdClicked(p0)
-                onNativeAdListener!!.onAdClicked(AdsConstants.MAX_MEDIATION)
-            }
-        })
-        nativeAdLoader!!.loadAd(maxNativeView)
+                override fun onNativeAdLoadFailed(p0: String?, p1: MaxError?) {
+                    super.onNativeAdLoadFailed(p0, p1)
+                    itemView.gone()
+                    onNativeAdListener!!.onError(p1!!.message)
+                }
+
+                override fun onNativeAdExpired(p0: MaxAd?) {
+                    super.onNativeAdExpired(p0)
+                }
+
+                override fun onNativeAdClicked(p0: MaxAd?) {
+                    super.onNativeAdClicked(p0)
+                    onNativeAdListener!!.onAdClicked(AdsConstants.MAX_MEDIATION)
+                }
+            })
+            nativeAdLoader!!.loadAd(maxNativeView)
+        } catch (error: Exception) {
+            this.onNativeAdListener!!.onError(error = "showNativeAds Error : ${error.localizedMessage}")
+        }
     }
 
 
     private fun onLoadAdError(error: String) {
         if (this.onNativeAdListener != null) {
-            this.onNativeAdListener!!.onError(error)
+            this.onNativeAdListener!!.onError("showNativeAds Error : $error")
         }
     }
 }

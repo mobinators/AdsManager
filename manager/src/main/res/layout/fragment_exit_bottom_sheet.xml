@@ -63,27 +63,6 @@
             app:layout_constraintVertical_bias="0">
 
             <Button
-                android:id="@+id/exitButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_10sdp"
-                android:layout_weight="0.9"
-                android:text="@string/exit_"
-                android:textAllCaps="false"
-                android:textColor="@color/menuColor"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/exitText"
-                app:layout_constraintVertical_bias="0" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="5dp"
-                android:layout_weight="0.2" />
-
-            <Button
                 android:id="@+id/cancelButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -91,14 +70,22 @@
                 android:layout_weight="0.9"
                 android:text="@string/cancel"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/exitButton"
-                app:layout_constraintTop_toBottomOf="@id/exitText"
-                app:layout_constraintVertical_bias="0" />
+                android:textColor="@color/white" />
 
+            <View
+                android:layout_width="0dp"
+                android:layout_height="5dp"
+                android:layout_weight="0.2" />
 
+            <Button
+                android:id="@+id/exitButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_weight="0.9"
+                android:text="@string/exit_"
+                android:textAllCaps="false"
+                android:textColor="@color/menuColor" />
         </LinearLayout>
 
         <FrameLayout

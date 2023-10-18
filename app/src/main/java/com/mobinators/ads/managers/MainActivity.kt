@@ -1,6 +1,7 @@
 package com.mobinators.ads.managers
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import com.facebook.ads.AdView
@@ -17,6 +18,7 @@ import com.mobinators.ads.manager.ui.commons.listener.OnNativeAdListener
 import com.mobinators.ads.manager.ui.commons.listener.OnRewardedAdListener
 import com.mobinators.ads.manager.ui.commons.listener.OpenAddCallback
 import com.mobinators.ads.manager.ui.commons.listener.PanelListener
+import com.mobinators.ads.manager.ui.commons.listener.PurchaseCallBack
 import com.mobinators.ads.manager.ui.commons.models.InAppPurchasedModel
 import com.mobinators.ads.manager.ui.commons.models.PanelModel
 import com.mobinators.ads.manager.ui.commons.nativeBanner.MediationNativeBanner
@@ -24,6 +26,8 @@ import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAd
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
+import com.mobinators.ads.manager.ui.commons.states.SubscriptionState
+import com.mobinators.ads.manager.ui.commons.utils.AppPurchaseUtils
 import com.mobinators.ads.manager.ui.commons.utils.ConnectionState
 import com.mobinators.ads.manager.ui.commons.utils.DeviceInfoUtils
 import com.mobinators.ads.manager.ui.commons.utils.InAppPurchaseUtils
@@ -54,7 +58,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
         mediationNativeAd = MediationNativeAd(this, false, binding.adContainer, true)
         logD("Device Info : ${DeviceInfoUtils.getDeviceInfo()}")
         inAppPurchased()
-
     }
 
     override fun onClick(itemId: View?) {
@@ -157,7 +160,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     }
 
     private fun rewardedAds() {
-        MediationRewardedAd.loadRewardedAd(this, object : OnRewardedAdListener {
+        MediationRewardedAd.loadRewardedAd(this, false, object : OnRewardedAdListener {
             override fun onError(error: String) {
                 logD("MainActivity onError Error : $error")
             }
@@ -191,7 +194,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
 
     private fun rewardedInterstitialAds() {
         MediationRewardedInterstitialAd.loadRewardedInterstitialAd(
-            this,
+            this, false,
             object : OnRewardedAdListener {
                 override fun onError(error: String) {
                     logD("MainActivity onError Error : $error")
@@ -224,7 +227,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     }
 
     private fun openAds() {
-        MediationOpenAd.loadAppOpenAd(this, object : OpenAddCallback {
+        MediationOpenAd.loadAppOpenAd(this, false, object : OpenAddCallback {
             override fun onDismissClick() {
                 logD("MainActivity onDismissClick")
             }
@@ -350,6 +353,35 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                 })
         inAppPurchaseUtils!!.startConnection()
         inAppPurchaseUtils!!.getSubscriptionInfo()
+
+       /* ----------------------------------OR-----------------------------  */
+
+//        AppPurchaseUtils.startConnection(this, "base64_key_example", object : PurchaseCallBack {
+//            override fun onPurchaseState(state: SubscriptionState) {
+//                when (state) {
+//                    is SubscriptionState.AlReadySubscribe -> Log.d("Tag", "onPurchaseState: AlReadySubscribe ")
+//                    is SubscriptionState.PendingSubscribe -> Log.d("Tag", "onPurchaseState: PendingSubscribe ")
+//                    is SubscriptionState.ProductDetail ->{
+//                        Log.d("Tag", "onPurchaseState: ProductDetail : ${state.model} ")
+//                        val productDetail=state.model
+//
+//                    }
+//                    is SubscriptionState.Subscribed ->  Log.d("Tag", "onPurchaseState: Subscribed: ${state.isSuccess} ")
+//                    is SubscriptionState.SubscriptionFailure ->  Log.d("Tag", "onPurchaseState: SubscriptionFailure : ${state.error} ")
+//                    is SubscriptionState.SubscriptionFinished -> {
+//                        Log.d("Tag", "onPurchaseState: SubscriptionFinished ${state.isPremium} ")
+//
+//                    }
+//                    is SubscriptionState.UnspecifiedState ->  Log.d("Tag", "onPurchaseState: UnspecifiedState ")
+//                }
+//            }
+//        })
+//
+//        AppPurchaseUtils.startSubscription("product_id_example")
+//        AppPurchaseUtils.getSubscriptionInfo("product_id_example")
+
+
+
     }
 
     override fun onBackPressed() {
@@ -376,9 +408,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
         })
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         inAppPurchaseUtils!!.disConnected()
+
+        /* ----------------------------------OR-----------------------------  */
+
+//        AppPurchaseUtils.disConnected()
     }
 }

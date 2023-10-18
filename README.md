@@ -14,7 +14,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.0.2'
+  implementation 'com.github.mobinators:AdsManager:1.0.4'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -201,7 +201,7 @@
 -> Reward Ads setup
 
 ```
-   MediationRewardedAd.loadRewardedAd(this, object : OnRewardedAdListener {
+   MediationRewardedAd.loadRewardedAd(this, false,  object : OnRewardedAdListener {
             override fun onError(error: String) {
                 logD("MainActivity onError Error : $error")
             }
@@ -238,6 +238,7 @@
 ```
     MediationRewardedInterstitialAd.loadRewardedInterstitialAd(
             this,
+            false,
             object : OnRewardedAdListener {
                 override fun onError(error: String) {
                     logD("MainActivity onError Error : $error")
@@ -272,7 +273,7 @@
 -> App Open Ads setup
 
 ```
-   MediationOpenAd.loadAppOpenAd(this, object : OpenAddCallback {
+   MediationOpenAd.loadAppOpenAd(this, false, object : OpenAddCallback {
             override fun onDismissClick() {
                 logD("MainActivity onDismissClick")
             }
@@ -366,6 +367,47 @@
 
 
       inAppPurchaseUtils!!.startSubSubscription() // SubScription 
+      
+      
+      
+      
+      ----------------------------------OR----------------------------- 
+                       
+                       
+      AppPurchaseUtils.startConnection(this, "base64_key_example", object : PurchaseCallBack {
+            override fun onPurchaseState(state: SubscriptionState) {
+                when (state) {
+                    is SubscriptionState.AlReadySubscribe -> Log.d("Tag", "onPurchaseState: AlReadySubscribe ")
+                    is SubscriptionState.PendingSubscribe -> Log.d("Tag", "onPurchaseState: PendingSubscribe ")
+                    is SubscriptionState.ProductDetail ->{
+                        Log.d("Tag", "onPurchaseState: ProductDetail : ${state.model} ")
+                        val productDetail=state.model  // Detail for Subscription
+                
+                    }
+                    is SubscriptionState.Subscribed ->  Log.d("Tag", "onPurchaseState: Subscribed: ${state.isSuccess} ")
+                    is SubscriptionState.SubscriptionFailure ->  Log.d("Tag", "onPurchaseState: SubscriptionFailure : ${state.error} ")
+                    is SubscriptionState.SubscriptionFinished -> {
+                        Log.d("Tag", "onPurchaseState: SubscriptionFinished ${state.isPremium} ")
+                      
+                    }
+                    is SubscriptionState.UnspecifiedState ->  Log.d("Tag", "onPurchaseState: UnspecifiedState ")
+                }
+            }
+        })
+        
+        
+        // Subscription 
+        AppPurchaseUtils.startSubscription("product_id_example)
+         
+         // info for Subcription
+        AppPurchaseUtils.getSubscriptionInfo("product_id_example")
+         
+         
+         // Disconnect 
+        AppPurchaseUtils.disConnected()
+         
+     
+     
 ```
 
 -> Exit Panel

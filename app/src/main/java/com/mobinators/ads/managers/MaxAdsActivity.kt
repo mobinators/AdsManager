@@ -76,6 +76,7 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
                 override fun isEnableAds(isAds: Boolean) {
                     logD("MaxAdsActivity isEnableAds : $isAds")
                 }
+
                 override fun isOffline(offline: Boolean) {
                     logD("Ads is Offline : $offline")
                 }
@@ -99,6 +100,7 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             override fun isEnableAds(isAds: Boolean) {
                 logD("MaxAdsActivity isEnableAds : $isAds")
             }
+
             override fun isOffline(offline: Boolean) {
                 logD("Ads is Offline : $offline")
             }
@@ -126,6 +128,7 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
                 override fun isEnableAds(isAds: Boolean) {
                     logD("MaxAdsActivity isEnableAds : $isAds")
                 }
+
                 override fun isOffline(offline: Boolean) {
                     logD("Ads is Offline : $offline")
                 }
@@ -138,7 +141,7 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
     }
 
     private fun rewardedAds() {
-        MediationRewardedAd.loadRewardedAd(this, object : OnRewardedAdListener {
+        MediationRewardedAd.loadRewardedAd(this, false, object : OnRewardedAdListener {
             override fun onError(error: String) {
                 logD("MaxAdsActivity onError Error : $error")
             }
@@ -162,6 +165,7 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             override fun isEnableAds(isAds: Boolean) {
                 logD("MaxAdsActivity isEnableAds : $isAds")
             }
+
             override fun isOffline(offline: Boolean) {
                 logD("Ads is Offline : $offline")
             }
@@ -193,6 +197,7 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             override fun isEnableAds(isAds: Boolean) {
                 logD("MaxAdsActivity isEnableAds : $isAds")
             }
+
             override fun isOffline(offline: Boolean) {
                 logD("Ads is Offline : $offline")
             }
@@ -200,7 +205,7 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
     }
 
     private fun openAds() {
-        MediationOpenAd.loadAppOpenAd(this, object : OpenAddCallback {
+        MediationOpenAd.loadAppOpenAd(this, false, object : OpenAddCallback {
             override fun onDismissClick() {
                 logD("MaxAdsActivity onDismissClick")
             }
@@ -212,6 +217,7 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             override fun isEnableAds(isAds: Boolean) {
                 logD("MaxAdsActivity isEnableAds : $isAds")
             }
+
             override fun isOffline(offline: Boolean) {
                 logD("Ads is Offline : $offline")
             }
