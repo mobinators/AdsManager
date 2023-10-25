@@ -3,7 +3,6 @@ package com.mobinators.ads.manager.ui.commons.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.util.Log
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
 import com.android.billingclient.api.BillingClient
@@ -16,67 +15,297 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.ImmutableList
-import com.mobinators.ads.manager.ui.commons.listener.PurchaseCallBack
-import com.mobinators.ads.manager.ui.commons.states.SubscriptionState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import pak.developer.app.managers.extensions.logD
 import java.io.IOException
 import java.util.concurrent.Executors
 
 
 @SuppressLint("StaticFieldLeak")
 object AppPurchaseUtils {
-    data class PurchaseModel(
-        var productName: String? = null,
-        var price: String? = null,
-        var desc: String? = null,
-        var duration: String? = null,
-        var phases: String? = null
-    )
-
-    private var isConnection: Boolean = false
-    private var base64Key: String? = null
-    private var purchaseListener: PurchaseCallBack? = null
-    private var activity: Activity? = null
+    private var isSuccess = false
     private var billingClient: BillingClient? = null
-    private var purchaseModel: PurchaseModel? = null
-
-    fun startConnection(activity: Activity, base64Key: String, listener: PurchaseCallBack) {
-        isConnection = true
+    private var activity: Activity? = null
+    private var base64Key: String? = null
+    private var listener: BillingCallback? = null
+    fun initConnection(activity: Activity, base64Key: String, listener: BillingCallback) {
+        this.listener = listener
         this.activity = activity
         this.base64Key = base64Key
-        this.purchaseListener = listener
-        try {
-            billingClient = BillingClient.newBuilder(activity).setListener(purchasesUpdatedListener)
-                .enablePendingPurchases().build()
-        } catch (error: Exception) {
-            this.purchaseListener!!.onPurchaseState(
-                state = SubscriptionState.SubscriptionFailure(
-                    error = error.localizedMessage ?: "Unexpected Error"
-                )
-            )
+        if (AdsUtils.isOnline(activity).not()) {
+            this.listener!!.onRequiredNetwork()
+            return
+        }
+        billingClient = BillingClient.newBuilder(activity)
+            .setListener(purchasesUpdatedListener)
+            .enablePendingPurchases()
+            .build()
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    private val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, purchases ->
+        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+            for (purchase in purchases) {
+                handlePurchase(purchase)
+            }
+        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
+            logD("Already Subscribed")
+            isSuccess = true
+            this.listener!!.onSubscribe(isSuccess, true, false)
+        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED) {
+            logD("FEATURE_NOT_SUPPORTED")
+            this.listener!!.onError("FEATURE_NOT_SUPPORTED")
+        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.BILLING_UNAVAILABLE) {
+            logD("BILLING_UNAVAILABLE")
+            this.listener!!.onError("BILLING_UNAVAILABLE")
+        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+            logD("USER_CANCELED")
+            this.listener!!.onError("USER_CANCELED")
+        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.DEVELOPER_ERROR) {
+            logD("DEVELOPER_ERROR")
+            this.listener!!.onError("DEVELOPER_ERROR")
+        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_UNAVAILABLE) {
+            logD("ITEM_UNAVAILABLE")
+            this.listener!!.onError("ITEM_UNAVAILABLE")
+        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.NETWORK_ERROR) {
+            logD("NETWORK_ERROR")
+            this.listener!!.onError("NETWORK_ERROR")
+        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.SERVICE_DISCONNECTED) {
+            logD("SERVICE_DISCONNECTED")
+            this.listener!!.onError("SERVICE_DISCONNECTED")
+        } else {
+            this.listener!!.onError("Error : ${billingResult.debugMessage}")
         }
     }
 
-    fun startSubscription(productId: String) {
-        try {
-            if (this.isConnection.not()) {
-
-                this.purchaseListener!!.onPurchaseState(
-                    state = SubscriptionState.SubscriptionFailure(
-                        error = "startSubscription Calling first startConnection Method"
+    @SuppressLint("SetTextI18n")
+    private fun handlePurchase(purchase: Purchase) {
+        val consumeParams = ConsumeParams.newBuilder()
+            .setPurchaseToken(purchase.purchaseToken)
+            .build()
+        val listener = ConsumeResponseListener { billingResult: BillingResult, _: String? ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                logD("handlePurchase")
+            }
+        }
+        billingClient!!.consumeAsync(consumeParams, listener)
+        when (purchase.purchaseState) {
+            Purchase.PurchaseState.PURCHASED -> {
+                if (!verifyValidSignature(purchase.originalJson, purchase.signature)) {
+                    this.listener!!.onError("Error : invalid Purchase")
+                    return
+                }
+                if (!purchase.isAcknowledged) {
+                    val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+                        .setPurchaseToken(purchase.purchaseToken)
+                        .build()
+                    billingClient!!.acknowledgePurchase(
+                        acknowledgePurchaseParams,
+                        acknowledgePurchaseResponseListener
                     )
-                )
-                return
+                    logD("Subscribed")
+                    isSuccess = true
+                } else {
+                    logD("Already Subscribed")
+                }
+                this.listener!!.onSubscribe(isSuccess, true, false)
             }
 
+            Purchase.PurchaseState.PENDING -> {
+                logD("Subscription Pending")
+                this.listener!!.onError("Subscription Pending")
+            }
+
+            Purchase.PurchaseState.UNSPECIFIED_STATE -> {
+                logD("UNSPECIFIED_STATE")
+                this.listener!!.onError("UNSPECIFIED_STATE")
+            }
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private var acknowledgePurchaseResponseListener =
+        AcknowledgePurchaseResponseListener { billingResult ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                isSuccess = true
+                this.listener!!.onSubscribe(isSuccess, true, false)
+            }
+        }
+
+    private fun verifyValidSignature(signedData: String, signature: String): Boolean {
+        return try {
+            InAppSecurity.verifyPurchase(this.base64Key, signedData, signature)
+        } catch (e: IOException) {
+            false
+        }
+    }
+
+    suspend fun getSubscriptionInfo(
+        productId: String,
+        price: (String?) -> Unit,
+    ) {
+        var phases: String?
+        var des: String? = null
+        var dur: String? = null
+
+        if (AdsUtils.isOnline(this.activity!!).not()) {
+            this.listener!!.onRequiredNetwork()
+            return
+        }
+        withContext(Dispatchers.IO) {
+
             billingClient!!.startConnection(object : BillingClientStateListener {
-                override fun onBillingServiceDisconnected() {
-                    purchaseListener!!.onPurchaseState(
-                        state = SubscriptionState.SubscriptionFailure(
-                            error = "onBillingServiceDisconnected calling "
-                        )
-                    )
+                @SuppressLint("CheckResult", "SetTextI18n")
+                override fun onBillingSetupFinished(billingResult: BillingResult) {
+                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                        val executorService = Executors.newSingleThreadExecutor()
+                        executorService.execute {
+                            val queryProductDetailsParams = QueryProductDetailsParams.newBuilder()
+                                .setProductList(
+                                    ImmutableList.of(
+                                        QueryProductDetailsParams.Product.newBuilder()
+                                            .setProductId(productId)
+                                            .setProductType(BillingClient.ProductType.SUBS)
+                                            .build()
+                                    )
+                                )
+                                .build()
+                            billingClient!!.queryProductDetailsAsync(
+                                queryProductDetailsParams
+                            ) { _, productDetailsList ->
+                                for (productDetails in productDetailsList) {
+                                    val offerToken = productDetails.subscriptionOfferDetails
+                                        ?.get(0)?.offerToken
+                                    ImmutableList.of(
+                                        BillingFlowParams.ProductDetailsParams.newBuilder()
+                                            .setProductDetails(productDetails)
+                                            .setOfferToken(offerToken!!)
+                                            .build()
+                                    )
+                                    des = productDetails.description
+                                    val formattedPrice =
+                                        productDetails.subscriptionOfferDetails!![0].pricingPhases
+                                            .pricingPhaseList[0].formattedPrice
+                                    val billingPeriod =
+                                        productDetails.subscriptionOfferDetails!![0].pricingPhases
+                                            .pricingPhaseList[0].billingPeriod
+                                    val recurrenceMode =
+                                        productDetails.subscriptionOfferDetails!![0].pricingPhases
+                                            .pricingPhaseList[0].recurrenceMode
+                                    val bp: String = billingPeriod
+                                    val n: String = billingPeriod.substring(1, 2)
+                                    val duration: String = billingPeriod.substring(2, 3)
+                                    if (recurrenceMode == 2) {
+                                        when (duration) {
+                                            "M" -> {
+                                                dur = " For $n Month "
+                                            }
+
+                                            "Y" -> {
+                                                dur = " For $n Year "
+                                            }
+
+                                            "W" -> {
+                                                dur = " For $n Week "
+                                            }
+
+                                            "D" -> {
+                                                dur = " For $n Days "
+                                            }
+                                        }
+                                    } else {
+                                        when (bp) {
+                                            "P1M" -> {
+                                                dur = "/Monthly"
+                                            }
+
+                                            "P6M" -> {
+                                                dur = "/Every 6 Month"
+                                            }
+
+                                            "P1Y" -> {
+                                                dur = "/Yearly"
+                                            }
+
+                                            "P1W" -> {
+                                                dur = "/Weekly"
+                                            }
+
+                                            "P3W" -> {
+                                                dur = "/Every /3 Week"
+                                            }
+                                        }
+                                    }
+                                    phases = "$formattedPrice $dur"
+                                    for (i in 0..productDetails.subscriptionOfferDetails!![0].pricingPhases.pricingPhaseList.size) {
+                                        if (i > 0) {
+                                            val period =
+                                                productDetails.subscriptionOfferDetails!![0].pricingPhases
+                                                    .pricingPhaseList[i].billingPeriod
+                                            val price =
+                                                productDetails.subscriptionOfferDetails!![0].pricingPhases
+                                                    .pricingPhaseList[i].formattedPrice
+                                            when (period) {
+                                                "P1M" -> {
+                                                    dur = "/Monthly"
+                                                }
+
+                                                "P6M" -> {
+                                                    dur = "/Every 6 Month"
+                                                }
+
+                                                "P1Y" -> {
+                                                    dur = "/Yearly"
+                                                }
+
+                                                "P1W" -> {
+                                                    dur = "/Weekly"
+                                                }
+
+                                                "P3W" -> {
+                                                    dur = "/Every /3 Week"
+                                                }
+                                            }
+                                            phases += """
+                                            
+                                            $price$dur
+                                            """.trimIndent()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        activity!!.runOnUiThread {
+                            try {
+                                Thread.sleep(1000)
+                            } catch (e: InterruptedException) {
+                                e.printStackTrace()
+                            }
+                            price(des?.replace("\n\n", ""))
+                        }
+
+                    }
                 }
 
+                override fun onBillingServiceDisconnected() {}
+            })
+        }
+    }
+
+
+    suspend fun onSubscription(productId: String) {
+        if (AdsUtils.isOnline(this.activity!!).not()) {
+            this.listener!!.onRequiredNetwork()
+            return
+        }
+        withContext(Dispatchers.IO) {
+
+
+            billingClient!!.startConnection(object : BillingClientStateListener {
+                override fun onBillingServiceDisconnected() {}
                 override fun onBillingSetupFinished(billingResult: BillingResult) {
                     val queryProductDetailsParams =
                         QueryProductDetailsParams.newBuilder().setProductList(
@@ -103,290 +332,28 @@ object AppPurchaseUtils {
                             val billingFlowParams = BillingFlowParams.newBuilder()
                                 .setProductDetailsParamsList(productDetailsParamList)
                                 .build()
-                            billingClient!!.launchBillingFlow(activity!!, billingFlowParams)
-                        }
-                    }
-                }
-            })
-        } catch (error: Exception) {
-            this.purchaseListener!!.onPurchaseState(
-                state = SubscriptionState.SubscriptionFailure(
-                    error = error.localizedMessage ?: "Unexpected Error"
-                )
-            )
-        }
-    }
-
-    fun getSubscriptionInfo(productId: String) {
-        try {
-            if (this.isConnection.not()) {
-
-                this.purchaseListener!!.onPurchaseState(
-                    state = SubscriptionState.SubscriptionFailure(
-                        error = "getSubscriptionInfo Calling first startConnection Method"
-                    )
-                )
-                return
-            }
-            purchaseModel = PurchaseModel()
-            billingClient!!.startConnection(object : BillingClientStateListener {
-                @SuppressLint("CheckResult", "SetTextI18n")
-                override fun onBillingSetupFinished(billingResult: BillingResult) {
-                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                        val executorService = Executors.newSingleThreadExecutor()
-                        executorService.execute {
-                            val queryProductDetailsParams = QueryProductDetailsParams.newBuilder()
-                                .setProductList(
-                                    ImmutableList.of(
-                                        QueryProductDetailsParams.Product.newBuilder()
-                                            .setProductId(productId)
-                                            .setProductType(BillingClient.ProductType.SUBS)
-                                            .build()
-                                    )
-                                )
-                                .build()
-                            billingClient!!.queryProductDetailsAsync(
-                                queryProductDetailsParams
-                            ) { _, productDetailsList ->
-                                for (productDetails in productDetailsList) {
-                                    val offerToken = productDetails.subscriptionOfferDetails
-                                        ?.get(0)?.offerToken
-
-                                    ImmutableList.of(
-                                        BillingFlowParams.ProductDetailsParams.newBuilder()
-                                            .setProductDetails(productDetails)
-                                            .setOfferToken(offerToken!!)
-                                            .build()
-                                    )
-                                    purchaseModel!!.productName = productDetails.name
-                                    purchaseModel!!.desc = productDetails.description
-                                    val formattedPrice =
-                                        productDetails.subscriptionOfferDetails!![0].pricingPhases
-                                            .pricingPhaseList[0].formattedPrice
-                                    val billingPeriod =
-                                        productDetails.subscriptionOfferDetails!![0].pricingPhases
-                                            .pricingPhaseList[0].billingPeriod
-                                    val recurrenceMode =
-                                        productDetails.subscriptionOfferDetails!![0].pricingPhases
-                                            .pricingPhaseList[0].recurrenceMode
-                                    val bp: String = billingPeriod
-                                    val n: String = billingPeriod.substring(1, 2)
-                                    val duration: String = billingPeriod.substring(2, 3)
-                                    if (recurrenceMode == 2) {
-                                        purchaseModel!!.duration = when (duration) {
-                                            "M" -> {
-                                                " For $n Month "
-                                            }
-
-                                            "Y" -> {
-                                                " For $n Year "
-                                            }
-
-                                            "W" -> {
-                                                " For $n Week "
-                                            }
-
-                                            "D" -> {
-                                                " For $n Days "
-                                            }
-
-                                            else -> {
-                                                ""
-                                            }
-                                        }
-                                    } else {
-                                        purchaseModel!!.duration = when (bp) {
-                                            "P1M" -> {
-                                                "/Monthly"
-                                            }
-
-                                            "P6M" -> {
-                                                "/Every 6 Month"
-                                            }
-
-                                            "P1Y" -> {
-                                                "/Yearly"
-                                            }
-
-                                            "P1W" -> {
-                                                "/Weekly"
-                                            }
-
-                                            "P3W" -> {
-                                                "/Every /3 Week"
-                                            }
-
-                                            else -> {
-                                                ""
-                                            }
-                                        }
-                                    }
-                                    purchaseModel!!.phases =
-                                        "$formattedPrice ${purchaseModel!!.duration}"
-                                    for (i in 0..productDetails.subscriptionOfferDetails!![0].pricingPhases.pricingPhaseList.size) {
-                                        if (i > 0) {
-                                            val period =
-                                                productDetails.subscriptionOfferDetails!![0].pricingPhases
-                                                    .pricingPhaseList[i].billingPeriod
-                                            val price =
-                                                productDetails.subscriptionOfferDetails!![0].pricingPhases
-                                                    .pricingPhaseList[i].formattedPrice
-                                            purchaseModel!!.duration = when (period) {
-                                                "P1M" -> {
-                                                    "/Monthly"
-                                                }
-
-                                                "P6M" -> {
-                                                    "/Every 6 Month"
-                                                }
-
-                                                "P1Y" -> {
-                                                    "/Yearly"
-                                                }
-
-                                                "P1W" -> {
-                                                    "/Weekly"
-                                                }
-
-                                                "P3W" -> {
-                                                    "/Every /3 Week"
-                                                }
-
-                                                else -> {
-                                                    ""
-                                                }
-                                            }
-                                            purchaseModel!!.phases += """
-                                            $price${purchaseModel!!.duration}
-                                            """.trimIndent()
-
-                                            Log.d(
-                                                "Tag",
-                                                "onBillingSetupFinished: Price : ${purchaseModel!!.phases} "
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        purchaseListener!!.onPurchaseState(
-                            state = SubscriptionState.ProductDetail(
-                                purchaseModel!!
+                            billingClient!!.launchBillingFlow(
+                                activity!!,
+                                billingFlowParams
                             )
-                        )
+                        }
                     }
                 }
-
-                override fun onBillingServiceDisconnected() {
-                    purchaseListener!!.onPurchaseState(
-                        state = SubscriptionState.SubscriptionFailure(
-                            error = "onBillingServiceDisconnected calling "
-                        )
-                    )
-                }
             })
-
-        } catch (error: Exception) {
-            this.purchaseListener!!.onPurchaseState(
-                state = SubscriptionState.SubscriptionFailure(
-                    error = error.localizedMessage ?: "Unexpected Error"
-                )
-            )
         }
     }
 
-    fun disConnected() {
+    fun clientDestroy() {
         if (billingClient != null) {
             billingClient!!.endConnection()
         }
     }
 
-
-    private val purchasesUpdatedListener =
-        PurchasesUpdatedListener { billingResult, purchases ->
-            when (billingResult.responseCode) {
-                BillingClient.BillingResponseCode.OK -> {
-                    if (purchases != null) {
-                        for (purchase in purchases) {
-                            handlePurchase(purchase)
-                        }
-                    }
-                }
-            }
-        }
-
-    @SuppressLint("SetTextI18n")
-    private fun handlePurchase(purchase: Purchase) {
-        val consumeParams = ConsumeParams.newBuilder()
-            .setPurchaseToken(purchase.purchaseToken)
-            .build()
-        val listener = ConsumeResponseListener { billingResult: BillingResult, _: String? ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                Log.d("TAG", "handlePurchase")
-            }
-        }
-        billingClient!!.consumeAsync(consumeParams, listener)
-        when (purchase.purchaseState) {
-            Purchase.PurchaseState.PURCHASED -> {
-                if (!verifyValidSignature(purchase.originalJson, purchase.signature)) {
-                    purchaseListener!!.onPurchaseState(
-                        state = SubscriptionState.SubscriptionFailure(
-                            "Error : invalid Purchase"
-                        )
-                    )
-                    return
-                }
-                if (!purchase.isAcknowledged) {
-                    val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
-                        .setPurchaseToken(purchase.purchaseToken)
-                        .build()
-                    billingClient!!.acknowledgePurchase(
-                        acknowledgePurchaseParams,
-                        acknowledgePurchaseResponseListener
-                    )
-                    purchaseListener!!.onPurchaseState(
-                        state = SubscriptionState.Subscribed(
-                            isSuccess = true
-                        )
-                    )
-                } else {
-                    purchaseListener!!.onPurchaseState(state = SubscriptionState.AlReadySubscribe)
-                }
-                purchaseListener!!.onPurchaseState(
-                    state = SubscriptionState.SubscriptionFinished(
-                        isPremium = true
-                    )
-                )
-            }
-
-            Purchase.PurchaseState.PENDING -> {
-                purchaseListener!!.onPurchaseState(state = SubscriptionState.PendingSubscribe)
-            }
-
-            Purchase.PurchaseState.UNSPECIFIED_STATE -> {
-                purchaseListener!!.onPurchaseState(state = SubscriptionState.UnspecifiedState)
-            }
-        }
+    interface BillingCallback {
+        fun onRequiredNetwork()
+        fun onSubscribe(isSuccess: Boolean, isPremium: Boolean, isLocked: Boolean)
+        fun onError(error: String)
     }
 
-    @SuppressLint("SetTextI18n")
-    private var acknowledgePurchaseResponseListener =
-        AcknowledgePurchaseResponseListener { billingResult ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                purchaseListener!!.onPurchaseState(state = SubscriptionState.Subscribed(true))
-                purchaseListener!!.onPurchaseState(
-                    state = SubscriptionState.SubscriptionFinished(
-                        true
-                    )
-                )
-            }
-        }
 
-    private fun verifyValidSignature(signedData: String, signature: String): Boolean {
-        return try {
-            InAppSecurity.verifyPurchase(base64Key, signedData, signature)
-        } catch (e: IOException) {
-            false
-        }
-    }
 }

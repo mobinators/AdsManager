@@ -1,7 +1,6 @@
 package com.mobinators.ads.managers
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import com.facebook.ads.AdView
@@ -11,14 +10,12 @@ import com.mobinators.ads.manager.extensions.exitPanel
 import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
 import com.mobinators.ads.manager.ui.commons.listener.BannerAdListener
-import com.mobinators.ads.manager.ui.commons.listener.BillingCallback
 import com.mobinators.ads.manager.ui.commons.listener.ImageProvider
 import com.mobinators.ads.manager.ui.commons.listener.InterstitialAdsListener
 import com.mobinators.ads.manager.ui.commons.listener.OnNativeAdListener
 import com.mobinators.ads.manager.ui.commons.listener.OnRewardedAdListener
 import com.mobinators.ads.manager.ui.commons.listener.OpenAddCallback
 import com.mobinators.ads.manager.ui.commons.listener.PanelListener
-import com.mobinators.ads.manager.ui.commons.listener.PurchaseCallBack
 import com.mobinators.ads.manager.ui.commons.models.InAppPurchasedModel
 import com.mobinators.ads.manager.ui.commons.models.PanelModel
 import com.mobinators.ads.manager.ui.commons.nativeBanner.MediationNativeBanner
@@ -26,8 +23,6 @@ import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAd
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
-import com.mobinators.ads.manager.ui.commons.states.SubscriptionState
-import com.mobinators.ads.manager.ui.commons.utils.AppPurchaseUtils
 import com.mobinators.ads.manager.ui.commons.utils.ConnectionState
 import com.mobinators.ads.manager.ui.commons.utils.DeviceInfoUtils
 import com.mobinators.ads.manager.ui.commons.utils.InAppPurchaseUtils
@@ -354,7 +349,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
         inAppPurchaseUtils!!.startConnection()
         inAppPurchaseUtils!!.getSubscriptionInfo()
 
-       /* ----------------------------------OR-----------------------------  */
+        /* ----------------------------------OR-----------------------------  */
 
 //        AppPurchaseUtils.startConnection(this, "base64_key_example", object : PurchaseCallBack {
 //            override fun onPurchaseState(state: SubscriptionState) {
@@ -379,7 +374,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
 //
 //        AppPurchaseUtils.startSubscription("product_id_example")
 //        AppPurchaseUtils.getSubscriptionInfo("product_id_example")
-
 
 
     }
@@ -416,4 +410,5 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
 
 //        AppPurchaseUtils.disConnected()
     }
+
 }

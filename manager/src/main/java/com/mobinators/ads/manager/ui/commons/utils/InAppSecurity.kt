@@ -15,8 +15,8 @@ import java.security.spec.InvalidKeySpecException
 import java.security.spec.X509EncodedKeySpec
 
 object InAppSecurity {
-    private val keyFactoryAlgorithm = "RSA"
-    private val signatureAlgorithms = "SHA1withRSA"
+    private const val KEY_FACTORY_ALGORITHM = "RSA"
+    private const val SIGNATURE_ALGORITHM = "SHA1withRSA"
 
     @Throws(IOException::class)
     fun verifyPurchase(base64PublicKey: String?, signedData: String?, signature: String?): Boolean {
@@ -35,7 +35,7 @@ object InAppSecurity {
         return try {
             val decodedKey = Base64.decode(encodedPublicKey, Base64.DEFAULT)
             val keyFactory =
-                KeyFactory.getInstance(keyFactoryAlgorithm)
+                KeyFactory.getInstance(KEY_FACTORY_ALGORITHM)
             keyFactory.generatePublic(X509EncodedKeySpec(decodedKey))
         } catch (e: NoSuchAlgorithmException) {
             throw RuntimeException(e)
@@ -53,7 +53,7 @@ object InAppSecurity {
         }
         try {
             val signatureAlgorithm =
-                Signature.getInstance(signatureAlgorithms)
+                Signature.getInstance(SIGNATURE_ALGORITHM)
             signatureAlgorithm.initVerify(publicKey)
             signatureAlgorithm.update(signedData.toByteArray())
             return signatureAlgorithm.verify(signatureBytes)

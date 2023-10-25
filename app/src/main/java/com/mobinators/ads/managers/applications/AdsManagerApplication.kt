@@ -2,6 +2,7 @@ package com.mobinators.ads.managers.applications
 
 import android.app.Application
 import android.content.pm.ApplicationInfo
+import androidx.multidex.MultiDex
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.mobinators.ads.manager.applications.AdsApplication
@@ -13,6 +14,7 @@ import pak.developer.app.managers.extensions.logD
 class AdsManagerApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        MultiDex.install(this)
         logD("Debug Mode : ${BuildConfig.DEBUG}  : ${0 != applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE}")
         AdsApplication.getValueFromConfig(
             FirebaseRemoteConfig.getInstance(),

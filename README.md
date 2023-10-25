@@ -14,7 +14,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.0.4'
+  implementation 'com.github.mobinators:AdsManager:1.0.5'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -32,12 +32,71 @@
     id 'com.google.firebase.crashlytics'
     }
     
+     defaultConfig {
+        ...
+        multiDexEnabled true
+    }
+    
+    
+    
     Dependency 
     
     implementation platform('com.google.firebase:firebase-bom:32.2.3')
     implementation 'com.google.firebase:firebase-analytics-ktx:21.3.0'
     implementation 'com.google.firebase:firebase-config-ktx:21.4.1'
     implementation 'com.google.firebase:firebase-crashlytics-ktx:18.4.1'
+    
+    implementation 'androidx.multidex:multidex:2.0.1'    
+```
+
+-> Ad this line in Manifest file
+
+```
+    <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/app_ads_id" />
+        <meta-data
+            android:name="applovin.sdk.key"
+            android:value="@string/SDK_KEY" />
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
+            android:value="true" />
+            
+             
+```
+
+-> Ad this line String File
+
+```
+     <string name="app_ads_id">ca-app-pub-3940256099942544~3347511713</string>  provide origin App id for show original ads
+    <string name="SDK_KEY">sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-1DcTfCWvHWTNRTTB12ENHdoQyLpX5LVcPGq9Nol8469q4z7rp1</string>  provide original AppLovin Sdk id
+```
+
+-> Ad this line in Application then register it in Manifest File
+
+```
+
+     MultiDex.install(this)
+    AdsApplication.getValueFromConfig(
+            FirebaseRemoteConfig.getInstance(),
+            this,
+            object : FetchRemoteCallback {
+                override fun onFetchValuesSuccess() {
+                    logD("onFetchValuesSuccess")
+                }
+
+                override fun onFetchValuesFailed() {
+                    logD("onFetchValuesFailed")
+                }
+
+                override fun onUpdateSuccess(appId: String, maxAppId: String) {
+                    logD("onUpdateSuccess : App Id : $appId  : MAX App Id: $maxAppId")
+                    updateManifest(appId = appId, maxAppId = maxAppId)
+                }
+            })
+        AdsApplication.setAnalytics(FirebaseAnalytics.getInstance(this))
+        
+        This app register in Manifest file
 ```
 
 -> Banner Ads setup
@@ -295,116 +354,47 @@
 -> In App Purchase
 
 ```
-    private var inAppPurchaseUtils: InAppPurchaseUtils? = null
-     inAppPurchaseUtils =
-            InAppPurchaseUtils(
-                this,
-                "product_id_example",
-                "base64_key_example",
-                object : BillingCallback {
-                    override fun onSubscribe(msg: String) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD(msg)
-                        }
-                    }
 
-                    override fun onAlreadySubscribe(msg: String) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD(msg)
-                        }
-                    }
-
-                    override fun onFeatureNotSupported() {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD("")
-                        }
-                    }
-
-                    override fun onBillingError(error: String) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD(" Error : $error")
-                        }
-                    }
-
-                    override fun onSubscriptionPending(msg: String) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD(msg)
-                        }
-                    }
-
-                    override fun onUnspecifiedState(msg: String) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD(msg)
-                        }
-                    }
-
-                    override fun onProductDetail(productDetail: InAppPurchasedModel) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD("Purchase Detail :${productDetail}")
-                        }
-                    }
-
-                    override fun isOffline(offline: Boolean) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD("isOffline : $offline")
-                        }
-                    }
-
-                    override fun onServiceDisConnected() {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD("ServiceDisConnected")
-                        }
-                    }
-
-                    override fun onBillingFinished(state: ConnectionState) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD("premium : ${state.premium}  : locked : ${state.locked}")
-                        }
-                    }
-                })
-       inAppPurchaseUtils!!.startConnection()  // Create object 
-       inAppPurchaseUtils!!.getSubscriptionInfo() // get information of SubScription 
-
-
-      inAppPurchaseUtils!!.startSubSubscription() // SubScription 
-      
-      
-      
-      
-      ----------------------------------OR----------------------------- 
-                       
-                       
-      AppPurchaseUtils.startConnection(this, "base64_key_example", object : PurchaseCallBack {
-            override fun onPurchaseState(state: SubscriptionState) {
-                when (state) {
-                    is SubscriptionState.AlReadySubscribe -> Log.d("Tag", "onPurchaseState: AlReadySubscribe ")
-                    is SubscriptionState.PendingSubscribe -> Log.d("Tag", "onPurchaseState: PendingSubscribe ")
-                    is SubscriptionState.ProductDetail ->{
-                        Log.d("Tag", "onPurchaseState: ProductDetail : ${state.model} ")
-                        val productDetail=state.model  // Detail for Subscription
-                
-                    }
-                    is SubscriptionState.Subscribed ->  Log.d("Tag", "onPurchaseState: Subscribed: ${state.isSuccess} ")
-                    is SubscriptionState.SubscriptionFailure ->  Log.d("Tag", "onPurchaseState: SubscriptionFailure : ${state.error} ")
-                    is SubscriptionState.SubscriptionFinished -> {
-                        Log.d("Tag", "onPurchaseState: SubscriptionFinished ${state.isPremium} ")
-                      
-                    }
-                    is SubscriptionState.UnspecifiedState ->  Log.d("Tag", "onPurchaseState: UnspecifiedState ")
+    
+    
+     PurchaseUtils.initConnection(
+            this,
+           base64_key_example,
+            object : PurchaseUtils.BillingCallback {
+                override fun onRequiredNetwork() {
+                    logD("Internet is not available")
                 }
-            }
-        })
-        
+
+                override fun onSubscribe(
+                    isSuccess: Boolean,
+                    isPremium: Boolean,
+                    isLocked: Boolean
+                ) {
+                    Log.d("Tag","isSuccess : $isSuccess , isPremium: $isPremium, isLocked: $isLocked")
+                }
+
+                override fun onError(error: String) {
+                   Log.d("Tag","$error")
+                }
+            })
+  
         
         // Subscription 
-        AppPurchaseUtils.startSubscription("product_id_example)
-         
+         CoroutineScope(Dispatchers.Main).launch {
+            PurchaseUtils.onSubscription("product_id_example")
+        }
+        
+    
          // info for Subcription
-        AppPurchaseUtils.getSubscriptionInfo("product_id_example")
+         CoroutineScope(Dispatchers.Main).launch {
+            PurchaseUtils.getSubscriptionInfo(AppConstants.WEEKLY_SUBSCRIPTION) {
+              Log.d("Tag","Price: $it")
+            }
+        }
          
          
          // Disconnect 
-        AppPurchaseUtils.disConnected()
+        PurchaseUtils.clientDestroy()
          
      
      
@@ -436,8 +426,7 @@
         })
 ```
 
-
--> Ads Strategy 
+-> Ads Strategy
 
 ``` 
   0-> ads is off
@@ -450,50 +439,3 @@
   remote_config_maanger_json_file is a folder which contain the remote config json file because any one create new Firebase project with remote config so import it file after that imported it then change the value of ads key 
   
 ```
-
--> Ad this line in Manifest file
-```
-    <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/app_ads_id" />
-        <meta-data
-            android:name="applovin.sdk.key"
-            android:value="@string/SDK_KEY" />
-        <meta-data
-            android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
-            android:value="true" />
-            
-             
-```
-
--> Ad this line String File
-
-```
-     <string name="app_ads_id">ca-app-pub-3940256099942544~3347511713</string>  provide origin App id for show original ads
-    <string name="SDK_KEY">sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-1DcTfCWvHWTNRTTB12ENHdoQyLpX5LVcPGq9Nol8469q4z7rp1</string>  provide original AppLovin Sdk id
-```
-
--> Ad this line in Application
-```
-    AdsApplication.getValueFromConfig(
-            FirebaseRemoteConfig.getInstance(),
-            this,
-            object : FetchRemoteCallback {
-                override fun onFetchValuesSuccess() {
-                    logD("onFetchValuesSuccess")
-                }
-
-                override fun onFetchValuesFailed() {
-                    logD("onFetchValuesFailed")
-                }
-
-                override fun onUpdateSuccess(appId: String, maxAppId: String) {
-                    logD("onUpdateSuccess : App Id : $appId  : MAX App Id: $maxAppId")
-                    updateManifest(appId = appId, maxAppId = maxAppId)
-                }
-            })
-        AdsApplication.setAnalytics(FirebaseAnalytics.getInstance(this))
-        
-        This app register in Manifest file
-```
-  
