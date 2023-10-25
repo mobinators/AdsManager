@@ -14,7 +14,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.0.5'
+  implementation 'com.github.mobinators:AdsManager:1.0.6'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -357,12 +357,12 @@
 
     
     
-     PurchaseUtils.initConnection(
+     AppPurchaseUtils.initConnection(
             this,
            base64_key_example,
             object : PurchaseUtils.BillingCallback {
                 override fun onRequiredNetwork() {
-                    logD("Internet is not available")
+                   Log.d("Tag","Internet is not available")
                 }
 
                 override fun onSubscribe(
@@ -381,20 +381,20 @@
         
         // Subscription 
          CoroutineScope(Dispatchers.Main).launch {
-            PurchaseUtils.onSubscription("product_id_example")
+            AppPurchaseUtils.onSubscription("product_id_example")
         }
         
     
          // info for Subcription
          CoroutineScope(Dispatchers.Main).launch {
-            PurchaseUtils.getSubscriptionInfo(AppConstants.WEEKLY_SUBSCRIPTION) {
+           AppPurchaseUtils.getSubscriptionInfo(AppConstants.WEEKLY_SUBSCRIPTION) {
               Log.d("Tag","Price: $it")
             }
         }
          
          
          // Disconnect 
-        PurchaseUtils.clientDestroy()
+        AppPurchaseUtils.clientDestroy()
          
      
      

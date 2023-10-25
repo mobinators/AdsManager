@@ -23,9 +23,9 @@ import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAd
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
+import com.mobinators.ads.manager.ui.commons.utils.AppPurchaseUtils
 import com.mobinators.ads.manager.ui.commons.utils.ConnectionState
 import com.mobinators.ads.manager.ui.commons.utils.DeviceInfoUtils
-import com.mobinators.ads.manager.ui.commons.utils.InAppPurchaseUtils
 import com.mobinators.ads.manager.ui.commons.views.dialog.ProgressDialogUtils
 import com.mobinators.ads.managers.databinding.ActivityMainBinding
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +38,6 @@ import pak.developer.app.managers.ui.commons.base.BaseActivity
 class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     private var mediationNativeAd: MediationNativeAd? = null
     private var progressDialogUtils: ProgressDialogUtils? = null
-    private var inAppPurchaseUtils: InAppPurchaseUtils? = null
     override fun getActivityView() = ActivityMainBinding.inflate(layoutInflater)
     override fun initView(savedInstanceState: Bundle?) {
         binding.maxAdActivity.setOnClickListener(this)
@@ -65,7 +64,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             binding.rewardedInterAds.id -> rewardedInterstitialAds()
             binding.openAds.id -> openAds()
             binding.interAds.id -> interstitialAds()
-            binding.billingButton.id -> inAppPurchaseUtils!!.startSubSubscription()
+            binding.billingButton.id -> {
+                CoroutineScope(Dispatchers.Main).launch {
+                    AppPurchaseUtils.onSubscription("product_id_example")
+                }
+            }
         }
     }
 
@@ -278,104 +281,26 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     }
 
     private fun inAppPurchased() {
+        AppPurchaseUtils.initConnection(
+            this,
+            "base64_key_example",
+            object : AppPurchaseUtils.BillingCallback {
+                override fun onRequiredNetwork() {
+                    logD("Internet is not available")
+                }
 
-        // Required Product ID and Base64 Key for Subscription
-        inAppPurchaseUtils =
-            InAppPurchaseUtils(
-                this,
-                "product_id_example",
-                "base64_key_example",
-                object : BillingCallback {
-                    override fun onSubscribe(msg: String) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD(msg)
-                        }
-                    }
+                override fun onSubscribe(
+                    isSuccess: Boolean,
+                    isPremium: Boolean,
+                    isLocked: Boolean
+                ) {
+                    logD("isSuccess : $isSuccess , isPremium: $isPremium, isLocked: $isLocked")
+                }
 
-                    override fun onAlreadySubscribe(msg: String) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD(msg)
-                        }
-                    }
-
-                    override fun onFeatureNotSupported() {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD("")
-                        }
-                    }
-
-                    override fun onBillingError(error: String) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD(" Error : $error")
-                        }
-                    }
-
-                    override fun onSubscriptionPending(msg: String) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD(msg)
-                        }
-                    }
-
-                    override fun onUnspecifiedState(msg: String) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD(msg)
-                        }
-                    }
-
-                    override fun onProductDetail(productDetail: InAppPurchasedModel) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD("Purchase Detail :${productDetail}")
-                        }
-                    }
-
-                    override fun isOffline(offline: Boolean) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD("isOffline : $offline")
-                        }
-                    }
-
-                    override fun onServiceDisConnected() {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD("ServiceDisConnected")
-                        }
-                    }
-
-                    override fun onBillingFinished(state: ConnectionState) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            logD("premium : ${state.premium}  : locked : ${state.locked}")
-                        }
-                    }
-                })
-        inAppPurchaseUtils!!.startConnection()
-        inAppPurchaseUtils!!.getSubscriptionInfo()
-
-        /* ----------------------------------OR-----------------------------  */
-
-//        AppPurchaseUtils.startConnection(this, "base64_key_example", object : PurchaseCallBack {
-//            override fun onPurchaseState(state: SubscriptionState) {
-//                when (state) {
-//                    is SubscriptionState.AlReadySubscribe -> Log.d("Tag", "onPurchaseState: AlReadySubscribe ")
-//                    is SubscriptionState.PendingSubscribe -> Log.d("Tag", "onPurchaseState: PendingSubscribe ")
-//                    is SubscriptionState.ProductDetail ->{
-//                        Log.d("Tag", "onPurchaseState: ProductDetail : ${state.model} ")
-//                        val productDetail=state.model
-//
-//                    }
-//                    is SubscriptionState.Subscribed ->  Log.d("Tag", "onPurchaseState: Subscribed: ${state.isSuccess} ")
-//                    is SubscriptionState.SubscriptionFailure ->  Log.d("Tag", "onPurchaseState: SubscriptionFailure : ${state.error} ")
-//                    is SubscriptionState.SubscriptionFinished -> {
-//                        Log.d("Tag", "onPurchaseState: SubscriptionFinished ${state.isPremium} ")
-//
-//                    }
-//                    is SubscriptionState.UnspecifiedState ->  Log.d("Tag", "onPurchaseState: UnspecifiedState ")
-//                }
-//            }
-//        })
-//
-//        AppPurchaseUtils.startSubscription("product_id_example")
-//        AppPurchaseUtils.getSubscriptionInfo("product_id_example")
-
-
+                override fun onError(error: String) {
+                    logD("$error")
+                }
+            })
     }
 
     override fun onBackPressed() {
@@ -404,11 +329,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        inAppPurchaseUtils!!.disConnected()
-
-        /* ----------------------------------OR-----------------------------  */
-
-//        AppPurchaseUtils.disConnected()
+        AppPurchaseUtils.clientDestroy()
     }
-
 }
