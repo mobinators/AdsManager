@@ -22,7 +22,6 @@ import com.mobinators.ads.manager.ui.commons.listener.InterstitialAdsListener
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.logD
-import pak.developer.app.managers.extensions.logException
 import java.lang.ref.WeakReference
 
 @SuppressLint("StaticFieldLeak")
@@ -43,14 +42,16 @@ object MediationAdInterstitial {
     ) {
         this.activity = activity
         this.interstitialListener = listener
-        if (AdsConstants.isAdPreloadEnable.not()) {
-            PreLoadMediationAdInterstitial.showInterstitialAdOnTime(activity, isPurchased, listener)
-            return
-        }
+        logD("Ads Pre loaded : ${AdsConstants.isAdPreloadEnable}")
         if (isPurchased) {
             listener.onError("You have pro version")
             return
         }
+        if (AdsConstants.isAdPreloadEnable.not()) {
+            PreLoadMediationAdInterstitial.showInterstitialAdOnTime(activity, isPurchased, listener)
+            return
+        }
+        logD("After PreLoad Ads")
         AdsConstants.interstitialClickAdCounter = 0
         AdsConstants.interstitialClickAdCounter++
         this.adMobKey = if (AdsConstants.testMode) {
@@ -80,14 +81,46 @@ object MediationAdInterstitial {
                 }
             }, timer)
         } catch (error: Exception) {
-            logException("Interstitial Ads Error : ${error.localizedMessage}")
-            if (this.interstitialListener != null) {
-                this.interstitialListener!!.onError(error.localizedMessage!!)
-            }
-            finishAd()
+            onError(error.localizedMessage)
         }
     }
 
+
+    fun initInterstitialAds(activity: Activity, isPurchased: Boolean) {
+        this.activity = activity
+        if (AdsUtils.isOnline(activity).not()) {
+            logD("Internet required")
+            return
+        }
+        logD("initInterstitialAds : ${AdsApplication.getAdsModel()?.strategy}")
+        if (AdsConstants.isInit.not()) {
+            Handler(Looper.myLooper()!!).postDelayed(Runnable {
+                initInterstitialAds(activity, isPurchased)
+            }, 1500)
+            return
+        }
+        if (isPurchased) {
+            return
+        }
+        this.adMobKey = if (AdsConstants.testMode) {
+            AdsConstants.TEST_ADMOB_INTERSTITIAL_ID
+        } else {
+            if (AdsApplication.getAdsModel()!!.admobMediation) {
+                AdsApplication.getAdsModel()!!.admobMediationInterstitialId
+
+            } else {
+                AdsApplication.getAdsModel()!!.admobInterstitialID
+            }
+        }
+        this.maxKey = if (AdsConstants.testMode) {
+            AdsConstants.TEST_MAX_INTERSTITIAL_ADS_ID
+        } else {
+            AdsApplication.getAdsModel()!!.maxInterstitialID
+        }
+        initAdMobInterstitialAd()
+        initMaxInterstitialAd()
+//        initSelectedAd()
+    }
 
     private fun showAdmobInterstitialAd() {
         try {
@@ -139,9 +172,11 @@ object MediationAdInterstitial {
                     this.admobInterstitialAD!!.show(this.activity!!)
                     initSelectedAd()
                 }
+            } else {
+                initInterstitialAds(this.activity!!, false)
             }
         } catch (error: Exception) {
-            this.interstitialListener!!.onError(error = "showInterstitialAds Error : ${error.localizedMessage}")
+            onError("showInterstitialAds Error : ${error.localizedMessage}")
         }
     }
 
@@ -158,12 +193,13 @@ object MediationAdInterstitial {
                 }
             }
         } catch (error: Exception) {
-            this.interstitialListener!!.onError(error = "showInterstitialAds Error : ${error.localizedMessage}")
+            onError("showInterstitialAds Error : ${error.localizedMessage}")
         }
     }
 
     private fun initAdMobInterstitialAd() {
         try {
+            logD("initAdMobInterstitialAd")
             if (AdsApplication.isAdmobInLimit()) {
                 if (AdsApplication.applyLimitOnAdmob) {
                     onError("Interstitial add banned in current duw to admob limit")
@@ -216,7 +252,7 @@ object MediationAdInterstitial {
                     }
                 })
         } catch (error: Exception) {
-            this.interstitialListener!!.onError(error = "showInterstitialAds Error : ${error.localizedMessage}")
+            onError("showInterstitialAds Error : ${error.localizedMessage}")
         }
     }
 
@@ -304,7 +340,7 @@ object MediationAdInterstitial {
             }
             maxInterstitialAd!!.loadAd()
         } catch (error: Exception) {
-            this.interstitialListener!!.onError(error = "showInterstitialAds Error : ${error.localizedMessage}")
+            onError("showInterstitialAds Error : ${error.localizedMessage}")
         }
     }
 
@@ -336,12 +372,11 @@ object MediationAdInterstitial {
                 }
 
                 else -> {
-                    this.interstitialListener!!.onError("You have to select priority type ADMOB or ADMOB MEDIATION or MAX MEDIATION")
-                    finishAd()
+                    onError("You have to select priority type ADMOB or ADMOB MEDIATION or MAX MEDIATION")
                 }
             }
         } catch (error: Exception) {
-            this.interstitialListener!!.onError(error = "showInterstitialAds Error : ${error.localizedMessage}")
+            onError("showInterstitialAds Error : ${error.localizedMessage}")
         }
     }
 
@@ -372,7 +407,7 @@ object MediationAdInterstitial {
                 }
             }
         } catch (error: Exception) {
-            this.interstitialListener!!.onError(error = "showInterstitialAds Error : ${error.localizedMessage}")
+            onError("showInterstitialAds Error : ${error.localizedMessage}")
         }
     }
 
@@ -381,10 +416,14 @@ object MediationAdInterstitial {
     }
 
     private fun onError(error: String) {
-        if (interstitialListener != null) {
-            interstitialListener!!.onError(error)
+        if (AdsApplication.getAdsModel() != null) {
+//            showSelectedAd()
+        } else {
+            if (interstitialListener != null) {
+                interstitialListener!!.onError(error)
+            }
+            finishAd()
         }
-        finishAd()
     }
 
     private fun onLoadError() {

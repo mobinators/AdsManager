@@ -127,6 +127,10 @@ object AdsApplication : Application() {
             appId = adsModel!!.admobAppID!!,
             maxAppId = adsModel!!.maxAppId!!
         )
+        AdsConstants.isAdPreloadEnable = when ((adsModel?.strategy ?: 0).toInt()) {
+            AdsConstants.ADS_OFF -> false
+            else -> true
+        }
         AdsConstants.isInit = true
     }
 

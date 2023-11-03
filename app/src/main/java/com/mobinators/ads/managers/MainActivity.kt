@@ -16,7 +16,6 @@ import com.mobinators.ads.manager.ui.commons.listener.OnNativeAdListener
 import com.mobinators.ads.manager.ui.commons.listener.OnRewardedAdListener
 import com.mobinators.ads.manager.ui.commons.listener.OpenAddCallback
 import com.mobinators.ads.manager.ui.commons.listener.PanelListener
-import com.mobinators.ads.manager.ui.commons.models.InAppPurchasedModel
 import com.mobinators.ads.manager.ui.commons.models.PanelModel
 import com.mobinators.ads.manager.ui.commons.nativeBanner.MediationNativeBanner
 import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAd
@@ -24,7 +23,6 @@ import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
 import com.mobinators.ads.manager.ui.commons.utils.AppPurchaseUtils
-import com.mobinators.ads.manager.ui.commons.utils.ConnectionState
 import com.mobinators.ads.manager.ui.commons.utils.DeviceInfoUtils
 import com.mobinators.ads.manager.ui.commons.views.dialog.ProgressDialogUtils
 import com.mobinators.ads.managers.databinding.ActivityMainBinding
@@ -40,6 +38,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     private var progressDialogUtils: ProgressDialogUtils? = null
     override fun getActivityView() = ActivityMainBinding.inflate(layoutInflater)
     override fun initView(savedInstanceState: Bundle?) {
+        MediationAdInterstitial.initInterstitialAds(this, false)
         binding.maxAdActivity.setOnClickListener(this)
         binding.loadAds.setOnClickListener(this)
         binding.nativeAds.setOnClickListener(this)
@@ -270,6 +269,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             }
 
             override fun isEnableAds(isAds: Boolean) {
+                if (isAds.not()) {
+                    progressDialogUtils!!.isShowDialog()
+                }
                 logD("MainActivity isEnableAds : $isAds")
             }
 

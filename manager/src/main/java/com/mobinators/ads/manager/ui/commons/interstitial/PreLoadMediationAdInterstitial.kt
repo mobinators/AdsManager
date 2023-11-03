@@ -81,7 +81,7 @@ object PreLoadMediationAdInterstitial {
                         if (AdsApplication.getFirebaseAnalytics() == null) {
                             logD("Unable to log events! FirebaseAnalytics object is null")
                         }
-                        interstitialAdListener!!.onError("Delay Time is Finished")
+                        interstitialAdListener!!.onError(" Pre load Delay Time is Finished")
                         showAd = false
                         timer = 2000L
                     }
@@ -356,7 +356,10 @@ object PreLoadMediationAdInterstitial {
         try {
             when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
                 AdsConstants.ADS_OFF -> {}
-                AdsConstants.AD_MOB_MEDIATION -> {}
+                AdsConstants.AD_MOB_MEDIATION -> {
+                    showAdmobInterstitialAd()
+                }
+
                 AdsConstants.AD_MOB -> {
                     showAdmobInterstitialAd()
                 }

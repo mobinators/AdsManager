@@ -4,4 +4,5 @@
     <string name="app_ads_id">ca-app-pub-3940256099942544~3347511713</string>
     // AppLovin Ads
     <string name="SDK_KEY">sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-1DcTfCWvHWTNRTTB12ENHdoQyLpX5LVcPGq9Nol8469q4z7rp1</string>
+    <string name="splash_screen">Splash Screen</string>
 </resources>

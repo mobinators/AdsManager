@@ -11,7 +11,6 @@ import com.applovin.mediation.MaxAdFormat
 import com.applovin.mediation.MaxAdViewAdListener
 import com.applovin.mediation.MaxError
 import com.applovin.mediation.ads.MaxAdView
-import com.applovin.sdk.AppLovinSdk
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -23,7 +22,6 @@ import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.gone
 import pak.developer.app.managers.extensions.logD
-import pak.developer.app.managers.extensions.logException
 
 
 @SuppressLint("StaticFieldLeak")
@@ -133,7 +131,7 @@ object BannerAdMediation {
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     super.onAdFailedToLoad(p0)
-                    bannerAdListener!!.onError(p0.message)
+                    onErrorFun(errorMessage = p0.message)
                     if (AdsApplication.isAdmobInLimit()) {
                         AdsApplication.applyLimitOnAdmob = true
                     }
@@ -223,11 +221,11 @@ object BannerAdMediation {
                 }
 
                 override fun onAdLoadFailed(p0: String?, p1: MaxError?) {
-                    bannerAdListener!!.onError(p1!!.message)
+                    onErrorFun(errorMessage = p1!!.message)
                 }
 
                 override fun onAdDisplayFailed(p0: MaxAd?, p1: MaxError?) {
-                    bannerAdListener!!.onError(p1!!.message)
+                    onErrorFun(errorMessage = p1!!.message)
                 }
 
                 override fun onAdExpanded(p0: MaxAd?) {
@@ -251,5 +249,19 @@ object BannerAdMediation {
         } catch (error: Exception) {
             this.bannerAdListener!!.onError(error = "showBannerAds Error : ${error.localizedMessage}")
         }
+    }
+
+    private fun onErrorFun(errorMessage: String) {
+        if (AdsApplication.getAdsModel() != null) {
+            selectAd()
+        } else {
+            this.bannerAdListener!!.onError(error = errorMessage)
+            clearValue()
+        }
+    }
+
+    private fun clearValue() {
+        this.appLovingKey = null
+        this.adMobKey = null
     }
 }

@@ -4,7 +4,7 @@
     package="com.mobinators.ads.managers">
 
     <application
-        android:name="com.mobinators.ads.managers.applications.AdsManagerApplication"
+        android:name=".applications.AdsManagerApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,10 +15,13 @@
         android:theme="@style/Theme.AdsManager"
         tools:targetApi="31">
         <activity
-            android:name="com.mobinators.ads.managers.MaxAdsActivity"
+            android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name="com.mobinators.ads.managers.MainActivity"
+            android:name=".MaxAdsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

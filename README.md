@@ -14,7 +14,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.0.6'
+  implementation 'com.github.mobinators:AdsManager:1.0.7'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -137,6 +137,11 @@
 -> Interstitial Ads setup
 
 ```
+
+
+    // Calling This line First show Interstitial Ads in onCreate() function
+    MediationAdInterstitial.initInterstitialAds(this, false)
+     
     MediationAdInterstitial.showInterstitialAd(this, false, object : InterstitialAdsListener {
             override fun onLoaded(adType: Int) {
                
