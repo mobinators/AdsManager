@@ -12,8 +12,8 @@ android {
 
     defaultConfig {
         minSdk 21
-        versionCode 9
-        versionName "1.0.8"
+        versionCode 20
+        versionName "1.0.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -93,8 +93,8 @@ afterEvaluate {
             release(MavenPublication) {
                 from components.release
                 groupId = 'com.github.mobinators'
-                artifactId = 'managers'
-                version = '1.0.8'
+                artifactId = 'manager'
+                version = '1.0.9'
             }
         }
     }
