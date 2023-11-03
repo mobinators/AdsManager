@@ -12,8 +12,8 @@ android {
 
     defaultConfig {
         minSdk 21
-        versionCode 11
-        versionName "1.1.0"
+        versionCode 12
+        versionName "1.1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -57,10 +57,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-config-ktx:21.5.0'
 
     // Analytics
-    implementation 'com.google.firebase:firebase-analytics-ktx:21.4.0'
+    implementation 'com.google.firebase:firebase-analytics-ktx:21.5.0'
 
     //Crashlytics
-    implementation 'com.google.firebase:firebase-crashlytics-ktx:18.5.0'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx:18.5.1'
 
     // Dynamic Link
     implementation 'com.google.firebase:firebase-dynamic-links-ktx:21.2.0'
@@ -94,7 +94,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.mobinators'
                 artifactId = 'managers'
-                version = '1.1.0'
+                version = '1.1.1'
             }
         }
     }
