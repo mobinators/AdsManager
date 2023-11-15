@@ -354,6 +354,4 @@ object AppPurchaseUtils {
         fun onSubscribe(isSuccess: Boolean, isPremium: Boolean, isLocked: Boolean)
         fun onError(error: String)
     }
-
-
 }

@@ -48,7 +48,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
         binding.openAds.setOnClickListener(this)
         binding.interAds.setOnClickListener(this)
         binding.billingButton.setOnClickListener(this)
-        mediationNativeAd = MediationNativeAd(this, false, binding.adContainer, true)
+        mediationNativeAd = MediationNativeAd(this, false, binding.adContainer, false)
         logD("Device Info : ${DeviceInfoUtils.getDeviceInfo()}")
         inAppPurchased()
     }

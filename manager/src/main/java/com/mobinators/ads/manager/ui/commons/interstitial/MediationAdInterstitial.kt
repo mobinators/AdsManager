@@ -59,7 +59,6 @@ object MediationAdInterstitial {
         } else {
             if (AdsApplication.getAdsModel()!!.admobMediation) {
                 AdsApplication.getAdsModel()!!.admobMediationInterstitialId
-
             } else {
                 AdsApplication.getAdsModel()!!.admobInterstitialID
             }
