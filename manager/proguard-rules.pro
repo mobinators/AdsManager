@@ -20,11 +20,11 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.facebook.login.** {*;}
--keep class com.google.ads.mediation.admob.AdMobAdapter {
-    *;
-}
-
--keep class com.google.ads.mediation.AdUrlAdapter {
-    *;
-}
+#-keep class com.facebook.login.** {*;}
+#-keep class com.google.ads.mediation.admob.AdMobAdapter {
+#    *;
+#}
+#
+#-keep class com.google.ads.mediation.AdUrlAdapter {
+#    *;
+#}
