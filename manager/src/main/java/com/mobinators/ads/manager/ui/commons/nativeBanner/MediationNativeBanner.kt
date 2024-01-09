@@ -347,35 +347,35 @@ object MediationNativeBanner {
             maxNativeAdLoader = MaxNativeAdLoader(this.maxKey!!, activity!!)
             maxNativeAdLoader!!.setRevenueListener { ad ->
                 val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
-                adjustAdRevenue.setRevenue(ad?.revenue, "USD")
-                adjustAdRevenue.setAdRevenueNetwork(ad?.networkName)
-                adjustAdRevenue.setAdRevenueUnit(ad?.adUnitId)
-                adjustAdRevenue.setAdRevenuePlacement(ad?.placement)
+                adjustAdRevenue.setRevenue(ad.revenue, "USD")
+                adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
+                adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
+                adjustAdRevenue.setAdRevenuePlacement(ad.placement)
                 Adjust.trackAdRevenue(adjustAdRevenue)
             }
             maxNativeAdLoader!!.setNativeAdListener(object : MaxNativeAdListener() {
-                override fun onNativeAdLoaded(p0: MaxNativeAdView?, ad: MaxAd?) {
-                    super.onNativeAdLoaded(p0, ad)
+                override fun onNativeAdLoaded(p0: MaxNativeAdView?, p1: MaxAd) {
+                    super.onNativeAdLoaded(p0, p1)
                     if (maxNativeAd != null) {
                         maxNativeAdLoader!!.destroy(maxNativeAd)
                     }
-                    maxNativeAd = ad
+                    maxNativeAd = p1
                     containerView!!.removeAllViews()
                     containerView!!.addView(p0)
                     onNativeAdListener!!.onLoaded(AdsConstants.MAX_MEDIATION)
                 }
 
-                override fun onNativeAdLoadFailed(p0: String?, p1: MaxError?) {
+                override fun onNativeAdLoadFailed(p0: String, p1: MaxError) {
                     super.onNativeAdLoadFailed(p0, p1)
                     containerView!!.gone()
-                    onNativeAdListener!!.onError(p1!!.message)
+                    onNativeAdListener!!.onError(p1.message)
                 }
 
-                override fun onNativeAdExpired(p0: MaxAd?) {
+                override fun onNativeAdExpired(p0: MaxAd) {
                     super.onNativeAdExpired(p0)
                 }
 
-                override fun onNativeAdClicked(p0: MaxAd?) {
+                override fun onNativeAdClicked(p0: MaxAd) {
                     super.onNativeAdClicked(p0)
                     onNativeAdListener!!.onAdClicked(AdsConstants.MAX_MEDIATION)
                 }

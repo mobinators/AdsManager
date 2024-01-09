@@ -14,7 +14,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.1.3'
+  implementation 'com.github.mobinators:AdsManager:1.1.4'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -176,6 +176,7 @@
 -> Native Ads setup
 
 ```
+    // Requiered native Ads width is match_paren and height is 300dp or above 
     private var mediationNativeAd: MediationNativeAd? = null
     mediationNativeAd = MediationNativeAd(this, false, binding.adContainer, true)
     mediationNativeAd!!.loadAd(object : OnNativeAdListener {
@@ -355,6 +356,49 @@
             }
         })
 ```
+
+
+-> Collapsible Banner Ads setup
+
+```
+
+  binding.bannerContainer is a viewBinding template sample if any one do use without bindingView then declare the variable after that initialize the variable and get findViewById() function
+  binding.bannerContainer.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                binding.bannerContainer.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                
+                // Calling MediaCollapsibleBanner Class 
+                 MediationCollapsibleBanner.showCollapsibleBannerAds(this,false,binding.bannerContainer,CollapseBannerState.BOTTOM,object : BannerAdListener {
+                    override fun onLoaded(adType: Int) {
+                       logD("MainActivity onLoaded : $adType")
+                    }
+
+                    override fun onAdClicked(adType: Int) {
+                       logD("MainActivity onAdClicked : $adType")
+                    }
+
+                    override fun onError(error: String) {
+                       logD("MainActivity onError Error : $error")
+                    }
+
+                    override fun onFacebookAdCreated(facebookBanner: AdView) {
+                      logD("MainActivity onFacebookAdCreated : $facebookBanner")
+                   }
+
+                   override fun isEnableAds(isAds: Boolean) {
+                      logD("MainActivity isEnableAds : $isAds")
+                   }
+
+                   override fun isOffline(offline: Boolean) {
+                      logD("Ads is Offline : $offline")
+                   }
+                })
+            }
+        })
+        
+        
+
 
 -> In App Purchase
 

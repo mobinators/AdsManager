@@ -172,6 +172,7 @@ object BannerAdMediation {
 
     private fun maxBannerAds() {
         try {
+            logD("MaxBanner Ads Calling ")
             this.appLovingKey = if (AdsConstants.testMode) {
                 AdsConstants.TEST_MAX_BANNER_ADS_ID
             } else {
@@ -197,7 +198,7 @@ object BannerAdMediation {
             logD("Max Banner Ads Id : ${this.appLovingKey}")
             val maxBannerView = MaxAdView(this.appLovingKey, MaxAdFormat.BANNER, this.activity)
             maxBannerView.setListener(object : MaxAdViewAdListener {
-                override fun onAdLoaded(p0: MaxAd?) {
+                override fun onAdLoaded(p0: MaxAd) {
                     logD("onAdLoaded")
                     if (bannerContainer!!.parent != null) {
                         bannerContainer!!.removeAllViews()
@@ -208,42 +209,45 @@ object BannerAdMediation {
                     }
                 }
 
-                override fun onAdDisplayed(p0: MaxAd?) {
+                override fun onAdDisplayed(p0: MaxAd) {
                     logD("onAdDisplayed")
                 }
 
-                override fun onAdHidden(p0: MaxAd?) {
+                override fun onAdHidden(p0: MaxAd) {
                     logD("onAdHidden")
                 }
 
-                override fun onAdClicked(p0: MaxAd?) {
+                override fun onAdClicked(p0: MaxAd) {
                     logD("onAdClicked")
                 }
 
-                override fun onAdLoadFailed(p0: String?, p1: MaxError?) {
-                    onErrorFun(errorMessage = p1!!.message)
+                override fun onAdLoadFailed(p0: String, p1: MaxError) {
+                    logD("Max Error Code : ${p1.code}")
+                    onErrorFun(errorMessage = p1.message)
                 }
 
-                override fun onAdDisplayFailed(p0: MaxAd?, p1: MaxError?) {
-                    onErrorFun(errorMessage = p1!!.message)
+                override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
+                    onErrorFun(errorMessage = p1.message)
                 }
 
-                override fun onAdExpanded(p0: MaxAd?) {
+                override fun onAdExpanded(p0: MaxAd) {
                     logD("onAdExpanded")
                 }
 
-                override fun onAdCollapsed(p0: MaxAd?) {
+                override fun onAdCollapsed(p0: MaxAd) {
                     logD("onAdCollapsed")
                 }
             })
             maxBannerView.setRevenueListener {
                 val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
-                adjustAdRevenue.setRevenue(it?.revenue, "USD")
-                adjustAdRevenue.setAdRevenueNetwork(it?.networkName)
-                adjustAdRevenue.setAdRevenueUnit(it?.adUnitId)
-                adjustAdRevenue.setAdRevenuePlacement(it?.placement)
+                adjustAdRevenue.setRevenue(it.revenue, "USD")
+                adjustAdRevenue.setAdRevenueNetwork(it.networkName)
+                adjustAdRevenue.setAdRevenueUnit(it.adUnitId)
+                adjustAdRevenue.setAdRevenuePlacement(it.placement)
                 Adjust.trackAdRevenue(adjustAdRevenue)
             }
+            maxBannerView.layoutParams =
+                ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50)
             maxBannerView.loadAd()
             maxBannerView.startAutoRefresh()
         } catch (error: Exception) {
@@ -253,7 +257,7 @@ object BannerAdMediation {
 
     private fun onErrorFun(errorMessage: String) {
         if (AdsApplication.getAdsModel() != null) {
-            selectAd()
+//            selectAd()
         } else {
             this.bannerAdListener!!.onError(error = errorMessage)
             clearValue()

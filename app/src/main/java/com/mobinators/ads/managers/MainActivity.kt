@@ -39,6 +39,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     override fun getActivityView() = ActivityMainBinding.inflate(layoutInflater)
     override fun initView(savedInstanceState: Bundle?) {
         MediationAdInterstitial.initInterstitialAds(this, false)
+        MediationRewardedInterstitialAd.loadRewardedInterstitialAds(this, false)
         binding.maxAdActivity.setOnClickListener(this)
         binding.loadAds.setOnClickListener(this)
         binding.nativeAds.setOnClickListener(this)
@@ -48,6 +49,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
         binding.openAds.setOnClickListener(this)
         binding.interAds.setOnClickListener(this)
         binding.billingButton.setOnClickListener(this)
+        binding.collapseBannerButton.setOnClickListener(this)
         mediationNativeAd = MediationNativeAd(this, false, binding.adContainer, false)
         logD("Device Info : ${DeviceInfoUtils.getDeviceInfo()}")
         inAppPurchased()
@@ -68,6 +70,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                     AppPurchaseUtils.onSubscription("product_id_example")
                 }
             }
+
+            binding.collapseBannerButton.id -> navigateActivity(
+                this,
+                CollapseBannerActivity::class.java
+            )
         }
     }
 
@@ -170,8 +177,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                 logD("MainActivity onClicked Ads Type : $adType")
             }
 
-            override fun onDismissClick(adType: Int) {
+            override fun onDismissClick(adType: Int, item: RewardItem) {
                 logD("MainActivity onDismissClick Ads Type : $adType")
+            }
+
+            override fun onCancel(adType: Int) {
+                logD("MainActivity onCancel Ads Type: $adType")
             }
 
             override fun onRewarded(item: RewardItem) {
@@ -190,7 +201,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     }
 
     private fun rewardedInterstitialAds() {
-        MediationRewardedInterstitialAd.loadRewardedInterstitialAd(
+        MediationRewardedInterstitialAd.showRewardedInterstitialAd(
             this, false,
             object : OnRewardedAdListener {
                 override fun onError(error: String) {
@@ -205,8 +216,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                     logD("MainActivity onClicked Ads Type : $adType")
                 }
 
-                override fun onDismissClick(adType: Int) {
-                    logD("MainActivity onDismissClick Ads Type : $adType")
+                override fun onDismissClick(adType: Int, item: RewardItem) {
+                    logD("MainActivity onDismissClick Ads Type : ${item.amount}")
+                }
+
+                override fun onCancel(adType: Int) {
+                    logD("MainActivity onCancel Ads Type: $adType")
                 }
 
                 override fun onRewarded(item: RewardItem) {
@@ -304,6 +319,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                 }
             })
     }
+
 
     override fun onBackPressed() {
         exitPanel(supportFragmentManager, object : PanelListener {

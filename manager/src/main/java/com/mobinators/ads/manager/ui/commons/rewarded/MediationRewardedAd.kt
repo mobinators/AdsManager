@@ -171,7 +171,7 @@ object MediationRewardedAd {
                     override fun onAdDismissedFullScreenContent() {
                         super.onAdDismissedFullScreenContent()
                         rewardedAd = null
-                        onRewardedAdListener!!.onDismissClick(AdsConstants.AD_MOB)
+                        onRewardedAdListener!!.onDismissClick(AdsConstants.AD_MOB, rewardedAd!!.rewardItem)
                     }
 
                     override fun onAdFailedToShowFullScreenContent(p0: AdError) {
@@ -217,27 +217,27 @@ object MediationRewardedAd {
             logD("Max Rewarded Ad Id : $maxRewardedKey")
             maxRewardedAd = MaxRewardedAd.getInstance(this.maxRewardedKey!!, this.currentActivity!!)
             maxRewardedAd!!.setListener(object : MaxRewardedAdListener {
-                override fun onAdLoaded(p0: MaxAd?) {
+                override fun onAdLoaded(p0: MaxAd) {
                     logD("onAdLoaded")
                     retryAttempt = 0
                     onRewardedAdListener!!.onAdLoaded(AdsConstants.MAX_MEDIATION)
                     showMaxRewardedAd()
                 }
 
-                override fun onAdDisplayed(p0: MaxAd?) {
+                override fun onAdDisplayed(p0: MaxAd) {
                     logD("onAdDisplayed")
                 }
 
-                override fun onAdHidden(p0: MaxAd?) {
+                override fun onAdHidden(p0: MaxAd) {
                     logD("onAdHidden")
                 }
 
-                override fun onAdClicked(p0: MaxAd?) {
+                override fun onAdClicked(p0: MaxAd) {
                     logD("onAdClicked")
                     onRewardedAdListener!!.onClicked(AdsConstants.MAX_MEDIATION)
                 }
 
-                override fun onAdLoadFailed(p0: String?, p1: MaxError?) {
+                override fun onAdLoadFailed(p0: String, p1: MaxError) {
                     logD("onAdLoadFailed")
                     retryAttempt++
                     val delayMillis =
@@ -246,33 +246,43 @@ object MediationRewardedAd {
                         { maxRewardedAd!!.loadAd() },
                         delayMillis
                     )
-                    onRewardedAdListener!!.onError(p1!!.message)
+                    onRewardedAdListener!!.onError(p1.message)
                 }
 
-                override fun onAdDisplayFailed(p0: MaxAd?, p1: MaxError?) {
+                override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
                     logD("onAdDisplayFailed")
-                    onRewardedAdListener!!.onError(p1!!.message)
+                    onRewardedAdListener!!.onError(p1.message)
                 }
 
-                override fun onUserRewarded(p0: MaxAd?, p1: MaxReward?) {
+                override fun onUserRewarded(p0: MaxAd, p1: MaxReward) {
                     logD("onUserRewarded")
                 }
 
-                override fun onRewardedVideoStarted(p0: MaxAd?) {
+                @Deprecated("Deprecated in Java", ReplaceWith(
+                    "logD(\"onRewardedVideoStarted\")",
+                    "pak.developer.app.managers.extensions.logD"
+                )
+                )
+                override fun onRewardedVideoStarted(p0: MaxAd) {
                     logD("onRewardedVideoStarted")
                 }
 
-                override fun onRewardedVideoCompleted(p0: MaxAd?) {
+                @Deprecated("Deprecated in Java", ReplaceWith(
+                    "logD(\"onRewardedVideoCompleted\")",
+                    "pak.developer.app.managers.extensions.logD"
+                )
+                )
+                override fun onRewardedVideoCompleted(p0: MaxAd) {
                     logD("onRewardedVideoCompleted")
                 }
             })
             maxRewardedAd!!.setRevenueListener { ad ->
                 logD("setRevenueListener : ${ad.revenue}")
                 val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
-                adjustAdRevenue.setRevenue(ad?.revenue, "USD")
-                adjustAdRevenue.setAdRevenueNetwork(ad?.networkName)
-                adjustAdRevenue.setAdRevenueUnit(ad?.adUnitId)
-                adjustAdRevenue.setAdRevenuePlacement(ad?.placement)
+                adjustAdRevenue.setRevenue(ad.revenue, "USD")
+                adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
+                adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
+                adjustAdRevenue.setAdRevenuePlacement(ad.placement)
                 Adjust.trackAdRevenue(adjustAdRevenue)
             }
             maxRewardedAd!!.loadAd()

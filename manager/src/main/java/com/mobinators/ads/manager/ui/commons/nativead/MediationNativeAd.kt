@@ -432,28 +432,28 @@ class MediationNativeAd(
             }
 
             nativeAdLoader!!.setNativeAdListener(object : MaxNativeAdListener() {
-                override fun onNativeAdLoaded(p0: MaxNativeAdView?, ad: MaxAd?) {
-                    super.onNativeAdLoaded(p0, ad)
+                override fun onNativeAdLoaded(p0: MaxNativeAdView?, p1: MaxAd) {
+                    super.onNativeAdLoaded(p0, p1)
                     if (nativeAd != null) {
                         nativeAdLoader!!.destroy(nativeAd)
                     }
-                    nativeAd = ad
+                    nativeAd = p1
                     itemView.removeAllViews()
                     itemView.addView(p0)
                     onNativeAdListener!!.onLoaded(AdsConstants.MAX_MEDIATION)
                 }
 
-                override fun onNativeAdLoadFailed(p0: String?, p1: MaxError?) {
+                override fun onNativeAdLoadFailed(p0: String, p1: MaxError) {
                     super.onNativeAdLoadFailed(p0, p1)
                     itemView.gone()
                     onNativeAdListener!!.onError(p1!!.message)
                 }
 
-                override fun onNativeAdExpired(p0: MaxAd?) {
+                override fun onNativeAdExpired(p0: MaxAd) {
                     super.onNativeAdExpired(p0)
                 }
 
-                override fun onNativeAdClicked(p0: MaxAd?) {
+                override fun onNativeAdClicked(p0: MaxAd) {
                     super.onNativeAdClicked(p0)
                     onNativeAdListener!!.onAdClicked(AdsConstants.MAX_MEDIATION)
                 }

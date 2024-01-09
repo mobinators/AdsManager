@@ -5,6 +5,7 @@ data class AdsModel(
     var admobInterstitialID: String? = null,
     var admobNativeID: String? = null,
     var admobBannerID: String? = null,
+    var collapseBannerID: String? = null,
     var admobOpenAdID: String? = null,
     var admobRewardedID: String? = null,
     var admobRewardedInterstitialID: String? = null,

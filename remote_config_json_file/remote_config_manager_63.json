@@ -1,10 +1,10 @@
 {
   "parameters": {
-    "Strategy": {
+    "ADMOB_COLLAPSE_BANNER_ADS_ID": {
       "defaultValue": {
-        "value": "2"
+        "value": "ca-app-pub-3940256099942544/2014213617"
       },
-      "valueType": "NUMBER"
+      "valueType": "STRING"
     },
     "ADMOB_MEDIATION_KEY": {
       "defaultValue": {
@@ -56,7 +56,7 @@
     },
     "APPLOVIN_APP_ID": {
       "defaultValue": {
-        "value": "sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-DcTfCWvHWTNRTTB12ENX5rp1LVcPGq9NoHdoQyLpl8469q4z71" 
+        "value": "sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-1DcTfCWvHWTNRTTB12ENHdoQyLp469q4z7X5rp1LVcPGq9Nol8"
       },
       "valueType": "STRING"
     },
@@ -108,6 +108,12 @@
       },
       "valueType": "STRING"
     },
+    "Strategy": {
+      "defaultValue": {
+        "value": "2"
+      },
+      "valueType": "NUMBER"
+    },
     "ADMOB_OPEN_AD_ENABLE": {
       "defaultValue": {
         "value": "true"
@@ -122,8 +128,8 @@
     }
   },
   "version": {
-    "versionNumber": "59",
-    "updateTime": "2023-09-13T05:11:15.193614Z",
+    "versionNumber": "63",
+    "updateTime": "2024-01-08T07:02:26.266860Z",
     "updateUser": {
       "email": "mobinators1010@gmail.com"
     },

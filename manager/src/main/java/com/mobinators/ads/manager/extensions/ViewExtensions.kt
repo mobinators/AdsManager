@@ -8,6 +8,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -198,5 +199,11 @@ fun Activity.exitPanel(
     exitFragment.setPanelModel(model = model ?: PanelModel())
     exitFragment.setListener(listener = listener)
     exitFragment.show(fragmentManager, exitFragment.tag)
+}
+
+inline fun <reified T> sdk30AndUp(onSdk30: () -> T): T? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        return onSdk30()
+    } else null
 }
 

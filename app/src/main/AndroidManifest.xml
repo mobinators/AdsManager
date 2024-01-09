@@ -15,6 +15,9 @@
         android:theme="@style/Theme.AdsManager"
         tools:targetApi="31">
         <activity
+            android:name=".CollapseBannerActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity

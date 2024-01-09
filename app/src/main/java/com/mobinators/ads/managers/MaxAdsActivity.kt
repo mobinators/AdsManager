@@ -28,6 +28,7 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
     override fun getActivityView() = ActivityMaxAdsBinding.inflate(layoutInflater)
 
     override fun initView(savedInstanceState: Bundle?) {
+        AdsUtils.maxTestAds(this)
         binding.maxBanner.setOnClickListener(this)
         binding.maxNative.setOnClickListener(this)
         binding.maxNativeBanner.setOnClickListener(this)
@@ -154,8 +155,12 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
                 logD("MaxAdsActivity onClicked Ads Type : $adType")
             }
 
-            override fun onDismissClick(adType: Int) {
+            override fun onDismissClick(adType: Int, item: RewardItem) {
                 logD("MaxAdsActivity onDismissClick Ads Type : $adType")
+            }
+
+            override fun onCancel(adType: Int) {
+                logD("MaxAdsActivity onCancel Ads Type: $adType")
             }
 
             override fun onRewarded(item: RewardItem) {

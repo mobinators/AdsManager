@@ -242,43 +242,43 @@ object MediationOpenAd {
             logD("Max Open Ads ID: ${this.maxAppOpenAdId}")
             maxAppOpenAd = MaxAppOpenAd(this.maxAppOpenAdId!!, this.currentActivity!!)
             maxAppOpenAd!!.setListener(object : MaxAdListener {
-                override fun onAdLoaded(p0: MaxAd?) {
+                override fun onAdLoaded(p0: MaxAd) {
                     logD("onAdLoaded")
                     showMaxAds()
                     loadTime = Date().time
                     AdsApplication.analyticsEvent("openAdLoaded", "onAddLoadedCalled")
                 }
 
-                override fun onAdDisplayed(p0: MaxAd?) {
+                override fun onAdDisplayed(p0: MaxAd) {
                     logD("onAdDisplayed")
                     isShowingAd = true
                 }
 
-                override fun onAdHidden(p0: MaxAd?) {
+                override fun onAdHidden(p0: MaxAd) {
                     logD("onAdHidden")
                 }
 
-                override fun onAdClicked(p0: MaxAd?) {
+                override fun onAdClicked(p0: MaxAd) {
                     logD("onAdClicked")
                 }
 
-                override fun onAdLoadFailed(p0: String?, loadError: MaxError?) {
+                override fun onAdLoadFailed(p0: String, p1: MaxError) {
                     logD("onAdLoadFailed")
                     isShowingAd = false
-                    openAddCallback!!.onErrorToShow(loadError!!.message)
+                    openAddCallback!!.onErrorToShow(p1.message)
                 }
 
-                override fun onAdDisplayFailed(p0: MaxAd?, p1: MaxError?) {
+                override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
                     logD("onAdDisplayFailed")
                     isShowingAd = false
                 }
             })
             maxAppOpenAd!!.setRevenueListener {
                 val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
-                adjustAdRevenue.setRevenue(it?.revenue, "USD")
-                adjustAdRevenue.setAdRevenueNetwork(it?.networkName)
-                adjustAdRevenue.setAdRevenueUnit(it?.adUnitId)
-                adjustAdRevenue.setAdRevenuePlacement(it?.placement)
+                adjustAdRevenue.setRevenue(it.revenue, "USD")
+                adjustAdRevenue.setAdRevenueNetwork(it.networkName)
+                adjustAdRevenue.setAdRevenueUnit(it.adUnitId)
+                adjustAdRevenue.setAdRevenuePlacement(it.placement)
                 Adjust.trackAdRevenue(adjustAdRevenue)
             }
             maxAppOpenAd!!.loadAd()

@@ -181,6 +181,7 @@ object MediationAdInterstitial {
 
     private fun showMaxInterstitialAd() {
         try {
+            logD("Calling Max Ads Interstitial Show Function")
             if (AdsUtils.isOnline(this.activity!!).not()) {
                 logD("is Offline ")
                 this.interstitialListener!!.isOffline(true)
@@ -274,10 +275,12 @@ object MediationAdInterstitial {
                     return
                 }
             }
+            logD("Max Interstitial Ads calling Function : ID : ${AdsApplication.getAdsModel()!!.maxInterstitialID} ")
             AdsApplication.analyticsEvent("admb_req", "Send interstitial max request")
             maxInterstitialAd = MaxInterstitialAd(this.maxKey!!, activityRef!!.get()!!)
+            maxInterstitialAd!!.loadAd()
             maxInterstitialAd!!.setListener(object : MaxAdListener {
-                override fun onAdLoaded(p0: MaxAd?) {
+                override fun onAdLoaded(p0: MaxAd) {
                     showAd = true
                     AdsConstants.canShowInterstitial = true
                     logD("MAX MEDIATION FRONT AD Loaded")
@@ -288,7 +291,7 @@ object MediationAdInterstitial {
                     showMaxInterstitialAd()
                 }
 
-                override fun onAdDisplayed(p0: MaxAd?) {
+                override fun onAdDisplayed(p0: MaxAd) {
                     AdsApplication.analyticsEvent(
                         "max_AdShow",
                         "Inters max ad showFullScreen"
@@ -301,19 +304,19 @@ object MediationAdInterstitial {
                     logD("The max ad was shown")
                 }
 
-                override fun onAdHidden(p0: MaxAd?) {
+                override fun onAdHidden(p0: MaxAd) {
                     logD("MAX FRONT Dismissed")
                     if (interstitialListener != null) {
                         interstitialListener!!.onDismisses(AdsConstants.MAX_MEDIATION)
                     }
                 }
 
-                override fun onAdClicked(p0: MaxAd?) {
+                override fun onAdClicked(p0: MaxAd) {
 
                 }
 
-                override fun onAdLoadFailed(p0: String?, adError: MaxError?) {
-                    logD("MAX FRONT AD Error : ${adError!!.message}")
+                override fun onAdLoadFailed(p0: String, p1: MaxError) {
+                    logD("MAX FRONT AD Error : ${p1.message}")
                     AdsApplication.analyticsEvent("max_failed", "Inters max ad failed load")
                     onLoadError()
                     if (AdsApplication.isAdmobInLimit()) {
@@ -322,7 +325,7 @@ object MediationAdInterstitial {
                     maxInterstitialAd = null
                 }
 
-                override fun onAdDisplayFailed(p0: MaxAd?, p1: MaxError?) {
+                override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
                     AdsApplication.analyticsEvent(
                         "max_failedShow",
                         "Inters max ad failed show"
@@ -331,13 +334,13 @@ object MediationAdInterstitial {
             })
             maxInterstitialAd!!.setRevenueListener { ad ->
                 val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
-                adjustAdRevenue.setRevenue(ad?.revenue, "USD")
-                adjustAdRevenue.setAdRevenueNetwork(ad?.networkName)
-                adjustAdRevenue.setAdRevenueUnit(ad?.adUnitId)
-                adjustAdRevenue.setAdRevenuePlacement(ad?.placement)
+                adjustAdRevenue.setRevenue(ad.revenue, "USD")
+                adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
+                adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
+                adjustAdRevenue.setAdRevenuePlacement(ad.placement)
                 Adjust.trackAdRevenue(adjustAdRevenue)
             }
-            maxInterstitialAd!!.loadAd()
+
         } catch (error: Exception) {
             onError("showInterstitialAds Error : ${error.localizedMessage}")
         }
