@@ -14,7 +14,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.1.4'
+  implementation 'com.github.mobinators:AdsManager:1.1.5'
 ```
 
 -> add Firebase classpath in Project level gradle
