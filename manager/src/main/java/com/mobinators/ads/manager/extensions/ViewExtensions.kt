@@ -207,3 +207,7 @@ inline fun <reified T> sdk30AndUp(onSdk30: () -> T): T? {
     } else null
 }
 
+
+
+
+inline infix fun <T> Boolean.then(param: () -> T): T? = if (this) param() else null

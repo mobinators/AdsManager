@@ -2,8 +2,7 @@ package com.mobinators.ads.manager.ui.commons.interstitial
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.os.Handler
-import android.os.Looper
+import android.content.Context
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAdRevenue
 import com.adjust.sdk.AdjustConfig
@@ -16,45 +15,29 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.mobinators.ads.manager.applications.AdsApplication
-import com.mobinators.ads.manager.ui.commons.listener.InterstitialAdsListener
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.logD
-import java.lang.ref.WeakReference
 
 @SuppressLint("StaticFieldLeak")
 object MediationAdInterstitial {
-    private var interstitialListener: InterstitialAdsListener? = null
-    private var activityRef: WeakReference<Activity>? = null
-    private var maxInterstitialAd: MaxInterstitialAd? = null
-    private var admobInterstitialAD: InterstitialAd? = null
-    private var activity: Activity? = null
-    private var adMobKey: String? = null
+    private var admobInterstitialAds: InterstitialAd? = null
+    private var maxInterstitialAds: MaxInterstitialAd? = null
+    private var admobKey: String? = null
     private var maxKey: String? = null
-    private var showAd: Boolean = true
-    private var timer = 3000L
-    fun showInterstitialAd(
-        activity: Activity,
-        isPurchased: Boolean,
-        listener: InterstitialAdsListener
-    ) {
-        this.activity = activity
-        this.interstitialListener = listener
-        logD("Ads Pre loaded : ${AdsConstants.isAdPreloadEnable}")
+    private var adsLoadCallback: LoadCallback? = null
+    private var adsShowCallback: AdsShowCallback? = null
+    private var activityRef: Activity? = null
+    private var contextRef: Context? = null
+    fun loadInterstitialAds(activity: Context, isPurchased: Boolean, listener: LoadCallback) {
+        this.adsLoadCallback = listener
+        this.contextRef = activity
         if (isPurchased) {
-            listener.onError("You have pro version")
+            this.adsLoadCallback!!.onAdsError("You have purchased")
             return
         }
-        if (AdsConstants.isAdPreloadEnable.not()) {
-            PreLoadMediationAdInterstitial.showInterstitialAdOnTime(activity, isPurchased, listener)
-            return
-        }
-        logD("After PreLoad Ads")
-        AdsConstants.interstitialClickAdCounter = 0
-        AdsConstants.interstitialClickAdCounter++
-        this.adMobKey = if (AdsConstants.testMode) {
+        this.admobKey = if (AdsConstants.testMode) {
             AdsConstants.TEST_ADMOB_INTERSTITIAL_ID
         } else {
             if (AdsApplication.getAdsModel()!!.admobMediation) {
@@ -68,271 +51,113 @@ object MediationAdInterstitial {
         } else {
             AdsApplication.getAdsModel()!!.maxInterstitialID
         }
-        try {
-            this.activityRef = WeakReference(activity)
-            showAd = true
-            logD("Interstitial Ad Ids---Admob: ${this.adMobKey} ----Max: ${this.maxKey}")
-            showSelectedAd()
-            Handler(Looper.getMainLooper()).postDelayed({
-                if (this.showAd && this.interstitialListener != null) {
-                    this.showAd = false
-                    this.timer = 2000L
-                }
-            }, timer)
-        } catch (error: Exception) {
-            onError(error.localizedMessage)
-        }
-    }
-
-
-    fun initInterstitialAds(activity: Activity, isPurchased: Boolean) {
-        this.activity = activity
-        if (AdsUtils.isOnline(activity).not()) {
-            logD("Internet required")
+        if (AdsUtils.isOnline(this.contextRef!!).not()) {
+            this.adsLoadCallback!!.onAdsError(error = "Interstitial Ads Network Error")
             return
         }
-        logD("initInterstitialAds : ${AdsApplication.getAdsModel()?.strategy}")
-        if (AdsConstants.isInit.not()) {
-            Handler(Looper.myLooper()!!).postDelayed(Runnable {
-                initInterstitialAds(activity, isPurchased)
-            }, 1500)
-            return
-        }
-        if (isPurchased) {
-            return
-        }
-        this.adMobKey = if (AdsConstants.testMode) {
-            AdsConstants.TEST_ADMOB_INTERSTITIAL_ID
-        } else {
-            if (AdsApplication.getAdsModel()!!.admobMediation) {
-                AdsApplication.getAdsModel()!!.admobMediationInterstitialId
-
-            } else {
-                AdsApplication.getAdsModel()!!.admobInterstitialID
-            }
-        }
-        this.maxKey = if (AdsConstants.testMode) {
-            AdsConstants.TEST_MAX_INTERSTITIAL_ADS_ID
-        } else {
-            AdsApplication.getAdsModel()!!.maxInterstitialID
-        }
-        initAdMobInterstitialAd()
-        initMaxInterstitialAd()
-//        initSelectedAd()
+        initSelectedInterstitialAds()
     }
 
-    private fun showAdmobInterstitialAd() {
+    private fun initSelectedInterstitialAds() {
         try {
-            if (AdsUtils.isOnline(this.activity!!).not()) {
-                logD("is Offline ")
-                this.interstitialListener!!.isOffline(true)
-                return
+            when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
+                AdsConstants.ADS_OFF -> this.adsLoadCallback!!.onAdsOff()
+                AdsConstants.AD_MOB_MEDIATION -> initInterstitialAds()
+                AdsConstants.AD_MOB -> initInterstitialAds()
+                AdsConstants.MAX_MEDIATION -> initMaxInterstitialAds()
+                else -> this.adsLoadCallback!!.onAdsError(error = "Ads Strategy wrong")
             }
-            if (this.showAd) {
-                if (this.admobInterstitialAD == null) {
-                    onError("Admob interstitial ad is null")
-                } else {
-                    this.showAd = false
-                    if (this.interstitialListener != null) {
-                        this.interstitialListener!!.onBeforeAdShow()
-                    }
-                    this.admobInterstitialAD!!.fullScreenContentCallback =
-                        object : FullScreenContentCallback() {
-                            override fun onAdFailedToShowFullScreenContent(error: AdError) {
-                                super.onAdFailedToShowFullScreenContent(error)
-                                onError(error.message)
-                                AdsApplication.analyticsEvent(
-                                    "amb_failedToShow",
-                                    "Inters admob ad failedShow"
-                                )
-                            }
 
-                            override fun onAdDismissedFullScreenContent() {
-                                super.onAdDismissedFullScreenContent()
-                                if (interstitialListener != null) {
-                                    interstitialListener!!.onDismisses(AdsConstants.AD_MOB)
-                                }
-                            }
-
-                            override fun onAdShowedFullScreenContent() {
-                                super.onAdShowedFullScreenContent()
-                                AdsApplication.analyticsEvent(
-                                    "amb_AdShowdFlScr",
-                                    "Inters admob ad showFullScreen"
-                                )
-                                admobInterstitialAD = null
-                                AdsApplication.setTime(
-                                    activityRef!!.get()!!,
-                                    AdsConstants.INTERSTITIAL_KEY
-                                )
-                                logD("The admob ad was shown.")
-                            }
-                        }
-                    this.admobInterstitialAD!!.show(this.activity!!)
-                    initSelectedAd()
-                }
-            } else {
-                initInterstitialAds(this.activity!!, false)
-            }
         } catch (error: Exception) {
-            onError("showInterstitialAds Error : ${error.localizedMessage}")
+            this.adsLoadCallback!!.onAdsError(error = "initSelectedInterstitialAds Error : ${error.localizedMessage}")
         }
     }
 
-    private fun showMaxInterstitialAd() {
+    private fun initInterstitialAds() {
         try {
-            logD("Calling Max Ads Interstitial Show Function")
-            if (AdsUtils.isOnline(this.activity!!).not()) {
-                logD("is Offline ")
-                this.interstitialListener!!.isOffline(true)
-                return
-            }
-            if (this.maxInterstitialAd != null) {
-                if (this.maxInterstitialAd!!.isReady) {
-                    this.maxInterstitialAd!!.showAd()
-                }
-            }
-        } catch (error: Exception) {
-            onError("showInterstitialAds Error : ${error.localizedMessage}")
-        }
-    }
-
-    private fun initAdMobInterstitialAd() {
-        try {
-            logD("initAdMobInterstitialAd")
             if (AdsApplication.isAdmobInLimit()) {
                 if (AdsApplication.applyLimitOnAdmob) {
-                    onError("Interstitial add banned in current duw to admob limit")
+                    this.adsLoadCallback!!.onAdsError("Interstitial add banned in current duw to admob limit")
                     return
                 }
             }
-            if (this.adMobKey!!.isEmpty() || this.adMobKey!!.isBlank()) {
-                onError("Null IDS Found")
+            if (this.admobKey!!.isEmpty() || this.admobKey!!.isBlank()) {
+                this.adsLoadCallback!!.onAdsError(error = "Null Interstitial Ads IDS Found")
                 return
             }
-            if (AdsUtils.isOnline(this.activity!!).not()) {
-                logD("is Offline ")
-                this.interstitialListener!!.isOffline(true)
-                return
-            }
-            if (this.adMobKey == AdsConstants.TEST_ADMOB_INTERSTITIAL_ID) {
-                logD("Test Ids")
-                if (AdsConstants.testMode.not()) {
-                    onError("NULL OR TEST IDS FOUND")
-                    this.interstitialListener!!.onError("NULL OR TEST IDS FOUND")
+            if (AdsConstants.testMode.not()) {
+                if (this.admobKey == AdsConstants.TEST_ADMOB_INTERSTITIAL_ID) {
+                    this.adsLoadCallback!!.onAdsError(error = "NULL OR TEST Interstitial Ads IDS FOUND because your app is release mode")
                     return
                 }
             }
-            AdsConstants.loadAdmobInters++
-            logD("Load Admob : ${AdsConstants.loadAdmobInters}")
-            AdsApplication.analyticsEvent("admb_req", "Send interstitial admob request")
             InterstitialAd.load(
-                this.activity!!,
-                this.adMobKey!!,
+                this.contextRef!!,
+                admobKey!!,
                 AdsApplication.getAdRequest(),
                 object : InterstitialAdLoadCallback() {
                     override fun onAdLoaded(ads: InterstitialAd) {
                         super.onAdLoaded(ads)
-                        admobInterstitialAD = ads
-                        if (interstitialListener != null) {
-                            interstitialListener!!.onLoaded(AdsConstants.AD_MOB)
-                        }
-                        AdsApplication.analyticsEvent("admob_load", "Inters admob ad loaded")
+                        admobInterstitialAds = ads
+                        logD("Interstitial Admob Ads Loaded")
+                        this@MediationAdInterstitial.adsLoadCallback!!.onAdsLoaded()
                     }
 
                     override fun onAdFailedToLoad(err: LoadAdError) {
                         super.onAdFailedToLoad(err)
                         logD("Admob Front Ad  Error : ${err.message}")
-                        AdsApplication.analyticsEvent(
-                            "adm_failedload",
-                            "Inters admob ad failedload"
-                        )
-                        initSelectedAd()
-                        admobInterstitialAD = null
+                        this@MediationAdInterstitial.adsLoadCallback!!.onAdsError(error = " Interstitial Ads Load Failed")
+                        admobInterstitialAds = null
                     }
                 })
         } catch (error: Exception) {
-            onError("showInterstitialAds Error : ${error.localizedMessage}")
+            this.adsLoadCallback!!.onAdsError(error = "Interstitial Ads Load Error: ${error.localizedMessage}")
         }
     }
 
-    private fun initMaxInterstitialAd() {
+    private fun initMaxInterstitialAds() {
         try {
             if (this.maxKey!!.isEmpty() || this.maxKey!!.isBlank()) {
-                onError("NULL  IDS FOUND")
+                this.adsLoadCallback!!.onAdsError(error = " NULL  Max Interstitial Ads IDS FOUND")
                 return
             }
-            if (AdsUtils.isOnline(this.activity!!).not()) {
-                logD("is Offline ")
-                this.interstitialListener!!.isOffline(true)
-                return
-            }
-            if (this.maxKey == AdsConstants.TEST_MAX_INTERSTITIAL_ADS_ID) {
-                logD("Test Ids")
-                if (AdsConstants.testMode.not()) {
-                    onError("NULL OR TEST IDS FOUND")
-                    this.interstitialListener!!.onError("NULL OR TEST IDS FOUND")
+            if (AdsConstants.testMode.not()) {
+                if (this.maxKey == AdsConstants.TEST_MAX_INTERSTITIAL_ADS_ID) {
+                    this.adsLoadCallback!!.onAdsError(error = "NULL OR TEST MAX Interstitial Ads IDS FOUND because your app is release mode")
                     return
                 }
             }
-            logD("Max Interstitial Ads calling Function : ID : ${AdsApplication.getAdsModel()!!.maxInterstitialID} ")
-            AdsApplication.analyticsEvent("admb_req", "Send interstitial max request")
-            maxInterstitialAd = MaxInterstitialAd(this.maxKey!!, activityRef!!.get()!!)
-            maxInterstitialAd!!.loadAd()
-            maxInterstitialAd!!.setListener(object : MaxAdListener {
+            this.maxInterstitialAds = MaxInterstitialAd("YOUR_AD_UNIT_ID", this.activityRef!!)
+            this.maxInterstitialAds!!.loadAd()
+            this.maxInterstitialAds!!.setListener(object : MaxAdListener {
                 override fun onAdLoaded(p0: MaxAd) {
-                    showAd = true
-                    AdsConstants.canShowInterstitial = true
-                    logD("MAX MEDIATION FRONT AD Loaded")
-                    if (interstitialListener != null) {
-                        interstitialListener!!.onLoaded(AdsConstants.AD_MOB)
-                    }
-                    AdsApplication.analyticsEvent("max_loaded", "Inters max ad loaded")
-                    showMaxInterstitialAd()
+                    this@MediationAdInterstitial.adsLoadCallback!!.onAdsLoaded()
                 }
 
                 override fun onAdDisplayed(p0: MaxAd) {
-                    AdsApplication.analyticsEvent(
-                        "max_AdShow",
-                        "Inters max ad showFullScreen"
-                    )
-                    maxInterstitialAd = null
-                    AdsApplication.setTime(
-                        activityRef!!.get()!!,
-                        AdsConstants.INTERSTITIAL_KEY
-                    )
-                    logD("The max ad was shown")
                 }
 
                 override fun onAdHidden(p0: MaxAd) {
-                    logD("MAX FRONT Dismissed")
-                    if (interstitialListener != null) {
-                        interstitialListener!!.onDismisses(AdsConstants.MAX_MEDIATION)
-                    }
+                    this@MediationAdInterstitial.adsShowCallback!!.onAdsDismiss()
                 }
 
                 override fun onAdClicked(p0: MaxAd) {
-
+                    this@MediationAdInterstitial.adsShowCallback!!.onAdsClicked()
                 }
 
                 override fun onAdLoadFailed(p0: String, p1: MaxError) {
-                    logD("MAX FRONT AD Error : ${p1.message}")
-                    AdsApplication.analyticsEvent("max_failed", "Inters max ad failed load")
-                    onLoadError()
+                    this@MediationAdInterstitial.adsLoadCallback!!.onAdsError(error = "Max Interstitial Ads failed to load")
                     if (AdsApplication.isAdmobInLimit()) {
                         AdsApplication.applyLimitOnAdmob = true
                     }
-                    maxInterstitialAd = null
+                    this@MediationAdInterstitial.maxInterstitialAds = null
                 }
 
                 override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
-                    AdsApplication.analyticsEvent(
-                        "max_failedShow",
-                        "Inters max ad failed show"
-                    )
+                    this@MediationAdInterstitial.adsShowCallback!!.onAdsError(error = "Max Interstitial Ads failed Display")
                 }
             })
-            maxInterstitialAd!!.setRevenueListener { ad ->
+            this.maxInterstitialAds!!.setRevenueListener { ad ->
                 val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
                 adjustAdRevenue.setRevenue(ad.revenue, "USD")
                 adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
@@ -340,95 +165,109 @@ object MediationAdInterstitial {
                 adjustAdRevenue.setAdRevenuePlacement(ad.placement)
                 Adjust.trackAdRevenue(adjustAdRevenue)
             }
-
         } catch (error: Exception) {
-            onError("showInterstitialAds Error : ${error.localizedMessage}")
+            this@MediationAdInterstitial.adsShowCallback!!.onAdsError(error = "Max Interstitial Ads Error : ${error.localizedMessage}")
         }
     }
 
-    private fun showSelectedAd() {
-        try {
-            if (AdsApplication.canShow(this.activity!!, AdsConstants.INTERSTITIAL_KEY, 0).not()) {
-                this.interstitialListener!!.onError("Time limit: Time is remaining to show! ")
-                finishAd()
-                return
-            }
-            when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> {
-                    this.interstitialListener!!.isEnableAds(false)
-                }
-
-                AdsConstants.AD_MOB_MEDIATION -> {
-                    this.interstitialListener!!.isEnableAds(true)
-                    showAdmobInterstitialAd()
-                }
-
-                AdsConstants.AD_MOB -> {
-                    this.interstitialListener!!.isEnableAds(true)
-                    showAdmobInterstitialAd()
-                }
-
-                AdsConstants.MAX_MEDIATION -> {
-                    this.interstitialListener!!.isEnableAds(true)
-                    showMaxInterstitialAd()
-                }
-
-                else -> {
-                    onError("You have to select priority type ADMOB or ADMOB MEDIATION or MAX MEDIATION")
-                }
-            }
-        } catch (error: Exception) {
-            onError("showInterstitialAds Error : ${error.localizedMessage}")
+    fun showInterstitialAds(activity: Activity, isPurchased: Boolean, listener: AdsShowCallback) {
+        this.adsShowCallback = listener
+        this.activityRef = activity
+        if (isPurchased) {
+            this.adsShowCallback!!.onAdsError("You have purchased")
+            return
         }
+        if (AdsUtils.isOnline(this.contextRef!!).not()) {
+            this.adsShowCallback!!.onAdsError(error = "Interstitial Ads Network Error")
+            return
+        }
+        showSelectedInterstitialAds()
     }
 
-    private fun initSelectedAd() {
+    private fun showSelectedInterstitialAds() {
         try {
             when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> {
-                    this.interstitialListener!!.isEnableAds(false)
-                }
+                AdsConstants.ADS_OFF -> this.adsShowCallback!!.onAdsOff()
+                AdsConstants.AD_MOB_MEDIATION -> showAdmobInterstitialAds()
+                AdsConstants.AD_MOB -> showAdmobInterstitialAds()
+                AdsConstants.MAX_MEDIATION -> showMaxInterstitialAds()
+                else -> this.adsShowCallback!!.onAdsError(error = "Ads Strategy wrong")
+            }
 
-                AdsConstants.AD_MOB_MEDIATION -> {
-                    this.interstitialListener!!.isEnableAds(true)
-                    initAdMobInterstitialAd()
-                }
+        } catch (error: Exception) {
+            this.adsShowCallback!!.onAdsError(error = "Show Admob SelectedInterstitial Ads Error : ${error.localizedMessage}")
+        }
+    }
 
-                AdsConstants.AD_MOB -> {
-                    this.interstitialListener!!.isEnableAds(true)
-                    initAdMobInterstitialAd()
-                }
 
-                AdsConstants.MAX_MEDIATION -> {
-                    this.interstitialListener!!.isEnableAds(true)
-                    initMaxInterstitialAd()
-                }
+    private fun showAdmobInterstitialAds() {
+        try {
+            if (this.admobInterstitialAds != null) {
+                this.admobInterstitialAds!!.show(this.activityRef!!)
+                this.admobInterstitialAds!!.fullScreenContentCallback =
+                    object : FullScreenContentCallback() {
+                        override fun onAdClicked() {
+                            super.onAdClicked()
+                            this@MediationAdInterstitial.adsShowCallback!!.onAdsClicked()
+                        }
 
-                else -> {
-                    finishAd()
-                }
+                        override fun onAdImpression() {
+                            super.onAdImpression()
+                            this@MediationAdInterstitial.adsShowCallback!!.onAdsImpress()
+                        }
+
+                        override fun onAdDismissedFullScreenContent() {
+                            super.onAdDismissedFullScreenContent()
+                            this@MediationAdInterstitial.adsShowCallback!!.onAdsDismiss()
+                        }
+
+                        override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                            super.onAdFailedToShowFullScreenContent(p0)
+                            this@MediationAdInterstitial.adsShowCallback!!.onAdsError(error = "Show Full Screen Interstitial Ads Failed : ${p0.message}")
+                            this@MediationAdInterstitial.admobInterstitialAds = null
+                        }
+
+                        override fun onAdShowedFullScreenContent() {
+                            super.onAdShowedFullScreenContent()
+                            this@MediationAdInterstitial.admobInterstitialAds = null
+                        }
+                    }
+                initSelectedInterstitialAds()
+            } else {
+                initSelectedInterstitialAds()
             }
         } catch (error: Exception) {
-            onError("showInterstitialAds Error : ${error.localizedMessage}")
+            this.adsShowCallback!!.onAdsError("Show Admob Interstitial Ads Error : ${error.localizedMessage}")
         }
     }
 
-    private fun finishAd() {
-        this.interstitialListener = null
-    }
-
-    private fun onError(error: String) {
-        if (AdsApplication.getAdsModel() != null) {
-//            showSelectedAd()
-        } else {
-            if (interstitialListener != null) {
-                interstitialListener!!.onError(error)
+    private fun showMaxInterstitialAds() {
+        try {
+            if (this.maxInterstitialAds != null) {
+                if (this.maxInterstitialAds!!.isReady) {
+                    this.maxInterstitialAds!!.showAd()
+                } else {
+                    initSelectedInterstitialAds()
+                }
+            } else {
+                initSelectedInterstitialAds()
             }
-            finishAd()
+        } catch (error: Exception) {
+            this.adsShowCallback!!.onAdsError(error = " Show Max Interstitial Ads Error : ${error.localizedMessage}")
         }
     }
 
-    private fun onLoadError() {
-        FirebaseCrashlytics.getInstance().log("Interstitial Ads Error")
+    interface LoadCallback {
+        fun onAdsLoaded()
+        fun onAdsError(error: String)
+        fun onAdsOff()
+    }
+
+    interface AdsShowCallback {
+        fun onAdsOff()
+        fun onAdsError(error: String)
+        fun onAdsClicked()
+        fun onAdsDismiss()
+        fun onAdsImpress()
     }
 }

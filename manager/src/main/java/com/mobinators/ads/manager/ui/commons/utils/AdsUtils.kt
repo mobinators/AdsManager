@@ -85,11 +85,17 @@ object AdsUtils {
 
 
     fun isOnline(context: Context): Boolean {
-        val manager: ConnectivityManager? =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-        val netInfo = manager!!.activeNetworkInfo
-        return netInfo != null && netInfo.isConnectedOrConnecting
+        return try {
+            val manager: ConnectivityManager? =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+            val netInfo = manager!!.activeNetworkInfo
+            netInfo != null && netInfo.isConnectedOrConnecting
+        } catch (error: Exception) {
+            logException("Internet Connect is disconnected")
+            false
+        }
     }
+
     fun maxTestAds(activity: Activity) {
         AppLovinSdk.getInstance(activity).showMediationDebugger()
     }

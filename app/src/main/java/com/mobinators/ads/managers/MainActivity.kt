@@ -11,7 +11,6 @@ import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
 import com.mobinators.ads.manager.ui.commons.listener.BannerAdListener
 import com.mobinators.ads.manager.ui.commons.listener.ImageProvider
-import com.mobinators.ads.manager.ui.commons.listener.InterstitialAdsListener
 import com.mobinators.ads.manager.ui.commons.listener.OnNativeAdListener
 import com.mobinators.ads.manager.ui.commons.listener.OnRewardedAdListener
 import com.mobinators.ads.manager.ui.commons.listener.OpenAddCallback
@@ -38,8 +37,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     private var progressDialogUtils: ProgressDialogUtils? = null
     override fun getActivityView() = ActivityMainBinding.inflate(layoutInflater)
     override fun initView(savedInstanceState: Bundle?) {
-        MediationAdInterstitial.initInterstitialAds(this, false)
-        MediationRewardedInterstitialAd.loadRewardedInterstitialAds(this, false)
         binding.maxAdActivity.setOnClickListener(this)
         binding.loadAds.setOnClickListener(this)
         binding.nativeAds.setOnClickListener(this)
@@ -201,41 +198,73 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     }
 
     private fun rewardedInterstitialAds() {
+
         MediationRewardedInterstitialAd.showRewardedInterstitialAd(
-            this, false,
-            object : OnRewardedAdListener {
-                override fun onError(error: String) {
-                    logD("MainActivity onError Error : $error")
+            this,
+            false,
+            object : MediationRewardedInterstitialAd.ShowRewardAdsCallback {
+                override fun onAdsOff() {
+                    logD("MainActivity Reward Interstitial Ads is off")
                 }
 
-                override fun onAdLoaded(adType: Int) {
-                    logD("MainActivity onAdLoaded Ads Type : $adType")
+                override fun onAdsError(error: String) {
+                    logD("MainActivity Reward Interstitial Ads Error : $error")
                 }
 
-                override fun onClicked(adType: Int) {
-                    logD("MainActivity onClicked Ads Type : $adType")
+                override fun onAdsReward(item: RewardItem) {
+                    logD("MainActivity Reward Interstitial Ads Reward : $item")
                 }
 
-                override fun onDismissClick(adType: Int, item: RewardItem) {
-                    logD("MainActivity onDismissClick Ads Type : ${item.amount}")
+                override fun onAdsClicked() {
+                    logD("MainActivity Reward Interstitial Ads Clicked")
                 }
 
-                override fun onCancel(adType: Int) {
-                    logD("MainActivity onCancel Ads Type: $adType")
+                override fun onAdsImpress() {
+                    logD("MainActivity Reward Interstitial Ads Impress")
                 }
 
-                override fun onRewarded(item: RewardItem) {
-                    logD("MainActivity onRewarded  : ${item.type} : rewarded : ${item.amount}")
+                override fun onAdsDismiss(item: RewardItem) {
+                    logD(" MainActivity Reward Interstitial Ads Dismiss : $item")
                 }
 
-                override fun isEnableAds(isAds: Boolean) {
-                    logD("MainActivity isEnableAds : $isAds")
-                }
-
-                override fun isOffline(offline: Boolean) {
-                    logD("Ads is Offline : $offline")
-                }
             })
+        /*
+                MediationRewardedInterstitialAd.showRewardedInterstitialAd(
+                    this, false,
+                    object : OnRewardedAdListener {
+                        override fun onError(error: String) {
+                            logD("MainActivity onError Error : $error")
+                        }
+
+                        override fun onAdLoaded(adType: Int) {
+                            logD("MainActivity onAdLoaded Ads Type : $adType")
+                        }
+
+                        override fun onClicked(adType: Int) {
+                            logD("MainActivity onClicked Ads Type : $adType")
+                        }
+
+                        override fun onDismissClick(adType: Int, item: RewardItem) {
+                            logD("MainActivity onDismissClick Ads Type : ${item.amount}")
+                        }
+
+                        override fun onCancel(adType: Int) {
+                            logD("MainActivity onCancel Ads Type: $adType")
+                        }
+
+                        override fun onRewarded(item: RewardItem) {
+                            logD("MainActivity onRewarded  : ${item.type} : rewarded : ${item.amount}")
+                        }
+
+                        override fun isEnableAds(isAds: Boolean) {
+                            logD("MainActivity isEnableAds : $isAds")
+                        }
+
+                        override fun isOffline(offline: Boolean) {
+                            logD("Ads is Offline : $offline")
+                        }
+                    })
+        */
     }
 
     private fun openAds() {
@@ -259,9 +288,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     }
 
     private fun interstitialAds() {
-        progressDialogUtils = ProgressDialogUtils(this)
-        progressDialogUtils!!.showDialog("Loading", "Wait while ad is loading...")
-        MediationAdInterstitial.showInterstitialAd(this, false, object : InterstitialAdsListener {
+//        progressDialogUtils = ProgressDialogUtils(this)
+//        progressDialogUtils!!.showDialog("Loading", "Wait while ad is loading...")
+
+        /*MediationAdInterstitial.showInterstitialAd(this, false, object : InterstitialAdsListener {
             override fun onLoaded(adType: Int) {
                 progressDialogUtils!!.isShowDialog()
                 logD("MainActivity onLoaded : $adType")
@@ -294,7 +324,33 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                 progressDialogUtils!!.isShowDialog()
                 logD("Ads is Offline : $offline")
             }
-        })
+        })*/
+
+        MediationAdInterstitial.showInterstitialAds(
+            this,
+            false,
+            object : MediationAdInterstitial.AdsShowCallback {
+                override fun onAdsOff() {
+                    logD("MainActivity Interstitial Ads is off")
+                }
+
+                override fun onAdsError(error: String) {
+                    logD("MainActivity Interstitial Ads :error")
+                }
+
+                override fun onAdsClicked() {
+                    logD("MainActivity Interstitial Ads clieck")
+                }
+
+                override fun onAdsDismiss() {
+                    logD("MainActivity Interstitial Ads dismiss")
+                }
+
+                override fun onAdsImpress() {
+                    logD("MainActivity Interstitial Ads Impress")
+                }
+
+            })
     }
 
     private fun inAppPurchased() {

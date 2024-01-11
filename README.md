@@ -69,7 +69,7 @@
 
 ```
      <string name="app_ads_id">ca-app-pub-3940256099942544~3347511713</string>  provide origin App id for show original ads
-    <string name="SDK_KEY">sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-1DcTfCWvHWTNRTTB12ENHdoQyLpX5LVcPGq9Nol8469q4z7rp1</string>  provide original AppLovin Sdk id
+    <string name="SDK_KEY">sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-9Nol8469q4z7rp11DcTfCWvHWTNRTTB12ENHdoQyLpX5LVcPGq</string>  provide original AppLovin Sdk id
 ```
 
 -> Ad this line in Application then register it in Manifest File
@@ -139,8 +139,24 @@
 ```
 
 
-    // Calling This line First show Interstitial Ads in onCreate() function
-    MediationAdInterstitial.initInterstitialAds(this, false)
+    // Calling This line First show Interstitial Ads in onCreate() function or Application class 
+       MediationAdInterstitial.loadInterstitialAds(
+                        this@AdsManagerApplication.applicationContext,
+                        false,
+                        object : MediationAdInterstitial.LoadCallback {
+                            override fun onAdsLoaded() {
+                                logD("Interstitial Ads Loaded")
+                            }
+
+                            override fun onAdsError(error: String) {
+                                logException(error)
+                            }
+
+                            override fun onAdsOff() {
+                                logD("Interstitial Ads is Off")
+                            }
+
+                        })
      
     MediationAdInterstitial.showInterstitialAd(this, false, object : InterstitialAdsListener {
             override fun onLoaded(adType: Int) {
@@ -301,38 +317,55 @@
 -> Reward Interstitial Ads setup
 
 ```
-    MediationRewardedInterstitialAd.loadRewardedInterstitialAd(
+      // Calling This line First show Interstitial Ads in onCreate() function or Application class 
+      MediationRewardedInterstitialAd.loadRewardedInterstitialAds(
+                        applicationContext,
+                        false,
+                        object : MediationRewardedInterstitialAd.RewardedLoadAds {
+                            override fun onAdsLoaded() {
+                                logD("Reward Interstitial Ads Loaded")
+                            }
+
+                            override fun onAdsOff() {
+                                logD("Reward Interstitial Ads is off")
+                            }
+
+                            override fun onAdsError(error: String) {
+                                logException(error)
+                            }
+
+                        })
+    
+    
+    MediationRewardedInterstitialAd.showRewardedInterstitialAd(
             this,
             false,
-            object : OnRewardedAdListener {
-                override fun onError(error: String) {
-                    logD("MainActivity onError Error : $error")
+            object : MediationRewardedInterstitialAd.ShowRewardAdsCallback {
+                override fun onAdsOff() {
+                    logD("MainActivity Reward Interstitial Ads is off")
                 }
 
-                override fun onAdLoaded(adType: Int) {
-                    logD("MainActivity onAdLoaded Ads Type : $adType")
+                override fun onAdsError(error: String) {
+                    logD("MainActivity Reward Interstitial Ads Error : $error")
                 }
 
-                override fun onClicked(adType: Int) {
-                    logD("MainActivity onClicked Ads Type : $adType")
+                override fun onAdsReward(item: RewardItem) {
+                    logD("MainActivity Reward Interstitial Ads Reward : $item")
                 }
 
-                override fun onDismissClick(adType: Int) {
-                    logD("MainActivity onDismissClick Ads Type : $adType")
+                override fun onAdsClicked() {
+                    logD("MainActivity Reward Interstitial Ads Clicked")
                 }
 
-                override fun onRewarded(item: RewardItem) {
-                    logD("MainActivity onRewarded  : ${item.type} : rewarded : ${item.amount}")
+                override fun onAdsImpress() {
+                    logD("MainActivity Reward Interstitial Ads Impress")
                 }
 
-                override fun isEnableAds(isAds: Boolean) {
-                    logD("MainActivity isEnableAds : $isAds")
-                }
-
-                override fun isOffline(offline: Boolean) {
-                    logD("Ads is Offline : $offline")
+                override fun onAdsDismiss(item: RewardItem) {
+                    logD(" MainActivity Reward Interstitial Ads Dismiss : $item")
                 }
             })
+   
 ```
 
 -> App Open Ads setup

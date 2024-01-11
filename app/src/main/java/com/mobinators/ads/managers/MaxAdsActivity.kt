@@ -10,7 +10,6 @@ import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
 import com.mobinators.ads.manager.ui.commons.listener.BannerAdListener
 import com.mobinators.ads.manager.ui.commons.listener.ImageProvider
-import com.mobinators.ads.manager.ui.commons.listener.InterstitialAdsListener
 import com.mobinators.ads.manager.ui.commons.listener.OnNativeAdListener
 import com.mobinators.ads.manager.ui.commons.listener.OnRewardedAdListener
 import com.mobinators.ads.manager.ui.commons.listener.OpenAddCallback
@@ -178,33 +177,54 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
     }
 
     private fun interstitialAds() {
-        MediationAdInterstitial.showInterstitialAd(this, false, object : InterstitialAdsListener {
-            override fun onLoaded(adType: Int) {
-                logD("MaxAdsActivity onLoaded : $adType")
+        /* MediationAdInterstitial.showInterstitialAd(this, false, object : InterstitialAdsListener {
+             override fun onLoaded(adType: Int) {
+                 logD("MaxAdsActivity onLoaded : $adType")
+             }
+
+             override fun onClicked(adType: Int) {
+                 logD("MaxAdsActivity onClicked : $adType")
+             }
+
+             override fun onBeforeAdShow() {
+                 logD("MaxAdsActivity onBeforeAdShow ")
+             }
+
+             override fun onDismisses(adType: Int) {
+                 logD("MaxAdsActivity onDismisses : $adType")
+             }
+
+             override fun onError(error: String) {
+                 logD("MaxAdsActivity onError : $error")
+             }
+
+             override fun isEnableAds(isAds: Boolean) {
+                 logD("MaxAdsActivity isEnableAds : $isAds")
+             }
+
+             override fun isOffline(offline: Boolean) {
+                 logD("Ads is Offline : $offline")
+             }
+         })*/
+        MediationAdInterstitial.showInterstitialAds(this, false, object : MediationAdInterstitial.AdsShowCallback {
+            override fun onAdsOff() {
+                logD("MaxAds Activity Interstitial Ads is off")
             }
 
-            override fun onClicked(adType: Int) {
-                logD("MaxAdsActivity onClicked : $adType")
+            override fun onAdsError(error: String) {
+                logD("MaxAds Activity Interstitial Ads error : $error")
             }
 
-            override fun onBeforeAdShow() {
-                logD("MaxAdsActivity onBeforeAdShow ")
+            override fun onAdsClicked() {
+                logD("MaxAds Activity Interstitial Ads click")
             }
 
-            override fun onDismisses(adType: Int) {
-                logD("MaxAdsActivity onDismisses : $adType")
+            override fun onAdsDismiss() {
+                logD("MaxAds Activity Interstitial Ads dismiss")
             }
 
-            override fun onError(error: String) {
-                logD("MaxAdsActivity onError : $error")
-            }
-
-            override fun isEnableAds(isAds: Boolean) {
-                logD("MaxAdsActivity isEnableAds : $isAds")
-            }
-
-            override fun isOffline(offline: Boolean) {
-                logD("Ads is Offline : $offline")
+            override fun onAdsImpress() {
+                logD("MaxAds Activity Interstitial Ads Impress")
             }
         })
     }
