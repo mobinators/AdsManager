@@ -138,12 +138,10 @@ class MediationNativeAd(
             }
             itemView.removeAllViews()
 
-            val admobNativeAdLayoutBinding =
-                AdmobNativeAdLayoutBinding.inflate(LayoutInflater.from(activity), itemView, false)
+            val admobNativeAdLayoutBinding = AdmobNativeAdLayoutBinding.inflate(LayoutInflater.from(activity), itemView, false)
             if (isCustom) {
                 logD("Custom Native Ads")
-                val customNative =
-                    CustomNativeBinding.inflate(LayoutInflater.from(activity), itemView, false)
+                val customNative = CustomNativeBinding.inflate(LayoutInflater.from(activity), itemView, false)
                 populateCustomNativeAdView(admobNativeAd!!, customNative)
                 return
             }
@@ -424,10 +422,10 @@ class MediationNativeAd(
             nativeAdLoader = MaxNativeAdLoader(this.maxKey!!, activity)
             nativeAdLoader!!.setRevenueListener { ad ->
                 val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
-                adjustAdRevenue.setRevenue(ad?.revenue, "USD")
-                adjustAdRevenue.setAdRevenueNetwork(ad?.networkName)
-                adjustAdRevenue.setAdRevenueUnit(ad?.adUnitId)
-                adjustAdRevenue.setAdRevenuePlacement(ad?.placement)
+                adjustAdRevenue.setRevenue(ad.revenue, "USD")
+                adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
+                adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
+                adjustAdRevenue.setAdRevenuePlacement(ad.placement)
                 Adjust.trackAdRevenue(adjustAdRevenue)
             }
 
@@ -446,7 +444,7 @@ class MediationNativeAd(
                 override fun onNativeAdLoadFailed(p0: String, p1: MaxError) {
                     super.onNativeAdLoadFailed(p0, p1)
                     itemView.gone()
-                    onNativeAdListener!!.onError(p1!!.message)
+                    onNativeAdListener!!.onError(p1.message)
                 }
 
                 override fun onNativeAdExpired(p0: MaxAd) {

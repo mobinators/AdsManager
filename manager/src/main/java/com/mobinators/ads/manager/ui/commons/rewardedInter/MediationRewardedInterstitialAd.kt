@@ -11,6 +11,7 @@ import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.mobinators.ads.manager.applications.AdsApplication
+import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 
@@ -22,6 +23,7 @@ object MediationRewardedInterstitialAd {
     private var admobRewardedInterKey: String? = null
     private var currentActivity: Activity? = null
     private var contextRef: Context? = null
+    var isAdsShow: Boolean = false
 
 
     fun loadRewardedInterstitialAds(
@@ -144,41 +146,46 @@ object MediationRewardedInterstitialAd {
     private fun admobRewardInterstitialAdShow() {
         try {
             if (rewardedInterstitialAd != null) {
-                rewardedInterstitialAd!!.show(currentActivity!!) {
-                    this.showRewardCallback!!.onAdsReward(it)
-                }
-                rewardedInterstitialAd!!.fullScreenContentCallback =
-                    object : FullScreenContentCallback() {
-                        override fun onAdClicked() {
-                            super.onAdClicked()
-                            this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsClicked()
-                        }
-
-                        override fun onAdDismissedFullScreenContent() {
-                            super.onAdDismissedFullScreenContent()
-                            this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsDismiss(
-                                this@MediationRewardedInterstitialAd.rewardedInterstitialAd!!.rewardItem
-                            )
-                            rewardedInterstitialAd = null
-                        }
-
-                        override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                            super.onAdFailedToShowFullScreenContent(p0)
-                            rewardedInterstitialAd = null
-                            this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsError(
-                                error = "Display Reward Interstitial Ads Failed : ${p0.message} "
-                            )
-                        }
-
-                        override fun onAdImpression() {
-                            super.onAdImpression()
-                            this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsImpress()
-                        }
-
-                        override fun onAdShowedFullScreenContent() {
-                            super.onAdShowedFullScreenContent()
-                        }
+                if (MediationOpenAd.isShowingAd.not()) {
+                    rewardedInterstitialAd!!.show(currentActivity!!) {
+                        this.showRewardCallback!!.onAdsReward(it)
                     }
+                    rewardedInterstitialAd!!.fullScreenContentCallback =
+                        object : FullScreenContentCallback() {
+                            override fun onAdClicked() {
+                                super.onAdClicked()
+                                this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsClicked()
+                            }
+
+                            override fun onAdDismissedFullScreenContent() {
+                                super.onAdDismissedFullScreenContent()
+                                this@MediationRewardedInterstitialAd.isAdsShow = false
+                                this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsDismiss(
+                                    this@MediationRewardedInterstitialAd.rewardedInterstitialAd!!.rewardItem
+                                )
+
+                            }
+
+                            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                                super.onAdFailedToShowFullScreenContent(p0)
+                                this@MediationRewardedInterstitialAd.isAdsShow = false
+                                this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsError(
+                                    error = "Display Reward Interstitial Ads Failed : ${p0.message} "
+                                )
+                            }
+
+                            override fun onAdImpression() {
+                                super.onAdImpression()
+                                this@MediationRewardedInterstitialAd.isAdsShow = false
+                                this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsImpress()
+                            }
+
+                            override fun onAdShowedFullScreenContent() {
+                                super.onAdShowedFullScreenContent()
+                                this@MediationRewardedInterstitialAd.isAdsShow = true
+                            }
+                        }
+                }
                 initSelectedRewardedInterstitialAds()
             } else {
                 initSelectedRewardedInterstitialAds()

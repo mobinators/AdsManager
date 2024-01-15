@@ -16,6 +16,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.mobinators.ads.manager.applications.AdsApplication
+import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.logD
@@ -24,12 +25,13 @@ import pak.developer.app.managers.extensions.logD
 object MediationAdInterstitial {
     private var admobInterstitialAds: InterstitialAd? = null
     private var maxInterstitialAds: MaxInterstitialAd? = null
-    private var admobKey: String? = null
-    private var maxKey: String? = null
-    private var adsLoadCallback: LoadCallback? = null
     private var adsShowCallback: AdsShowCallback? = null
+    private var adsLoadCallback: LoadCallback? = null
     private var activityRef: Activity? = null
     private var contextRef: Context? = null
+    private var admobKey: String? = null
+    private var maxKey: String? = null
+    var isAdsShow: Boolean = false
     fun loadInterstitialAds(activity: Context, isPurchased: Boolean, listener: LoadCallback) {
         this.adsLoadCallback = listener
         this.contextRef = activity
@@ -135,9 +137,11 @@ object MediationAdInterstitial {
                 }
 
                 override fun onAdDisplayed(p0: MaxAd) {
+                    this@MediationAdInterstitial.isAdsShow = true
                 }
 
                 override fun onAdHidden(p0: MaxAd) {
+                    this@MediationAdInterstitial.isAdsShow = false
                     this@MediationAdInterstitial.adsShowCallback!!.onAdsDismiss()
                 }
 
@@ -146,6 +150,7 @@ object MediationAdInterstitial {
                 }
 
                 override fun onAdLoadFailed(p0: String, p1: MaxError) {
+                    this@MediationAdInterstitial.isAdsShow = false
                     this@MediationAdInterstitial.adsLoadCallback!!.onAdsError(error = "Max Interstitial Ads failed to load")
                     if (AdsApplication.isAdmobInLimit()) {
                         AdsApplication.applyLimitOnAdmob = true
@@ -154,6 +159,7 @@ object MediationAdInterstitial {
                 }
 
                 override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
+                    this@MediationAdInterstitial.isAdsShow = false
                     this@MediationAdInterstitial.adsShowCallback!!.onAdsError(error = "Max Interstitial Ads failed Display")
                 }
             })
@@ -203,35 +209,41 @@ object MediationAdInterstitial {
     private fun showAdmobInterstitialAds() {
         try {
             if (this.admobInterstitialAds != null) {
-                this.admobInterstitialAds!!.show(this.activityRef!!)
-                this.admobInterstitialAds!!.fullScreenContentCallback =
-                    object : FullScreenContentCallback() {
-                        override fun onAdClicked() {
-                            super.onAdClicked()
-                            this@MediationAdInterstitial.adsShowCallback!!.onAdsClicked()
-                        }
+                if (MediationOpenAd.isShowingAd.not()) {
+                    this.admobInterstitialAds!!.show(this.activityRef!!)
+                    this.admobInterstitialAds!!.fullScreenContentCallback =
+                        object : FullScreenContentCallback() {
+                            override fun onAdClicked() {
+                                super.onAdClicked()
+                                this@MediationAdInterstitial.adsShowCallback!!.onAdsClicked()
+                            }
 
-                        override fun onAdImpression() {
-                            super.onAdImpression()
-                            this@MediationAdInterstitial.adsShowCallback!!.onAdsImpress()
-                        }
+                            override fun onAdImpression() {
+                                super.onAdImpression()
+                                this@MediationAdInterstitial.isAdsShow = false
+                                this@MediationAdInterstitial.adsShowCallback!!.onAdsImpress()
+                            }
 
-                        override fun onAdDismissedFullScreenContent() {
-                            super.onAdDismissedFullScreenContent()
-                            this@MediationAdInterstitial.adsShowCallback!!.onAdsDismiss()
-                        }
+                            override fun onAdDismissedFullScreenContent() {
+                                super.onAdDismissedFullScreenContent()
+                                this@MediationAdInterstitial.isAdsShow = false
+                                this@MediationAdInterstitial.adsShowCallback!!.onAdsDismiss()
+                            }
 
-                        override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                            super.onAdFailedToShowFullScreenContent(p0)
-                            this@MediationAdInterstitial.adsShowCallback!!.onAdsError(error = "Show Full Screen Interstitial Ads Failed : ${p0.message}")
-                            this@MediationAdInterstitial.admobInterstitialAds = null
-                        }
+                            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                                super.onAdFailedToShowFullScreenContent(p0)
+                                this@MediationAdInterstitial.isAdsShow = false
+                                this@MediationAdInterstitial.adsShowCallback!!.onAdsError(error = "Show Full Screen Interstitial Ads Failed : ${p0.message}")
+                                this@MediationAdInterstitial.admobInterstitialAds = null
+                            }
 
-                        override fun onAdShowedFullScreenContent() {
-                            super.onAdShowedFullScreenContent()
-                            this@MediationAdInterstitial.admobInterstitialAds = null
+                            override fun onAdShowedFullScreenContent() {
+                                this@MediationAdInterstitial.isAdsShow = true
+                                super.onAdShowedFullScreenContent()
+                                this@MediationAdInterstitial.admobInterstitialAds = null
+                            }
                         }
-                    }
+                }
                 initSelectedInterstitialAds()
             } else {
                 initSelectedInterstitialAds()
@@ -245,7 +257,9 @@ object MediationAdInterstitial {
         try {
             if (this.maxInterstitialAds != null) {
                 if (this.maxInterstitialAds!!.isReady) {
-                    this.maxInterstitialAds!!.showAd()
+                    if (MediationOpenAd.isShowingAd.not()) {
+                        this.maxInterstitialAds!!.showAd()
+                    }
                 } else {
                     initSelectedInterstitialAds()
                 }

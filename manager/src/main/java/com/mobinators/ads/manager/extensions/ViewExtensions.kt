@@ -38,8 +38,7 @@ import pak.developer.app.managers.extensions.preferenceUtils
 private var appUpdateManager: AppUpdateManager? = null
 fun Application.updateManifest(appId: String, maxAppId: String) {
     try {
-        val applicationInfo: ApplicationInfo =
-            packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+        val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
         val bundle: Bundle = applicationInfo.metaData
         val appKey: String? = bundle.getString("com.google.android.gms.ads.APPLICATION_ID")
         logD("Name Found ADMOB : $appKey")

@@ -62,8 +62,7 @@ object AdsApplication : Application() {
     fun getValueFromConfig(
         firebaseConfig: FirebaseRemoteConfig, context: Context, listener: FetchRemoteCallback
     ) {
-        AdsConstants.testMode =
-            0 != context.applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
+        AdsConstants.testMode = 0 != context.applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
         logD("Test Mode: ${AdsConstants.testMode}")
         logD("Test pre Build ----------------------> wow it works <---------------------------")
         this.onFetchRemoteCallbackListener = listener

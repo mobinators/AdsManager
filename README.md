@@ -158,35 +158,30 @@
 
                         })
      
-    MediationAdInterstitial.showInterstitialAd(this, false, object : InterstitialAdsListener {
-            override fun onLoaded(adType: Int) {
-               
-            }
+     MediationAdInterstitial.showInterstitialAds(
+            this,
+            false,
+            object : MediationAdInterstitial.AdsShowCallback {
+                override fun onAdsOff() {
+                    logD("MainActivity Interstitial Ads is off")
+                }
 
-            override fun onClicked(adType: Int) {
-                
-            }
+                override fun onAdsError(error: String) {
+                    logD("MainActivity Interstitial Ads :error")
+                }
 
-            override fun onBeforeAdShow() {
-                
-            }
+                override fun onAdsClicked() {
+                    logD("MainActivity Interstitial Ads clieck")
+                }
 
-            override fun onDismisses(adType: Int) {
-                
-            }
+                override fun onAdsDismiss() {
+                    logD("MainActivity Interstitial Ads dismiss")
+                }
 
-            override fun onError(error: String) {
-               
-            }
-
-            override fun isEnableAds(isAds: Boolean) {
-                
-            }
-
-            override fun isOffline(offline: Boolean) {
-               
-            }
-        })
+                override fun onAdsImpress() {
+                    logD("MainActivity Interstitial Ads Impress")
+                }
+            })
 ```
 
 -> Native Ads setup
