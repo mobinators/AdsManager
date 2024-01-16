@@ -2,20 +2,12 @@ package com.mobinators.ads.managers
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import com.facebook.ads.AdView
-import com.google.android.gms.ads.rewarded.RewardItem
-import com.mobinators.ads.manager.extensions.createThumbNail
 import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
 import com.mobinators.ads.manager.ui.commons.listener.BannerAdListener
-import com.mobinators.ads.manager.ui.commons.listener.ImageProvider
-import com.mobinators.ads.manager.ui.commons.listener.OnNativeAdListener
-import com.mobinators.ads.manager.ui.commons.listener.OnRewardedAdListener
-import com.mobinators.ads.manager.ui.commons.listener.OpenAddCallback
-import com.mobinators.ads.manager.ui.commons.nativeBanner.MediationNativeBanner
-import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAd
+import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAds
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
@@ -24,7 +16,6 @@ import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.ui.commons.base.BaseActivity
 
 class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListener {
-    private var mediationNativeAd: MediationNativeAd? = null
     override fun getActivityView() = ActivityMaxAdsBinding.inflate(layoutInflater)
 
     override fun initView(savedInstanceState: Bundle?) {
@@ -63,7 +54,6 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
         binding.maxInterstitial.setOnClickListener(this)
         binding.maxOpen.setOnClickListener(this)
         binding.testAdsEnable.setOnClickListener(this)
-        mediationNativeAd = MediationNativeAd(this, false, binding.maxContainer)
     }
 
     override fun onClick(itemId: View?) {
@@ -77,7 +67,6 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             binding.testAdsEnable.id -> AdsUtils.maxTestAds(this@MaxAdsActivity)
         }
     }
-//    BannerAdMediation.maxTestAds(this@MaxAdsActivity)
 
     private fun bannerAds() {
         BannerAdMediation.showBannerAds(
@@ -112,60 +101,89 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
     }
 
     private fun nativeAds() {
-        mediationNativeAd!!.loadAd(object : OnNativeAdListener {
-            override fun onError(error: String) {
-                logD("MaxAdsActivity Error : $error")
-            }
-
-            override fun onLoaded(adType: Int) {
-                logD("MaxAdsActivity Ads Type : $adType")
-            }
-
-            override fun onAdClicked(adType: Int) {
-                logD("MaxAdsActivity Ads Type : $adType")
-            }
-
-            override fun isEnableAds(isAds: Boolean) {
-                logD("MaxAdsActivity isEnableAds : $isAds")
-            }
-
-            override fun isOffline(offline: Boolean) {
-                logD("Ads is Offline : $offline")
-            }
-        })
-    }
-
-    private fun nativeBannerAds() {
-        MediationNativeBanner.loadAd(
+        MediationNativeAds.showNativeAds(
             this,
             false,
             binding.maxContainer,
-            object : OnNativeAdListener {
-                override fun onError(error: String) {
-                    logD("MaxAdsActivity Error : $error")
+            object : MediationNativeAds.ShowNativeAdsCallback {
+                override fun onAdsOff() {
+                    logD("MaxActivity Ads Off")
                 }
 
-                override fun onLoaded(adType: Int) {
-                    logD("MaxAdsActivity Ads Type : $adType")
+                override fun onAdsOpen() {
+                    logD("MaxActivity onAdsOpen")
                 }
 
-                override fun onAdClicked(adType: Int) {
-                    logD("MaxAdsActivity Ads Type : $adType")
+                override fun onAdsClicked() {
+                    logD("MaxActivity onAdsClicked")
                 }
 
-                override fun isEnableAds(isAds: Boolean) {
-                    logD("MaxAdsActivity isEnableAds : $isAds")
+                override fun onAdsClosed() {
+                    logD("MaxActivity onAdsClosed")
                 }
 
-                override fun isOffline(offline: Boolean) {
-                    logD("Ads is Offline : $offline")
+                override fun onAdsSwipe() {
+                    logD("MaxActivity onAdsSwipe")
                 }
-            },
-            object : ImageProvider {
-                override fun onProviderImage(imageView: ImageView, imageUrl: String) {
-                    imageView.createThumbNail(this@MaxAdsActivity, imageUrl)
+
+                override fun onAdsError(errorState: AdsErrorState) {
+                    when (errorState) {
+                        AdsErrorState.NETWORK_OFF -> logD("MaxActivity Native Ads Internet Off")
+                        AdsErrorState.APP_PURCHASED -> logD("MaxActivity Native Ads You have Purchased your app")
+                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("MaxActivity Native Ads Ads Strategy wrong")
+                        AdsErrorState.ADS_ID_NULL -> logD("MaxActivity Native Ads Ads Is Null found")
+                        AdsErrorState.TEST_ADS_ID -> logD("MaxActivity Native Ads Test Id found in released mode your app")
+                        AdsErrorState.ADS_LOAD_FAILED -> logD("MaxActivity Native Ads ads load failed")
+                        AdsErrorState.ADS_DISMISS -> logD("MaxActivity Native Ads Ads Dismiss")
+                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("MaxActivity Native Ads Display Ads failed")
+                        AdsErrorState.ADS_IMPRESS -> logD("MaxActivity Native Ads Ads Impress Mode")
+                    }
                 }
-            })
+            }
+        )
+    }
+
+    private fun nativeBannerAds() {
+        MediationNativeAds.showNativeAds(
+            this,
+            false,
+            binding.maxContainer,
+            object : MediationNativeAds.ShowNativeAdsCallback {
+                override fun onAdsOff() {
+                    logD("MaxActivity Ads Off")
+                }
+
+                override fun onAdsOpen() {
+                    logD("MaxActivity onAdsOpen")
+                }
+
+                override fun onAdsClicked() {
+                    logD("MaxActivity onAdsClicked")
+                }
+
+                override fun onAdsClosed() {
+                    logD("MaxActivity onAdsClosed")
+                }
+
+                override fun onAdsSwipe() {
+                    logD("MaxActivity onAdsSwipe")
+                }
+
+                override fun onAdsError(errorState: AdsErrorState) {
+                    when (errorState) {
+                        AdsErrorState.NETWORK_OFF -> logD("MaxActivity Native Ads Internet Off")
+                        AdsErrorState.APP_PURCHASED -> logD("MaxActivity Native Ads You have Purchased your app")
+                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("MaxActivity Native Ads Ads Strategy wrong")
+                        AdsErrorState.ADS_ID_NULL -> logD("MaxActivity Native Ads Ads Is Null found")
+                        AdsErrorState.TEST_ADS_ID -> logD("MaxActivity Native Ads Test Id found in released mode your app")
+                        AdsErrorState.ADS_LOAD_FAILED -> logD("MaxActivity Native Ads ads load failed")
+                        AdsErrorState.ADS_DISMISS -> logD("MaxActivity Native Ads Ads Dismiss")
+                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("MaxActivity Native Ads Display Ads failed")
+                        AdsErrorState.ADS_IMPRESS -> logD("MaxActivity Native Ads Ads Impress Mode")
+                    }
+                }
+            }, true
+        )
     }
 
     private fun rewardedAds() {
@@ -207,56 +225,30 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
     }
 
     private fun interstitialAds() {
-        /* MediationAdInterstitial.showInterstitialAd(this, false, object : InterstitialAdsListener {
-             override fun onLoaded(adType: Int) {
-                 logD("MaxAdsActivity onLoaded : $adType")
-             }
+        MediationAdInterstitial.showInterstitialAds(
+            this,
+            false,
+            object : MediationAdInterstitial.AdsShowCallback {
+                override fun onAdsOff() {
+                    logD("MaxAds Activity Interstitial Ads is off")
+                }
 
-             override fun onClicked(adType: Int) {
-                 logD("MaxAdsActivity onClicked : $adType")
-             }
+                override fun onAdsError(error: String) {
+                    logD("MaxAds Activity Interstitial Ads error : $error")
+                }
 
-             override fun onBeforeAdShow() {
-                 logD("MaxAdsActivity onBeforeAdShow ")
-             }
+                override fun onAdsClicked() {
+                    logD("MaxAds Activity Interstitial Ads click")
+                }
 
-             override fun onDismisses(adType: Int) {
-                 logD("MaxAdsActivity onDismisses : $adType")
-             }
+                override fun onAdsDismiss() {
+                    logD("MaxAds Activity Interstitial Ads dismiss")
+                }
 
-             override fun onError(error: String) {
-                 logD("MaxAdsActivity onError : $error")
-             }
-
-             override fun isEnableAds(isAds: Boolean) {
-                 logD("MaxAdsActivity isEnableAds : $isAds")
-             }
-
-             override fun isOffline(offline: Boolean) {
-                 logD("Ads is Offline : $offline")
-             }
-         })*/
-        MediationAdInterstitial.showInterstitialAds(this, false, object : MediationAdInterstitial.AdsShowCallback {
-            override fun onAdsOff() {
-                logD("MaxAds Activity Interstitial Ads is off")
-            }
-
-            override fun onAdsError(error: String) {
-                logD("MaxAds Activity Interstitial Ads error : $error")
-            }
-
-            override fun onAdsClicked() {
-                logD("MaxAds Activity Interstitial Ads click")
-            }
-
-            override fun onAdsDismiss() {
-                logD("MaxAds Activity Interstitial Ads dismiss")
-            }
-
-            override fun onAdsImpress() {
-                logD("MaxAds Activity Interstitial Ads Impress")
-            }
-        })
+                override fun onAdsImpress() {
+                    logD("MaxAds Activity Interstitial Ads Impress")
+                }
+            })
     }
 
     private fun openAds() {
@@ -289,7 +281,6 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
                         AdsErrorState.ADS_IMPRESS -> logD("Ads Impress Mode")
                     }
                 }
-
             })
     }
 }

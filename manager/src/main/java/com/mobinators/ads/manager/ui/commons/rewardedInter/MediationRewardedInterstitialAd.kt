@@ -117,10 +117,10 @@ object MediationRewardedInterstitialAd {
             return
         }
         try {
-            if (AdsUtils.isOnline(activity).not()) {
+          /*  if (AdsUtils.isOnline(activity).not()) {
                 this.showRewardCallback!!.onAdsError(error = "Network Error ")
                 return
-            }
+            }*/
             showSelectedRewardedInterstitial()
         } catch (error: Exception) {
             this.showRewardCallback!!.onAdsError(error = " Show Reward Interstitial Ads Error: ${error.localizedMessage}")

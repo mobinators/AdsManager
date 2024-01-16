@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAdRevenue
@@ -13,12 +14,15 @@ import com.applovin.mediation.MaxError
 import com.applovin.mediation.nativeAds.MaxNativeAdListener
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
+import com.applovin.mediation.nativeAds.MaxNativeAdViewBinder
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.VideoController
 import com.google.android.gms.ads.VideoOptions
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
+import com.mobinators.ads.manager.R
 import com.mobinators.ads.manager.applications.AdsApplication
 import com.mobinators.ads.manager.databinding.AdmobNativeAdLayoutBinding
 import com.mobinators.ads.manager.databinding.CustomNativeBinding
@@ -27,6 +31,7 @@ import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.gone
 import pak.developer.app.managers.extensions.logException
+import pak.developer.app.managers.extensions.visible
 
 @SuppressLint("StaticFieldLeak")
 object MediationNativeAds {
@@ -34,7 +39,6 @@ object MediationNativeAds {
     private var showAdsCallback: ShowNativeAdsCallback? = null
     private var maxNativeAdView: MaxNativeAdView? = null
     private var maxNativeAds: MaxNativeAdLoader? = null
-    private var builder: AdLoader.Builder? = null
     private var containerView: ViewGroup? = null
     private var isCustomAdsView: Boolean = false
     private var admobNativeAd: NativeAd? = null
@@ -67,6 +71,7 @@ object MediationNativeAds {
         this.activityRef = activity
         this.showAdsCallback = listener
         this.isCustomAdsView = isCustomView
+        this.containerView = containerView
         if (isPurchased) {
             this.showAdsCallback!!.onAdsError(errorState = AdsErrorState.APP_PURCHASED)
             return
@@ -109,22 +114,25 @@ object MediationNativeAds {
                     return
                 }
             }
-            builder = AdLoader.Builder(this.contextRef!!, this.nativeAdsKey!!)
-            /* builder.forNativeAd {
-                 val activityDestroy = (contextRef as Activity).isDestroyed
-                 val activity = (contextRef as Activity)
-                 if (activityDestroy || activity.isFinishing || activity.isChangingConfigurations) {
-                     it.destroy()
-                     return@forNativeAd
-                 }
-                 this.admobNativeAd?.destroy()
-                 this.admobNativeAd = it
-                 bindAdmobContentAd()
-             }*/
+            val builder = AdLoader.Builder(this.contextRef!!, this.nativeAdsKey!!)
+            builder.forNativeAd {
+                try {
+                    val activityDestroy = this.activityRef!!.isDestroyed
+                    val activity = this.activityRef!!
+                    if (activityDestroy || activity.isFinishing || activity.isChangingConfigurations) {
+                        it.destroy()
+                        return@forNativeAd
+                    }
+                } catch (error: Exception) {
+                    logException("Activity Ref is null")
+                }
+                this.admobNativeAd?.destroy()
+                this.admobNativeAd = it
+            }
             val videoOption = VideoOptions.Builder().setStartMuted(true).build()
             val nativeAdOption = NativeAdOptions.Builder().setVideoOptions(videoOption).build()
-            this.builder!!.withNativeAdOptions(nativeAdOption)
-            val adLoader = this.builder!!.withAdListener(object : AdListener() {
+            builder.withNativeAdOptions(nativeAdOption)
+            val adLoader = builder.withAdListener(object : AdListener() {
                 override fun onAdLoaded() {
                     super.onAdLoaded()
                     this@MediationNativeAds.loadAdsCallback!!.onAdsLoaded()
@@ -137,22 +145,27 @@ object MediationNativeAds {
 
                 override fun onAdClicked() {
                     super.onAdClicked()
+                    this@MediationNativeAds.showAdsCallback?.onAdsClicked()
                 }
 
                 override fun onAdClosed() {
                     super.onAdClosed()
+                    this@MediationNativeAds.showAdsCallback?.onAdsClosed()
                 }
 
                 override fun onAdImpression() {
                     super.onAdImpression()
+                    this@MediationNativeAds.showAdsCallback?.onAdsError(errorState = AdsErrorState.ADS_IMPRESS)
                 }
 
                 override fun onAdOpened() {
                     super.onAdOpened()
+                    this@MediationNativeAds.showAdsCallback?.onAdsOpen()
                 }
 
                 override fun onAdSwipeGestureClicked() {
                     super.onAdSwipeGestureClicked()
+                    this@MediationNativeAds.showAdsCallback?.onAdsSwipe()
                 }
             }).build()
             adLoader.loadAd(AdsApplication.getAdRequest())
@@ -208,10 +221,12 @@ object MediationNativeAds {
 
                 override fun onNativeAdClicked(p0: MaxAd) {
                     super.onNativeAdClicked(p0)
+                    this@MediationNativeAds.showAdsCallback?.onAdsClicked()
                 }
 
                 override fun onNativeAdExpired(p0: MaxAd) {
                     super.onNativeAdExpired(p0)
+                    this@MediationNativeAds.showAdsCallback?.onAdsClosed()
                 }
             })
             this.maxNativeAds!!.loadAd(this.maxNativeAdView)
@@ -237,16 +252,6 @@ object MediationNativeAds {
 
 
     private fun bindAdmobContentAd() {
-        this.builder!!.forNativeAd {
-            val activityDestroy = this.activityRef!!.isDestroyed
-            if (activityDestroy || this.activityRef!!.isFinishing || this.activityRef!!.isChangingConfigurations) {
-                it.destroy()
-                return@forNativeAd
-            }
-            this.admobNativeAd?.destroy()
-            this.admobNativeAd = it
-            bindAdmobContentAd()
-        }
         if (this.admobNativeAd != null) {
             this.containerView!!.removeAllViews()
             if (this.isCustomAdsView) {
@@ -264,19 +269,179 @@ object MediationNativeAds {
                 )
                 nativeAdsViewBinding(nativeAdBinding = admobNativeAdLayoutBinding)
             }
+            initSelectedNativeAds()
+        } else {
+            initSelectedNativeAds()
         }
     }
 
     private fun bindMaxContentAd() {
-
+        try {
+            val binder: MaxNativeAdViewBinder =
+                MaxNativeAdViewBinder.Builder(R.layout.max_native_ad_layout)
+                    .setTitleTextViewId(R.id.title_text_view)
+                    .setBodyTextViewId(R.id.body_text_view)
+                    .setAdvertiserTextViewId(R.id.advertiser_textView)
+                    .setIconImageViewId(R.id.icon_image_view)
+                    .setMediaContentViewGroupId(R.id.media_view_container)
+                    .setOptionsContentViewGroupId(R.id.options_view)
+                    .setCallToActionButtonId(R.id.cta_button)
+                    .build()
+            this.maxNativeAdView = MaxNativeAdView(binder, this.activityRef!!)
+            initSelectedNativeAds()
+        } catch (error: Exception) {
+            initSelectedNativeAds()
+            logException("showNativeAds Error : ${error.localizedMessage}")
+        }
     }
 
     private fun customNativeAdsBinding(customBinding: CustomNativeBinding) {
+        try {
+            this.containerView!!.addView(customBinding.root)
+            val nativeAdView = customBinding.root
+            nativeAdView.mediaView = customBinding.adMedia
+            nativeAdView.headlineView = customBinding.adHeadline
+            nativeAdView.bodyView = customBinding.adBody
+            nativeAdView.callToActionView = customBinding.adCallToAction
+            nativeAdView.iconView = customBinding.adAppIcon
+            nativeAdView.priceView = customBinding.adPrice
+            nativeAdView.starRatingView = customBinding.adStars
+            nativeAdView.storeView = customBinding.adStore
+            nativeAdView.advertiserView = customBinding.adAdvertiser
+            customBinding.adHeadline.text = this.admobNativeAd!!.headline
+            this.admobNativeAd!!.mediaContent?.let { customBinding.adMedia.mediaContent = it }
+            if (this.admobNativeAd!!.callToAction == null) {
+                customBinding.adCallToAction.gone()
+            } else {
+                customBinding.adCallToAction.visible()
+                customBinding.adCallToAction.text = this.admobNativeAd!!.callToAction
+            }
 
+            if (this.admobNativeAd!!.icon == null) {
+                customBinding.adAppIcon.gone()
+            } else {
+                customBinding.adAppIcon.setImageDrawable(this.admobNativeAd!!.icon?.drawable)
+                customBinding.adAppIcon.visible()
+            }
+
+            if (this.admobNativeAd!!.price == null) {
+                customBinding.adPrice.gone()
+            } else {
+                customBinding.adPrice.visible()
+                customBinding.adPrice.text = this.admobNativeAd!!.price
+            }
+            if (this.admobNativeAd!!.store == null) {
+                customBinding.adStore.gone()
+            } else {
+                customBinding.adStore.visible()
+                customBinding.adStore.text = this.admobNativeAd!!.store
+            }
+            if (this.admobNativeAd!!.starRating == null) {
+                customBinding.adStars.gone()
+            } else {
+                customBinding.adStars.rating = this.admobNativeAd!!.starRating!!.toFloat()
+                customBinding.adStars.visible()
+            }
+            if (this.admobNativeAd!!.advertiser == null) {
+                customBinding.adAdvertiser.gone()
+            } else {
+                customBinding.adAdvertiser.text = this.admobNativeAd!!.advertiser
+                customBinding.adAdvertiser.visible()
+            }
+            nativeAdView.setNativeAd(this.admobNativeAd!!)
+            val vc = this.admobNativeAd!!.mediaContent?.videoController
+            if (vc != null && vc.hasVideoContent()) {
+                vc.videoLifecycleCallbacks =
+                    object : VideoController.VideoLifecycleCallbacks() {
+                        @SuppressLint("SetTextI18n")
+                        override fun onVideoEnd() {
+                            logException("Video status: Video playback has ended.")
+                            super.onVideoEnd()
+                        }
+                    }
+            } else {
+                logException("Video status: Ad does not contain a video asset.")
+            }
+        } catch (error: Exception) {
+            logException("showNativeAds Error : ${error.localizedMessage}")
+        }
     }
 
     private fun nativeAdsViewBinding(nativeAdBinding: AdmobNativeAdLayoutBinding) {
+        this.containerView!!.addView(nativeAdBinding.root)
+        val nativeAdView = nativeAdBinding.root
+        nativeAdView.mediaView = nativeAdBinding.adMedia
+        nativeAdView.headlineView = nativeAdBinding.adHeadline
+        nativeAdView.bodyView = nativeAdBinding.adBody
+        nativeAdView.callToActionView = nativeAdBinding.adAction
+        nativeAdView.iconView = nativeAdBinding.squareIcon
+        nativeAdView.priceView = nativeAdBinding.adPrice
+        nativeAdView.starRatingView = nativeAdBinding.adStars
+        nativeAdView.storeView = nativeAdBinding.adStore
+        nativeAdView.advertiserView = nativeAdBinding.advertiser
+        nativeAdBinding.adHeadline.text = admobNativeAd!!.headline
+        admobNativeAd!!.mediaContent?.let {
+            nativeAdBinding.adMedia.mediaContent = it
+        }
+        if (admobNativeAd!!.body == null) {
+            nativeAdBinding.adBody.visibility = View.INVISIBLE
+        } else {
+            nativeAdBinding.adBody.visibility = View.VISIBLE
+            nativeAdBinding.adBody.text = admobNativeAd!!.body
+        }
 
+        if (admobNativeAd!!.callToAction == null) {
+            nativeAdBinding.adAction.gone()
+        } else {
+            nativeAdBinding.adAction.visible()
+            nativeAdBinding.adAction.text = admobNativeAd!!.callToAction
+        }
+
+        if (admobNativeAd!!.icon == null) {
+            nativeAdBinding.squareIcon.gone()
+        } else {
+            nativeAdBinding.squareIcon.setImageDrawable(admobNativeAd!!.icon?.drawable)
+            nativeAdBinding.squareIcon.visible()
+        }
+
+        if (admobNativeAd!!.price == null) {
+            nativeAdBinding.adPrice.gone()
+        } else {
+            nativeAdBinding.adPrice.visible()
+            nativeAdBinding.adPrice.text = admobNativeAd!!.price
+        }
+        if (admobNativeAd!!.store == null) {
+            nativeAdBinding.adStore.gone()
+        } else {
+            nativeAdBinding.adStore.visible()
+            nativeAdBinding.adStore.text = admobNativeAd!!.store
+        }
+        if (admobNativeAd!!.starRating == null) {
+            nativeAdBinding.adStars.gone()
+        } else {
+            nativeAdBinding.adStars.rating = admobNativeAd!!.starRating!!.toFloat()
+            nativeAdBinding.adStars.visible()
+        }
+        if (admobNativeAd!!.advertiser == null) {
+            nativeAdBinding.advertiser.gone()
+        } else {
+            nativeAdBinding.advertiser.text = admobNativeAd!!.advertiser
+            nativeAdBinding.advertiser.visible()
+        }
+        nativeAdView.setNativeAd(admobNativeAd!!)
+        val vc = admobNativeAd!!.mediaContent?.videoController
+        if (vc != null && vc.hasVideoContent()) {
+            vc.videoLifecycleCallbacks =
+                object : VideoController.VideoLifecycleCallbacks() {
+                    @SuppressLint("SetTextI18n")
+                    override fun onVideoEnd() {
+                        logException("Video status: Video playback has ended.")
+                        super.onVideoEnd()
+                    }
+                }
+        } else {
+            logException("Video status: Ad does not contain a video asset.")
+        }
     }
 
     fun onDestroy() {
@@ -300,7 +465,10 @@ object MediationNativeAds {
 
     interface ShowNativeAdsCallback {
         fun onAdsOff()
-        fun onAdsDisplay()
+        fun onAdsOpen()
+        fun onAdsClicked()
+        fun onAdsClosed()
+        fun onAdsSwipe()
         fun onAdsError(errorState: AdsErrorState)
     }
 }

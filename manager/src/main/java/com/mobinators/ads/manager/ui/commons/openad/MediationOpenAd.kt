@@ -62,10 +62,10 @@ object MediationOpenAd {
             this.showCallback!!.onAdsError(errorState = AdsErrorState.APP_PURCHASED)
             return
         }
-        if (AdsApplication.getAdsModel()!!.isAppOpenAdd.not()) {
+      /*  if (AdsApplication.getAdsModel()!!.isAppOpenAdd.not()) {
             logException("App OPen Ads is not enable")
             return
-        }
+        }*/
         showSelectedAppOpenAds()
 
     }

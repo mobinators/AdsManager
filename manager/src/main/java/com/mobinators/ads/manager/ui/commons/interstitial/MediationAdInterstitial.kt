@@ -183,10 +183,10 @@ object MediationAdInterstitial {
             this.adsShowCallback!!.onAdsError("You have purchased")
             return
         }
-        if (AdsUtils.isOnline(this.contextRef!!).not()) {
+      /*  if (AdsUtils.isOnline(this.contextRef!!).not()) {
             this.adsShowCallback!!.onAdsError(error = "Interstitial Ads Network Error")
             return
-        }
+        }*/
         showSelectedInterstitialAds()
     }
 

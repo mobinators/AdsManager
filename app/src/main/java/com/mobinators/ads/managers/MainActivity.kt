@@ -2,29 +2,21 @@ package com.mobinators.ads.managers
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import com.facebook.ads.AdView
 import com.google.android.gms.ads.rewarded.RewardItem
-import com.mobinators.ads.manager.extensions.createThumbNail
 import com.mobinators.ads.manager.extensions.exitPanel
 import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
 import com.mobinators.ads.manager.ui.commons.listener.BannerAdListener
-import com.mobinators.ads.manager.ui.commons.listener.ImageProvider
-import com.mobinators.ads.manager.ui.commons.listener.OnNativeAdListener
-import com.mobinators.ads.manager.ui.commons.listener.OnRewardedAdListener
-import com.mobinators.ads.manager.ui.commons.listener.OpenAddCallback
 import com.mobinators.ads.manager.ui.commons.listener.PanelListener
 import com.mobinators.ads.manager.ui.commons.models.PanelModel
-import com.mobinators.ads.manager.ui.commons.nativeBanner.MediationNativeBanner
-import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAd
+import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAds
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
 import com.mobinators.ads.manager.ui.commons.utils.AppPurchaseUtils
 import com.mobinators.ads.manager.ui.commons.utils.DeviceInfoUtils
-import com.mobinators.ads.manager.ui.commons.views.dialog.ProgressDialogUtils
 import com.mobinators.ads.managers.databinding.ActivityMainBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,8 +26,6 @@ import pak.developer.app.managers.extensions.navigateActivity
 import pak.developer.app.managers.ui.commons.base.BaseActivity
 
 class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
-    private var mediationNativeAd: MediationNativeAd? = null
-    private var progressDialogUtils: ProgressDialogUtils? = null
     override fun getActivityView() = ActivityMainBinding.inflate(layoutInflater)
     override fun initView(savedInstanceState: Bundle?) {
         MediationRewardedAd.loadRewardAds(
@@ -75,7 +65,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
         binding.interAds.setOnClickListener(this)
         binding.billingButton.setOnClickListener(this)
         binding.collapseBannerButton.setOnClickListener(this)
-        mediationNativeAd = MediationNativeAd(this, false, binding.adContainer, false)
         logD("Device Info : ${DeviceInfoUtils.getDeviceInfo()}")
         inAppPurchased()
     }
@@ -137,55 +126,89 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     }
 
     private fun nativeAds() {
-        mediationNativeAd!!.loadAd(object : OnNativeAdListener {
-            override fun onError(error: String) {
-                logD("MainActivity Error : $error")
-            }
+        MediationNativeAds.showNativeAds(
+            this,
+            false,
+            binding.adContainer,
+            object : MediationNativeAds.ShowNativeAdsCallback {
+                override fun onAdsOff() {
+                    logD("MainActivity Ads Off")
+                }
 
-            override fun onLoaded(adType: Int) {
-                logD("MainActivity Ads Type : $adType")
-            }
+                override fun onAdsOpen() {
+                    logD("MainActivity onAdsOpen")
+                }
 
-            override fun onAdClicked(adType: Int) {
-                logD("MainActivity Ads Type : $adType")
-            }
+                override fun onAdsClicked() {
+                    logD("MainActivity onAdsClicked")
+                }
 
-            override fun isEnableAds(isAds: Boolean) {
-                logD("MainActivity isEnableAds : $isAds")
-            }
+                override fun onAdsClosed() {
+                    logD("MainActivity onAdsClosed")
+                }
 
-            override fun isOffline(offline: Boolean) {
-                logD("Ads is Offline : $offline")
+                override fun onAdsSwipe() {
+                    logD("MainActivity onAdsSwipe")
+                }
+
+                override fun onAdsError(errorState: AdsErrorState) {
+                    when (errorState) {
+                        AdsErrorState.NETWORK_OFF -> logD("MainActivity Native Ads Internet Off")
+                        AdsErrorState.APP_PURCHASED -> logD("MainActivity Native Ads You have Purchased your app")
+                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("MainActivity Native Ads Ads Strategy wrong")
+                        AdsErrorState.ADS_ID_NULL -> logD("MainActivity Native Ads Ads Is Null found")
+                        AdsErrorState.TEST_ADS_ID -> logD("MainActivity Native Ads Test Id found in released mode your app")
+                        AdsErrorState.ADS_LOAD_FAILED -> logD("MainActivity Native Ads ads load failed")
+                        AdsErrorState.ADS_DISMISS -> logD("MainActivity Native Ads Ads Dismiss")
+                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("MainActivity Native Ads Display Ads failed")
+                        AdsErrorState.ADS_IMPRESS -> logD("MainActivity Native Ads Ads Impress Mode")
+                    }
+                }
             }
-        })
+        )
     }
 
     private fun nativeBannerAds() {
-        MediationNativeBanner.loadAd(this, false, binding.adContainer, object : OnNativeAdListener {
-            override fun onError(error: String) {
-                logD("MainActivity Error : $error")
-            }
+        MediationNativeAds.showNativeAds(
+            this,
+            false,
+            binding.adContainer,
+            object : MediationNativeAds.ShowNativeAdsCallback {
+                override fun onAdsOff() {
+                    logD("MainActivity Ads Off")
+                }
 
-            override fun onLoaded(adType: Int) {
-                logD("MainActivity Ads Type : $adType")
-            }
+                override fun onAdsOpen() {
+                    logD("MainActivity onAdsOpen")
+                }
 
-            override fun onAdClicked(adType: Int) {
-                logD("MainActivity Ads Type : $adType")
-            }
+                override fun onAdsClicked() {
+                    logD("MainActivity onAdsClicked")
+                }
 
-            override fun isEnableAds(isAds: Boolean) {
-                logD("MainActivity isEnableAds : $isAds")
-            }
+                override fun onAdsClosed() {
+                    logD("MainActivity onAdsClosed")
+                }
 
-            override fun isOffline(offline: Boolean) {
-                logD("Ads is Offline : $offline")
-            }
-        }, object : ImageProvider {
-            override fun onProviderImage(imageView: ImageView, imageUrl: String) {
-                imageView.createThumbNail(this@MainActivity, imageUrl)
-            }
-        })
+                override fun onAdsSwipe() {
+                    logD("MainActivity onAdsSwipe")
+                }
+
+                override fun onAdsError(errorState: AdsErrorState) {
+                    when (errorState) {
+                        AdsErrorState.NETWORK_OFF -> logD("MainActivity Native Ads Internet Off")
+                        AdsErrorState.APP_PURCHASED -> logD("MainActivity Native Ads You have Purchased your app")
+                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("MainActivity Native Ads Ads Strategy wrong")
+                        AdsErrorState.ADS_ID_NULL -> logD("MainActivity Native Ads Ads Is Null found")
+                        AdsErrorState.TEST_ADS_ID -> logD("MainActivity Native Ads Test Id found in released mode your app")
+                        AdsErrorState.ADS_LOAD_FAILED -> logD("MainActivity Native Ads ads load failed")
+                        AdsErrorState.ADS_DISMISS -> logD("MainActivity Native Ads Ads Dismiss")
+                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("MainActivity Native Ads Display Ads failed")
+                        AdsErrorState.ADS_IMPRESS -> logD("MainActivity Native Ads Ads Impress Mode")
+                    }
+                }
+            }, true
+        )
     }
 
     private fun rewardedAds() {
@@ -294,44 +317,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     }
 
     private fun interstitialAds() {
-//        progressDialogUtils = ProgressDialogUtils(this)
-//        progressDialogUtils!!.showDialog("Loading", "Wait while ad is loading...")
-
-        /*MediationAdInterstitial.showInterstitialAd(this, false, object : InterstitialAdsListener {
-            override fun onLoaded(adType: Int) {
-                progressDialogUtils!!.isShowDialog()
-                logD("MainActivity onLoaded : $adType")
-            }
-
-            override fun onClicked(adType: Int) {
-                logD("MainActivity onClicked : $adType")
-            }
-
-            override fun onBeforeAdShow() {
-                logD("MainActivity onBeforeAdShow ")
-            }
-
-            override fun onDismisses(adType: Int) {
-                logD("MainActivity onDismisses : $adType")
-            }
-
-            override fun onError(error: String) {
-                logD("MainActivity onError : $error")
-            }
-
-            override fun isEnableAds(isAds: Boolean) {
-                if (isAds.not()) {
-                    progressDialogUtils!!.isShowDialog()
-                }
-                logD("MainActivity isEnableAds : $isAds")
-            }
-
-            override fun isOffline(offline: Boolean) {
-                progressDialogUtils!!.isShowDialog()
-                logD("Ads is Offline : $offline")
-            }
-        })*/
-
         MediationAdInterstitial.showInterstitialAds(
             this,
             false,
