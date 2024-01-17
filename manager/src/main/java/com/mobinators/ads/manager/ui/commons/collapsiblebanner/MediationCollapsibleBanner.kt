@@ -10,10 +10,13 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.mobinators.ads.manager.applications.AdsApplication
 import com.mobinators.ads.manager.extensions.sdk30AndUp
-import com.mobinators.ads.manager.ui.commons.listener.BannerAdListener
+import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
+import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.gone
+import pak.developer.app.managers.extensions.logD
+import pak.developer.app.managers.extensions.logException
 
 
 @SuppressLint("StaticFieldLeak")
@@ -35,11 +38,11 @@ object MediationCollapsibleBanner {
         collapseBannerState = bannerState
         this.bannerListener = listener
         if (isPurchased) {
-            this.bannerListener?.onError("You have purchased this app version")
+            this.bannerListener?.onAdsError(adsErrorState = AdsErrorState.APP_PURCHASED)
             return
         }
         if (AdsUtils.isOnline(this.mainActivity!!).not()) {
-            this.bannerListener?.isOffline(true)
+            this.bannerListener?.onAdsError(adsErrorState = AdsErrorState.NETWORK_OFF)
             this.collapseBannerContainer!!.gone()
             return
         }
@@ -49,26 +52,14 @@ object MediationCollapsibleBanner {
     private fun collapseBannerSelected() {
         try {
             when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> {
-                    this.bannerListener!!.isEnableAds(false)
-                }
-
-                AdsConstants.AD_MOB_MEDIATION -> {
-                    this.bannerListener!!.isEnableAds(true)
-                }
-
-                AdsConstants.AD_MOB -> {
-                    this.bannerListener!!.isEnableAds(true)
-                    collapseBannerAdsInt()
-                }
-
-                AdsConstants.MAX_MEDIATION -> {
-                    this.bannerListener!!.isEnableAds(true)
-                }
+                AdsConstants.ADS_OFF -> this.bannerListener!!.onAdsOff()
+                AdsConstants.AD_MOB_MEDIATION -> {}
+                AdsConstants.AD_MOB -> collapseBannerAdsInt()
+                AdsConstants.MAX_MEDIATION -> {}
             }
 
         } catch (error: Exception) {
-            this.bannerListener?.onError("Selected Collapse Banner Ads Error :  ${error.localizedMessage}")
+            logException("Selected Collapse Banner Ads Error :  ${error.localizedMessage}")
         }
     }
 
@@ -84,16 +75,16 @@ object MediationCollapsibleBanner {
                 }
             }
             if (AdsApplication.getAdsModel()!!.admobMediation) {
-                this.bannerListener?.onError("AdMob Mediation is enable")
+                logD("AdMob Mediation is enable")
                 return
             }
             if (this.admobCollapseBannerKey.isNullOrEmpty() || this.admobCollapseBannerKey.isNullOrBlank()) {
-                this.bannerListener?.onError("Collapse Banner Ads id is null")
+                this.bannerListener?.onAdsError(adsErrorState = AdsErrorState.ADS_ID_NULL)
                 return
             }
             if (this.admobCollapseBannerKey == AdsConstants.TEST_ADMOB_COLLAPSE_BANNER_ID) {
                 if (AdsConstants.testMode.not()) {
-                    this.bannerListener?.onError("NULL OR TEST IDS FOUND")
+                    this.bannerListener?.onAdsError(adsErrorState = AdsErrorState.TEST_ADS_ID)
                     return
                 }
             }
@@ -113,7 +104,7 @@ object MediationCollapsibleBanner {
             collapseBannerView.loadAd(adRequest)
             this.collapseBannerContainer!!.addView(collapseBannerView)
         } catch (error: Exception) {
-            this.bannerListener?.onError("Collapse Banner Init Error : ${error.localizedMessage}")
+            logException("Collapse Banner Init Error : ${error.localizedMessage}")
         }
     }
 
@@ -134,5 +125,11 @@ object MediationCollapsibleBanner {
             this.mainActivity!!,
             adWidth
         )
+    }
+
+    interface BannerAdListener {
+        fun onAdsOff()
+        fun onAdsLoaded()
+        fun onAdsError(adsErrorState: AdsErrorState)
     }
 }

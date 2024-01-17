@@ -27,8 +27,12 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.gson.Gson
 import com.mobinators.ads.manager.ui.commons.listener.AppListener
+import com.mobinators.ads.manager.ui.commons.listener.AppRateUsCallback
+import com.mobinators.ads.manager.ui.commons.listener.AppUpdateState
 import com.mobinators.ads.manager.ui.commons.listener.PanelListener
+import com.mobinators.ads.manager.ui.commons.listener.RateUsState
 import com.mobinators.ads.manager.ui.commons.models.PanelModel
+import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.fragments.ExitBottomSheetFragment
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.logException
@@ -38,13 +42,24 @@ import pak.developer.app.managers.extensions.preferenceUtils
 private var appUpdateManager: AppUpdateManager? = null
 fun Application.updateManifest(appId: String, maxAppId: String) {
     try {
-        val applicationInfo: ApplicationInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+        if (AdsConstants.testMode.not()) {
+            if (appId == AdsConstants.TEST_ADMOB_APP_ID) {
+                logD("found test App id")
+                return
+            }
+        }
+        val applicationInfo: ApplicationInfo =
+            packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
         val bundle: Bundle = applicationInfo.metaData
         val appKey: String? = bundle.getString("com.google.android.gms.ads.APPLICATION_ID")
         logD("Name Found ADMOB : $appKey")
         applicationInfo.metaData.putString("com.google.android.gms.ads.APPLICATION_ID", appId)
         val apiKey: String? = bundle.getString("com.google.android.gms.ads.APPLICATION_ID")
         logD("Name Found ADMOB : $apiKey")
+        if (maxAppId.isEmpty() || maxAppId.isBlank()) {
+            logD("Null Apploving Sdk key")
+            return
+        }
         // Applovin Sdk Key
         val maxAppKey: String? = bundle.getString("applovin.sdk.key")
         logD("Name Found APPLOVIN : $maxAppKey")
@@ -125,67 +140,90 @@ fun Activity.appSharing(appName: String, appPackageName: String) {
     }
 }
 
-fun Activity.appRateUs() {
-    val manager = ReviewManagerFactory.create(this)
-    val request = manager.requestReviewFlow()
-    request.addOnCompleteListener { task ->
-        if (task.isSuccessful) {
-            val flow = manager.launchReviewFlow(this, task.result)
-            flow.addOnCompleteListener {
-                if (it.isSuccessful) {
-                    if (it.isComplete) {
-                        logD("appRateUs: Result : ${it.result} : isComplete :${it.isComplete}")
-                    } else {
-                        logD("appRateUs: Result : ${it.result} :  cancel : ${it.isCanceled}")
+fun Activity.appRateUs(listener: AppRateUsCallback) {
+    when (AdsConstants.selectedStore) {
+        AdsConstants.GOOGLE_PLAY_STORE -> {
+            val manager = ReviewManagerFactory.create(this)
+            val request = manager.requestReviewFlow()
+            request.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val flow = manager.launchReviewFlow(this, task.result)
+                    flow.addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            if (it.isComplete) {
+                                listener.onRateUsState(rateState = RateUsState.RATE_US_COMPLETED)
+                                logD("appRateUs: Result : ${it.result} : isComplete :${it.isComplete}")
+                            } else {
+                                listener.onRateUsState(rateState = RateUsState.RATE_US_CANCEL)
+                                logD("appRateUs: Result : ${it.result} :  cancel : ${it.isCanceled}")
+                            }
+                        } else {
+                            listener.onRateUsState(rateState = RateUsState.RATE_US_ERROR)
+                            logD("appRateUs: Error : ${it.exception?.message} : isComplete :${it.isComplete}  :  cancel : ${it.isCanceled}")
+                        }
+                    }.addOnCanceledListener {
+                        listener.onRateUsState(rateState = RateUsState.RATE_US_CANCEL)
+                        logD("appRateUs: cancel listener ")
+                    }.addOnFailureListener {
+                        listener.onRateUsState(rateState = RateUsState.RATE_US_FAILED)
+                        logD("appRateUs: failure listener ")
                     }
                 } else {
-                    logD("appRateUs: Error : ${it.exception?.message} : isComplete :${it.isComplete}  :  cancel : ${it.isCanceled}")
+                    listener.onRateUsState(rateState = RateUsState.RATE_US_ERROR)
+                    logException("appRateUp Error : ${task.exception?.localizedMessage} ")
                 }
-            }.addOnCanceledListener {
-                logD("appRateUs: cancel listener ")
-            }.addOnFailureListener {
-                logD("appRateUs: failure listener ")
             }
-        } else {
-            logException("appRateUp Error : ${task.exception?.localizedMessage} ")
         }
+
+        AdsConstants.AMAZON_APP_STORE -> listener.onRateUsState(rateState = RateUsState.AMAZON_STORE)
+        AdsConstants.HUAWEI_APP_GALLERY -> listener.onRateUsState(rateState = RateUsState.HUAWEI_STORE)
+        else -> listener.onRateUsState(rateState = RateUsState.WRONG_STORE)
     }
 }
 
 fun Activity.appUpdate(listener: AppListener, requestCode: Int) {
-    appUpdateManager = AppUpdateManagerFactory.create(this)
-    appUpdateManager!!.registerListener(object : InstallStateUpdatedListener {
-        override fun onStateUpdate(state: InstallState) {
-            if (state.installStatus() == InstallStatus.DOWNLOADED) {
-                listener.onDownload()
+    when (AdsConstants.selectedStore) {
+        AdsConstants.GOOGLE_PLAY_STORE -> {
+            appUpdateManager = AppUpdateManagerFactory.create(this)
+            appUpdateManager!!.registerListener(object : InstallStateUpdatedListener {
+                override fun onStateUpdate(state: InstallState) {
+                    if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                        listener.onDownload()
 
-            } else if (state.installStatus() == InstallStatus.INSTALLED) {
-                listener.onInstalled()
-                appUpdateManager!!.unregisterListener(this)
-            } else if (state.installStatus() == InstallStatus.CANCELED) {
+                    } else if (state.installStatus() == InstallStatus.INSTALLED) {
+                        listener.onInstalled()
+                        appUpdateManager!!.unregisterListener(this)
+                    } else if (state.installStatus() == InstallStatus.CANCELED) {
+                        listener.onCancel()
+                    }
+                }
+            })
+            appUpdateManager!!.appUpdateInfo.addOnSuccessListener {
+                if (it.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && it.isUpdateTypeAllowed(
+                        AppUpdateType.FLEXIBLE
+                    )
+                ) {
+                    appUpdateManager!!.startUpdateFlowForResult(
+                        it,
+                        AppUpdateType.FLEXIBLE,
+                        this,
+                        requestCode
+                    )
+                } else {
+                    listener.onNoUpdateAvailable()
+                }
+            }.addOnFailureListener {
+                listener.onFailure(error = it)
+            }.addOnCanceledListener {
                 listener.onCancel()
             }
         }
-    })
-    appUpdateManager!!.appUpdateInfo.addOnSuccessListener {
-        if (it.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && it.isUpdateTypeAllowed(
-                AppUpdateType.FLEXIBLE
-            )
-        ) {
-            appUpdateManager!!.startUpdateFlowForResult(
-                it,
-                AppUpdateType.FLEXIBLE,
-                this,
-                requestCode
-            )
-        } else {
-            listener.onNoUpdateAvailable()
-        }
-    }.addOnFailureListener {
-        listener.onFailure(error = it)
-    }.addOnCanceledListener {
-        listener.onCancel()
+
+        AdsConstants.AMAZON_APP_STORE -> listener.onStore(updateState = AppUpdateState.AMAZON_STORE)
+        AdsConstants.HUAWEI_APP_GALLERY -> listener.onStore(updateState = AppUpdateState.HUAWEI_STORE)
+        else -> listener.onStore(updateState = AppUpdateState.WRONG_STORE)
     }
+
 }
 
 
@@ -205,8 +243,6 @@ inline fun <reified T> sdk30AndUp(onSdk30: () -> T): T? {
         return onSdk30()
     } else null
 }
-
-
 
 
 inline infix fun <T> Boolean.then(param: () -> T): T? = if (this) param() else null

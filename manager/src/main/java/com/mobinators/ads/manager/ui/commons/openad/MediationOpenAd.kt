@@ -62,10 +62,6 @@ object MediationOpenAd {
             this.showCallback!!.onAdsError(errorState = AdsErrorState.APP_PURCHASED)
             return
         }
-      /*  if (AdsApplication.getAdsModel()!!.isAppOpenAdd.not()) {
-            logException("App OPen Ads is not enable")
-            return
-        }*/
         showSelectedAppOpenAds()
 
     }
@@ -204,7 +200,10 @@ object MediationOpenAd {
     private fun showAdmobAppOpenAds() {
         try {
             if (this.admobAppOPenAd != null) {
-                if (MediationRewardedAd.isAdsShow.not() || MediationAdInterstitial.isAdsShow.not() || MediationRewardedInterstitialAd.isAdsShow.not() || isShowingAd.not()) {
+                if (MediationRewardedAd.isAdsShow || MediationAdInterstitial.isAdsShow || MediationRewardedInterstitialAd.isAdsShow) {
+                    logD("Other Ads Open")
+                } else {
+                    logD("Other Ads Open : Reward : ${MediationRewardedAd.isAdsShow} : Interstitial : ${MediationAdInterstitial.isAdsShow} : Reward Interstitial : ${MediationRewardedInterstitialAd.isAdsShow}")
                     this.admobAppOPenAd!!.show(this.activityRef!!)
                     this.admobAppOPenAd!!.fullScreenContentCallback =
                         object : FullScreenContentCallback() {

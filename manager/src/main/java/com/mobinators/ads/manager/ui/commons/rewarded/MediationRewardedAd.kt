@@ -114,6 +114,7 @@ object MediationRewardedAd {
 
                     override fun onAdFailedToLoad(p0: LoadAdError) {
                         super.onAdFailedToLoad(p0)
+                        logException("Reward Ads Load Failed Error : ${p0.message}")
                         this@MediationRewardedAd.admobRewardAds = null
                         this@MediationRewardedAd.loadedCallback!!.onAdsError(errorState = AdsErrorState.ADS_LOAD_FAILED)
                     }

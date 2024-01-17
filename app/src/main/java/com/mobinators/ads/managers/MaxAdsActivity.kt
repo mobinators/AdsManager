@@ -2,11 +2,9 @@ package com.mobinators.ads.managers
 
 import android.os.Bundle
 import android.view.View
-import com.facebook.ads.AdView
 import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
-import com.mobinators.ads.manager.ui.commons.listener.BannerAdListener
 import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAds
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
@@ -73,29 +71,39 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             this,
             false,
             binding.maxContainer,
-            object : BannerAdListener {
-                override fun onLoaded(adType: Int) {
-                    logD("MaxAdsActivity onLoaded : $adType")
+            object : BannerAdMediation.BannerAdListener {
+                override fun onAdsOff() {
+                    logD("MaxActivity Banner Ads : Ads Off")
                 }
 
-                override fun onAdClicked(adType: Int) {
-                    logD("MaxAdsActivity onAdClicked : $adType")
+                override fun onAdsLoaded() {
+                    logD("MaxActivity Banner Ads : Ads Loaded")
                 }
 
-                override fun onError(error: String) {
-                    logD("MaxAdsActivity onError Error : $error")
+                override fun onAdsClicked() {
+                    logD("MaxActivity Banner Ads : Ads Clicked")
                 }
 
-                override fun onFacebookAdCreated(facebookBanner: AdView) {
-                    logD("MaxAdsActivity onFacebookAdCreated : $facebookBanner")
+                override fun onAdsClosed() {
+                    logD("MaxActivity Banner Ads : Ads Closed")
                 }
 
-                override fun isEnableAds(isAds: Boolean) {
-                    logD("MaxAdsActivity isEnableAds : $isAds")
+                override fun onAdsOpened() {
+                    logD("MaxActivity Banner Ads : Ads Open")
                 }
 
-                override fun isOffline(offline: Boolean) {
-                    logD("Ads is Offline : $offline")
+                override fun onAdsError(adsErrorState: AdsErrorState) {
+                    when (adsErrorState) {
+                        AdsErrorState.NETWORK_OFF -> logD("MaxActivity Banner Ads : Internet Off")
+                        AdsErrorState.APP_PURCHASED -> logD("MaxActivity Banner Ads : You have Purchased your app")
+                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("MaxActivity Banner Ads : Ads Strategy wrong")
+                        AdsErrorState.ADS_ID_NULL -> logD("MaxActivity Banner Ads : Ads ID is Null found")
+                        AdsErrorState.TEST_ADS_ID -> logD("MaxActivity Banner Ads : Test Id found in released mode your app")
+                        AdsErrorState.ADS_LOAD_FAILED -> logD("MaxActivity Banner Ads : Ads load failed")
+                        AdsErrorState.ADS_DISMISS -> logD("MaxActivity Banner Ads : Ads Dismiss")
+                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("MaxActivity Banner Ads : Display Ads failed")
+                        AdsErrorState.ADS_IMPRESS -> logD("MaxActivity Banner Ads : Ads Impress Mode")
+                    }
                 }
             })
     }
@@ -233,21 +241,25 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
                     logD("MaxAds Activity Interstitial Ads is off")
                 }
 
-                override fun onAdsError(error: String) {
-                    logD("MaxAds Activity Interstitial Ads error : $error")
+                override fun onAdsError(errorState: AdsErrorState) {
+                    when (errorState) {
+                        AdsErrorState.NETWORK_OFF -> logD("MaxActivity Interstitial Ads : Internet Off")
+                        AdsErrorState.APP_PURCHASED -> logD("MaxActivity Interstitial Ads : You have Purchased your app")
+                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("MaxActivity Interstitial Ads : Ads Strategy wrong")
+                        AdsErrorState.ADS_ID_NULL -> logD("MaxActivity Interstitial Ads : Ads ID is Null found")
+                        AdsErrorState.TEST_ADS_ID -> logD("MaxActivity Interstitial Ads : Test Id found in released mode your app")
+                        AdsErrorState.ADS_LOAD_FAILED -> logD("MaxActivity Interstitial Ads : Ads load failed")
+                        AdsErrorState.ADS_DISMISS -> logD("MaxActivity Interstitial Ads : Ads Dismiss")
+                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("MaxActivity Interstitial Ads : Display Ads failed")
+                        AdsErrorState.ADS_IMPRESS -> logD("MaxActivity Interstitial Ads : Ads Impress Mode")
+                    }
+
                 }
 
                 override fun onAdsClicked() {
                     logD("MaxAds Activity Interstitial Ads click")
                 }
 
-                override fun onAdsDismiss() {
-                    logD("MaxAds Activity Interstitial Ads dismiss")
-                }
-
-                override fun onAdsImpress() {
-                    logD("MaxAds Activity Interstitial Ads Impress")
-                }
             })
     }
 

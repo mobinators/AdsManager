@@ -60,9 +60,14 @@ object AdsApplication : Application() {
     }
 
     fun getValueFromConfig(
-        firebaseConfig: FirebaseRemoteConfig, context: Context, listener: FetchRemoteCallback
+        firebaseConfig: FirebaseRemoteConfig,
+        context: Context,
+        storeId: Int,
+        listener: FetchRemoteCallback
     ) {
-        AdsConstants.testMode = 0 != context.applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
+        AdsConstants.selectedStore = storeId
+        AdsConstants.testMode =
+            0 != context.applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
         logD("Test Mode: ${AdsConstants.testMode}")
         logD("Test pre Build ----------------------> wow it works <---------------------------")
         this.onFetchRemoteCallbackListener = listener
@@ -122,11 +127,10 @@ object AdsApplication : Application() {
                 remoteConfig.getString(AdsConstants.ADMOB_MEDIATION_REWARDED_ID_KEY)
         }
         checkOpenAddIsEnable(remoteConfig)
-        logD("Ads Strategy : ${remoteConfig.getLong(AdsConstants.ADS_STRATEGY)}")
-        logD("AdsModel Detail : $adsModel")
+        logD("Ads Strategy : ${remoteConfig.getLong(AdsConstants.ADS_STRATEGY)} :")
+        logD(" Store Strategy : ${remoteConfig.getLong(AdsConstants.STORE_STRATEGY_KEY)}")
         this.onFetchRemoteCallbackListener!!.onUpdateSuccess(
-            appId = adsModel!!.admobAppID!!,
-            maxAppId = adsModel!!.maxAppId!!
+            appId = adsModel!!.admobAppID!!, maxAppId = adsModel!!.maxAppId!!
         )
         AdsConstants.isAdPreloadEnable = when ((adsModel?.strategy ?: 0).toInt()) {
             AdsConstants.ADS_OFF -> false

@@ -1,6 +1,7 @@
 package com.mobinators.ads.manager.ui.commons.utils
 
 object AdsConstants {
+    const val TEST_ADMOB_APP_ID = "ca-app-pub-3940256099942544~3347511713"
     const val TEST_ADMOB_REWARDED_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/5354046379"
     const val TEST_ADMOB_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712"
     const val TEST_ADMOB_BANNER_ID = "ca-app-pub-3940256099942544/6300978111"
@@ -38,19 +39,16 @@ object AdsConstants {
     const val ADMOB_MEDIATION_REWARDED_ID_KEY = "ADMOB_MEDIATION_REWARDED_ID"
     const val ADMOB_MEDIATION_INTERSTITIAL_ID_KEY = "ADMOB_MEDIATION_INTERSTITIAL_ID"
     const val ADMOB_MEDIATION_KEY = "ADMOB_MEDIATION_KEY"
-    const val ADS_MODEL_KEY = "Model_Key"
     const val ADS_STRATEGY = "Strategy"
-    const val INTERSTITIAL_KEY = "Interstitial_Key"
     const val FIREBASE_ANALYTICS_KEY = "Ads_Manager_Event"
     const val ADMOB_OPEN_AD_ENABLE_KEY = "ADMOB_OPEN_AD_ENABLE"
-    const val OPEN_AD_KEY = "Open_Ad"
+    const val STORE_STRATEGY_KEY = "STORE_STRATEGY"
     var testMode: Boolean = false
     var isAdPreloadEnable = false
-    var interstitialClickAdCounter = 0
-    var loadAdmobInters = 0
     var isInit = false
-    var canShowInterstitial = true
-    var admobRequestNativeFailed = 0
-    var adMobNativeAdLoad = 0
     var isAppOpenAdEnable = true
+    const val GOOGLE_PLAY_STORE = 1
+    const val AMAZON_APP_STORE = 2
+    const val HUAWEI_APP_GALLERY = 3
+    var selectedStore: Int = 1
 }

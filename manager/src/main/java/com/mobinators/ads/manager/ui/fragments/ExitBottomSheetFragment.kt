@@ -13,7 +13,8 @@ import com.mobinators.ads.manager.databinding.FragmentExitBottomSheetBinding
 import com.mobinators.ads.manager.extensions.setBackgroundColors
 import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
 import com.mobinators.ads.manager.ui.commons.base.BaseBottomSheet
-import com.mobinators.ads.manager.ui.commons.listener.BannerAdListener
+import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
+import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.*
 import com.mobinators.ads.manager.ui.commons.listener.PanelListener
 import com.mobinators.ads.manager.ui.commons.models.PanelModel
 import pak.developer.app.managers.extensions.logD
@@ -34,48 +35,72 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
         binding.cancelButton.setOnClickListener(this)
         binding.exitButton.setOnClickListener(this)
         panelModel?.let {
-            binding.cancelButton.setBackgroundColors(requireContext(), it.cancelBgColor ?: R.color.menuColor)
+            binding.cancelButton.setBackgroundColors(
+                requireContext(),
+                it.cancelBgColor ?: R.color.menuColor
+            )
             binding.cancelButton.text = it.cancelButtonText ?: resources.getString(R.string.cancel)
-            binding.cancelButton.setTextColor(resources.getColor(it.cancelButtonTitleColor?: R.color.menuColor))
-            binding.exitButton.setBackgroundColors(requireContext(), it.exitButtonBgColor ?: R.color.menuColor)
+            binding.cancelButton.setTextColor(
+                resources.getColor(
+                    it.cancelButtonTitleColor ?: R.color.menuColor
+                )
+            )
+            binding.exitButton.setBackgroundColors(
+                requireContext(),
+                it.exitButtonBgColor ?: R.color.menuColor
+            )
             binding.exitButton.text = it.exitButtonText ?: resources.getString(R.string.exit_)
-            binding.exitButton.setTextColor(resources.getColor(it.exitButtonTextColor ?: R.color.menuColor))
+            binding.exitButton.setTextColor(
+                resources.getColor(
+                    it.exitButtonTextColor ?: R.color.menuColor
+                )
+            )
             binding.exitText.text = it.desc ?: resources.getString(R.string.sure_you_want_to_exit)
             binding.exitAppText.text = it.title ?: resources.getString(R.string.exit_app)
             binding.exitAppText.setTextColor(resources.getColor(it.titleColor ?: R.color.menuColor))
             binding.exitText.setTextColor(resources.getColor(it.descColor ?: R.color.menuColor))
-            it.panelBackgroundColor?.let {colorId->
+            it.panelBackgroundColor?.let { colorId ->
                 binding.rootLayout.setCardBackgroundColor(resources.getColor(colorId))
-            }?: binding.rootLayout.setCardBackgroundColor(Color.WHITE)
+            } ?: binding.rootLayout.setCardBackgroundColor(Color.WHITE)
         }
 
         BannerAdMediation.showBannerAds(
             requireActivity(),
             false,
             binding.exitBannerFrame,
-            object : BannerAdListener {
-                override fun onLoaded(adType: Int) {
-                    logD("Exit Panel onLoaded : $adType")
+            object : BannerAdMediation.BannerAdListener {
+                override fun onAdsOff() {
+                    logD("Exit Panel onAdsOff")
                 }
 
-                override fun onAdClicked(adType: Int) {
-                    logD("Exit Panel onAdClicked : $adType")
+                override fun onAdsLoaded() {
+                    logD("Exit Panel onAdsLoaded")
                 }
 
-                override fun onError(error: String) {
-                    logD("Exit Panel onError Error : $error")
+                override fun onAdsClicked() {
+                    logD("Exit Panel onAdsClicked")
                 }
 
-                override fun onFacebookAdCreated(facebookBanner: AdView) {
-                    logD("Exit Panel onFacebookAdCreated : $facebookBanner")
+                override fun onAdsClosed() {
+                    logD("Exit Panel onAdsClosed")
                 }
 
-                override fun isEnableAds(isAds: Boolean) {
-                    logD("Exit Panel isEnableAds : $isAds")
+                override fun onAdsOpened() {
+                    logD("Exit Panel onAdsOpened")
                 }
 
-                override fun isOffline(offline: Boolean) {
-                    logD("Exit Panel Ads is Offline : $offline")
+                override fun onAdsError(adsErrorState: AdsErrorState) {
+                    when (adsErrorState) {
+                        NETWORK_OFF -> logD("Exit Panel Network Off")
+                        APP_PURCHASED -> logD("Exit Panel Purchased")
+                        ADS_STRATEGY_WRONG -> logD("Exit Panel Strategy Wrong")
+                        ADS_ID_NULL -> logD("Exit Panel Ads id Null")
+                        TEST_ADS_ID -> logD("Exit Panel Test Ads ID")
+                        ADS_LOAD_FAILED -> logD("Exit Panel Load Failed")
+                        ADS_DISMISS -> logD("Exit Panel Dismiss")
+                        ADS_DISPLAY_FAILED -> logD("Exit Panel Display Failed")
+                        ADS_IMPRESS -> logD("Exit Panel Impress")
+                    }
                 }
             })
     }

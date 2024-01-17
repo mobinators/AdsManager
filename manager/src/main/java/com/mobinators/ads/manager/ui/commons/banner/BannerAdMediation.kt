@@ -16,12 +16,14 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.mobinators.ads.manager.applications.AdsApplication
-import com.mobinators.ads.manager.ui.commons.listener.BannerAdListener
+import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.models.AdsModel
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.gone
 import pak.developer.app.managers.extensions.logD
+import pak.developer.app.managers.extensions.logException
+import pak.developer.app.managers.extensions.visible
 
 
 @SuppressLint("StaticFieldLeak")
@@ -42,15 +44,16 @@ object BannerAdMediation {
         this.bannerContainer = containerView
         this.bannerAdListener = listener
         this.activity = activity
+        this.bannerContainer!!.gone()
         if (isPurchased) {
-            listener.onError("You have pro version")
+            listener.onAdsError(adsErrorState = AdsErrorState.APP_PURCHASED)
             return
         }
         try {
             modelClass = AdsApplication.getAdsModel()
             selectAd()
         } catch (error: Exception) {
-            this.bannerAdListener!!.onError(error = "showBannerAds Error : ${error.localizedMessage}")
+            logD("Show Banner Ads Error : ${error.localizedMessage}")
         }
     }
 
@@ -58,27 +61,14 @@ object BannerAdMediation {
     private fun selectAd() {
         try {
             when (modelClass?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> {
-                    this.bannerAdListener!!.isEnableAds(false)
-                }
-
-                AdsConstants.AD_MOB_MEDIATION -> {
-                    this.bannerAdListener!!.isEnableAds(true)
-                    adMobBannerAds()
-                }
-
-                AdsConstants.AD_MOB -> {
-                    this.bannerAdListener!!.isEnableAds(true)
-                    adMobBannerAds()
-                }
-
-                AdsConstants.MAX_MEDIATION -> {
-                    this.bannerAdListener!!.isEnableAds(true)
-                    maxBannerAds()
-                }
+                AdsConstants.ADS_OFF -> this.bannerAdListener!!.onAdsOff()
+                AdsConstants.AD_MOB_MEDIATION -> adMobBannerAds()
+                AdsConstants.AD_MOB -> adMobBannerAds()
+                AdsConstants.MAX_MEDIATION -> maxBannerAds()
+                else -> this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_STRATEGY_WRONG)
             }
         } catch (error: Exception) {
-            this.bannerAdListener!!.onError(error = "showBannerAds Error : ${error.localizedMessage}")
+            logException("Selected Banner Ads Error : ${error.localizedMessage}")
         }
     }
 
@@ -89,31 +79,24 @@ object BannerAdMediation {
             } else {
                 if (modelClass!!.admobMediation) {
                     modelClass!!.admobMediationBannerId
-
                 } else {
                     modelClass!!.admobBannerID
                 }
             }
             if (adMobKey!!.isEmpty() || adMobKey!!.isBlank()) {
-                this.bannerAdListener!!.onError("AdMob Banner Ads Id is null")
+                this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_ID_NULL)
                 return
             }
             if (AdsUtils.isOnline(this.activity!!).not()) {
-                logD("is Offline ")
-                this.bannerContainer!!.gone()
-                this.bannerAdListener!!.isOffline(true)
+                this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.NETWORK_OFF)
                 return
             }
-            logD("debug mode : ${AdsConstants.testMode}")
-            if (this.adMobKey == AdsConstants.TEST_ADMOB_BANNER_ID) {
-                logD("Test Ids")
-                if (AdsConstants.testMode.not()) {
-                    logD("NULL OR TEST IDS FOUND")
-                    this.bannerAdListener!!.onError("NULL OR TEST IDS FOUND")
+            if (AdsConstants.testMode.not()) {
+                if (this.adMobKey == AdsConstants.TEST_ADMOB_BANNER_ID) {
+                    this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.TEST_ADS_ID)
                     return
                 }
             }
-            logD("AdMob Banner Ads Id : $adMobKey")
             val bannerView = AdView(this.activity!!)
             bannerView.setAdSize(AdSize.BANNER)
             bannerView.adUnitId = adMobKey!!
@@ -121,17 +104,17 @@ object BannerAdMediation {
             bannerView.adListener = object : AdListener() {
                 override fun onAdClicked() {
                     super.onAdClicked()
-                    logD("onAdClicked")
+                    this@BannerAdMediation.bannerAdListener!!.onAdsClicked()
                 }
 
                 override fun onAdClosed() {
                     super.onAdClosed()
-                    logD("onAdClosed")
+                    this@BannerAdMediation.bannerAdListener!!.onAdsClosed()
                 }
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     super.onAdFailedToLoad(p0)
-                    onErrorFun(errorMessage = p0.message)
+                    this@BannerAdMediation.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_LOAD_FAILED)
                     if (AdsApplication.isAdmobInLimit()) {
                         AdsApplication.applyLimitOnAdmob = true
                     }
@@ -139,24 +122,25 @@ object BannerAdMediation {
 
                 override fun onAdImpression() {
                     super.onAdImpression()
-                    logD("onAdImpression")
+                    this@BannerAdMediation.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_IMPRESS)
                 }
 
                 override fun onAdLoaded() {
                     super.onAdLoaded()
+                    this@BannerAdMediation.bannerContainer!!.visible()
                     if (bannerContainer!!.parent != null) {
                         bannerContainer!!.removeAllViews()
                     }
                     bannerContainer!!.addView(bannerView)
                     if (bannerAdListener != null) {
-                        bannerAdListener!!.onLoaded(AdsConstants.AD_MOB)
+                        bannerAdListener!!.onAdsLoaded()
                     }
                 }
 
                 override fun onAdOpened() {
                     super.onAdOpened()
                     if (bannerAdListener != null) {
-                        bannerAdListener!!.onAdClicked(AdsConstants.AD_MOB)
+                        bannerAdListener!!.onAdsOpened()
                     }
                 }
 
@@ -166,46 +150,42 @@ object BannerAdMediation {
                 }
             }
         } catch (error: Exception) {
-            this.bannerAdListener!!.onError(error = "showBannerAds Error : ${error.localizedMessage}")
+            logException("Show Banner Ads Error : ${error.localizedMessage}")
         }
     }
 
     private fun maxBannerAds() {
         try {
-            logD("MaxBanner Ads Calling ")
             this.appLovingKey = if (AdsConstants.testMode) {
                 AdsConstants.TEST_MAX_BANNER_ADS_ID
             } else {
                 modelClass!!.maxBannerID
             }
             if (this.appLovingKey!!.isEmpty() || this.appLovingKey!!.isBlank()) {
-                this.bannerAdListener!!.onError("Max Mediation Banner Ads Id is null")
+                this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_ID_NULL)
                 return
             }
             if (AdsUtils.isOnline(this.activity!!).not()) {
                 this.bannerContainer!!.gone()
-                this.bannerAdListener!!.isOffline(true)
+                this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.NETWORK_OFF)
                 return
             }
-            if (this.appLovingKey == AdsConstants.TEST_MAX_BANNER_ADS_ID) {
-                logD("Test Ids")
-                if (AdsConstants.testMode.not()) {
-                    logD("NULL OR TEST IDS FOUND")
-                    this.bannerAdListener!!.onError("NULL OR TEST IDS FOUND")
+            if (AdsConstants.testMode.not()) {
+                if (this.appLovingKey == AdsConstants.TEST_MAX_BANNER_ADS_ID) {
+                    this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.TEST_ADS_ID)
                     return
                 }
             }
-            logD("Max Banner Ads Id : ${this.appLovingKey}")
             val maxBannerView = MaxAdView(this.appLovingKey, MaxAdFormat.BANNER, this.activity)
             maxBannerView.setListener(object : MaxAdViewAdListener {
                 override fun onAdLoaded(p0: MaxAd) {
-                    logD("onAdLoaded")
+                    this@BannerAdMediation.bannerContainer!!.visible()
                     if (bannerContainer!!.parent != null) {
                         bannerContainer!!.removeAllViews()
                     }
                     bannerContainer!!.addView(maxBannerView)
                     if (bannerAdListener != null) {
-                        bannerAdListener!!.onLoaded(AdsConstants.MAX_MEDIATION)
+                        bannerAdListener!!.onAdsLoaded()
                     }
                 }
 
@@ -218,16 +198,15 @@ object BannerAdMediation {
                 }
 
                 override fun onAdClicked(p0: MaxAd) {
-                    logD("onAdClicked")
+                    this@BannerAdMediation.bannerAdListener!!.onAdsClicked()
                 }
 
                 override fun onAdLoadFailed(p0: String, p1: MaxError) {
-                    logD("Max Error Code : ${p1.code}")
-                    onErrorFun(errorMessage = p1.message)
+                    this@BannerAdMediation.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_LOAD_FAILED)
                 }
 
                 override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
-                    onErrorFun(errorMessage = p1.message)
+                    this@BannerAdMediation.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_DISPLAY_FAILED)
                 }
 
                 override fun onAdExpanded(p0: MaxAd) {
@@ -251,21 +230,16 @@ object BannerAdMediation {
             maxBannerView.loadAd()
             maxBannerView.startAutoRefresh()
         } catch (error: Exception) {
-            this.bannerAdListener!!.onError(error = "showBannerAds Error : ${error.localizedMessage}")
+            logException("Show Max Banner Ads Error : ${error.localizedMessage}")
         }
     }
 
-    private fun onErrorFun(errorMessage: String) {
-        if (AdsApplication.getAdsModel() != null) {
-//            selectAd()
-        } else {
-            this.bannerAdListener!!.onError(error = errorMessage)
-            clearValue()
-        }
-    }
-
-    private fun clearValue() {
-        this.appLovingKey = null
-        this.adMobKey = null
+    interface BannerAdListener {
+        fun onAdsOff()
+        fun onAdsLoaded()
+        fun onAdsClicked()
+        fun onAdsClosed()
+        fun onAdsOpened()
+        fun onAdsError(adsErrorState: AdsErrorState)
     }
 }

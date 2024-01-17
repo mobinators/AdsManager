@@ -18,6 +18,7 @@ import com.mobinators.ads.manager.ui.commons.listener.FetchRemoteCallback
 import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAds
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
+import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.logException
 
@@ -31,6 +32,7 @@ class AdsManagerApplication : Application() {
         AdsApplication.getValueFromConfig(
             FirebaseRemoteConfig.getInstance(),
             this,
+            AdsConstants.GOOGLE_PLAY_STORE,
             object : FetchRemoteCallback {
                 override fun onFetchValuesSuccess() {
                     logD("onFetchValuesSuccess")
@@ -51,8 +53,18 @@ class AdsManagerApplication : Application() {
                                 logD("Interstitial Ads Loaded")
                             }
 
-                            override fun onAdsError(error: String) {
-                                logException(error)
+                            override fun onAdsError(errorState: AdsErrorState) {
+                                when (errorState) {
+                                    AdsErrorState.NETWORK_OFF -> logD("Interstitial Ads : Internet Off")
+                                    AdsErrorState.APP_PURCHASED -> logD("Interstitial Ads : You have Purchased your app")
+                                    AdsErrorState.ADS_STRATEGY_WRONG -> logD("Interstitial Ads : Ads Strategy wrong")
+                                    AdsErrorState.ADS_ID_NULL -> logD("Interstitial Ads : Ads Is Null found")
+                                    AdsErrorState.TEST_ADS_ID -> logD("Interstitial Ads : Test Id found in released mode your app")
+                                    AdsErrorState.ADS_LOAD_FAILED -> logD("Interstitial Ads : Ads  load failed")
+                                    AdsErrorState.ADS_DISMISS -> logD("Interstitial Ads : Ads Dismiss")
+                                    AdsErrorState.ADS_DISPLAY_FAILED -> logD("Interstitial Ads : Display Ads failed")
+                                    AdsErrorState.ADS_IMPRESS -> logD("Interstitial Ads : Ads Impress Mode")
+                                }
                             }
 
                             override fun onAdsOff() {
