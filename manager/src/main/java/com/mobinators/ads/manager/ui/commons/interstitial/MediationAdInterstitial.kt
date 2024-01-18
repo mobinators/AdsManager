@@ -18,6 +18,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.mobinators.ads.manager.applications.AdsApplication
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
+import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
+import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.logD
@@ -206,7 +208,9 @@ object MediationAdInterstitial {
     private fun showAdmobInterstitialAds() {
         try {
             if (this.admobInterstitialAds != null) {
-                if (MediationOpenAd.isShowingAd.not()) {
+                if (MediationOpenAd.isShowingAd || MediationRewardedAd.isAdsShow || MediationRewardedInterstitialAd.isAdsShow) {
+                    logD("Other Ads Show")
+                } else {
                     this.admobInterstitialAds!!.show(this.activityRef!!)
                     this.admobInterstitialAds!!.fullScreenContentCallback =
                         object : FullScreenContentCallback() {
@@ -240,8 +244,8 @@ object MediationAdInterstitial {
                                 this@MediationAdInterstitial.admobInterstitialAds = null
                             }
                         }
+                    initSelectedInterstitialAds()
                 }
-                initSelectedInterstitialAds()
             } else {
                 initSelectedInterstitialAds()
             }
@@ -256,6 +260,7 @@ object MediationAdInterstitial {
                 if (this.maxInterstitialAds!!.isReady) {
                     if (MediationOpenAd.isShowingAd.not()) {
                         this.maxInterstitialAds!!.showAd()
+                        initSelectedInterstitialAds()
                     }
                 } else {
                     initSelectedInterstitialAds()

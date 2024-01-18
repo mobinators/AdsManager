@@ -1,7 +1,6 @@
 package com.mobinators.ads.managers
 
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.mobinators.ads.manager.extensions.appRateUs
@@ -340,69 +339,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             })
     }
 
-    private fun openAds() {
-        MediationAdInterstitial.showInterstitialAds(
-            this,
-            false,
-            object : MediationAdInterstitial.AdsShowCallback {
-                override fun onAdsOff() {
-                    logD("MainActivity Interstitial Ads is off")
-                }
-
-                override fun onAdsError(errorState: AdsErrorState) {
-                    when (errorState) {
-                        AdsErrorState.NETWORK_OFF -> logD("MainActivity Interstitial Ads : Internet Off")
-                        AdsErrorState.APP_PURCHASED -> logD("MainActivity Interstitial Ads : You have Purchased your app")
-                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("MainActivity Interstitial Ads : Ads Strategy wrong")
-                        AdsErrorState.ADS_ID_NULL -> logD("MainActivity Interstitial Ads : Ads ID is Null found")
-                        AdsErrorState.TEST_ADS_ID -> logD("MainActivity Interstitial Ads : Test Id found in released mode your app")
-                        AdsErrorState.ADS_LOAD_FAILED -> logD("MainActivity Interstitial Ads : Ads load failed")
-                        AdsErrorState.ADS_DISMISS -> logD("MainActivity Interstitial Ads : Ads Dismiss")
-                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("MainActivity Interstitial Ads : Display Ads failed")
-                        AdsErrorState.ADS_IMPRESS -> logD("MainActivity Interstitial Ads : Ads Impress Mode")
-                    }
-                }
-
-                override fun onAdsClicked() {
-                    logD("MainActivity Interstitial Ads click")
-                }
-            })
-
-        Handler().postDelayed(Runnable {
-            MediationOpenAd.showAppOpenAds(
-                this,
-                false,
-                object : MediationOpenAd.AdsShowAppOpenCallback {
-                    override fun onAdsOff() {
-                        logD("MainActivity App Open Ads is off")
-                    }
-
-                    override fun onAdsClicked() {
-                        logD("MainActivity App Open Ads Clicked")
-                    }
-
-                    override fun onAdsDisplay() {
-                        logD("MainActivity App Open Ads onAdsDisplay")
-                    }
-
-                    override fun onAdsError(errorState: AdsErrorState) {
-                        when (errorState) {
-                            AdsErrorState.NETWORK_OFF -> logD("Internet Off")
-                            AdsErrorState.APP_PURCHASED -> logD("You have Purchased your app")
-                            AdsErrorState.ADS_STRATEGY_WRONG -> logD("Ads Strategy wrong")
-                            AdsErrorState.ADS_ID_NULL -> logD("Ads Is Null found")
-                            AdsErrorState.TEST_ADS_ID -> logD("Test Id found in released mode your app")
-                            AdsErrorState.ADS_LOAD_FAILED -> logD("ads load failed")
-                            AdsErrorState.ADS_DISMISS -> logD("Ads Dismiss")
-                            AdsErrorState.ADS_DISPLAY_FAILED -> logD("Display Ads failed")
-                            AdsErrorState.ADS_IMPRESS -> logD("Ads Impress Mode")
-                        }
-                    }
-
-                })
-        }, 1500)
-    }
-
     private fun interstitialAds() {
         MediationAdInterstitial.showInterstitialAds(
             this,
@@ -431,6 +367,40 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                 }
             })
     }
+
+    private fun openAds() {
+        MediationOpenAd.showAppOpenAds(
+            this,
+            false,
+            object : MediationOpenAd.AdsShowAppOpenCallback {
+                override fun onAdsOff() {
+                    logD("MainActivity App Open Ads is off")
+                }
+
+                override fun onAdsClicked() {
+                    logD("MainActivity App Open Ads Clicked")
+                }
+
+                override fun onAdsDisplay() {
+                    logD("MainActivity App Open Ads onAdsDisplay")
+                }
+
+                override fun onAdsError(errorState: AdsErrorState) {
+                    when (errorState) {
+                        AdsErrorState.NETWORK_OFF -> logD("Internet Off")
+                        AdsErrorState.APP_PURCHASED -> logD("You have Purchased your app")
+                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("Ads Strategy wrong")
+                        AdsErrorState.ADS_ID_NULL -> logD("Ads Is Null found")
+                        AdsErrorState.TEST_ADS_ID -> logD("Test Id found in released mode your app")
+                        AdsErrorState.ADS_LOAD_FAILED -> logD("ads load failed")
+                        AdsErrorState.ADS_DISMISS -> logD("Ads Dismiss")
+                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("Display Ads failed")
+                        AdsErrorState.ADS_IMPRESS -> logD("Ads Impress Mode")
+                    }
+                }
+            })
+    }
+
 
     private fun inAppPurchased() {
         AppPurchaseUtils.initConnection(
@@ -483,5 +453,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     override fun onDestroy() {
         super.onDestroy()
         AppPurchaseUtils.clientDestroy()
+        MediationNativeAds.onDestroy()
     }
 }

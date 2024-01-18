@@ -18,7 +18,9 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions
 import com.mobinators.ads.manager.applications.AdsApplication
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
+import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
+import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.logD
@@ -219,9 +221,9 @@ object MediationRewardedAd {
     private fun showRewardedAds() {
         try {
             if (this.admobRewardAds != null) {
-                if (MediationOpenAd.isShowingAd.not()) {
-
-
+                if (MediationOpenAd.isShowingAd || MediationAdInterstitial.isAdsShow || MediationRewardedInterstitialAd.isAdsShow) {
+                    logD("Other Ads show")
+                } else {
                     this.admobRewardAds!!.show(this.activityRef!!) {
                         this.showRewardLoadCallback!!.onRewardEarned(
                             item = it.amount,
@@ -259,14 +261,14 @@ object MediationRewardedAd {
 
                             override fun onAdImpression() {
                                 super.onAdImpression()
-                                this@MediationRewardedAd.isAdsShow = false
                                 this@MediationRewardedAd.showRewardLoadCallback!!.onAdsError(
                                     errorState = AdsErrorState.ADS_IMPRESS
                                 )
                             }
                         }
+                    initSelectedRewardAds()
                 }
-                initSelectedRewardAds()
+
             } else {
                 initSelectedRewardAds()
             }
@@ -278,10 +280,12 @@ object MediationRewardedAd {
     private fun showMaxRewardedAds() {
         try {
             if (this.maxRewardedAd!!.isReady) {
-                if (MediationOpenAd.isShowingAd.not()) {
+                if (MediationOpenAd.isShowingAd || MediationAdInterstitial.isAdsShow || MediationRewardedInterstitialAd.isAdsShow) {
+                    logD("Other Ads Show")
+                } else {
                     this.maxRewardedAd!!.showAd()
+                    initSelectedRewardAds()
                 }
-                initSelectedRewardAds()
             } else {
                 initSelectedRewardAds()
             }

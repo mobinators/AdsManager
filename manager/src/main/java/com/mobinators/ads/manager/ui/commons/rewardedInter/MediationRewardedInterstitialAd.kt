@@ -11,9 +11,12 @@ import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.mobinators.ads.manager.applications.AdsApplication
+import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
+import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
+import pak.developer.app.managers.extensions.logD
 
 @SuppressLint("StaticFieldLeak")
 object MediationRewardedInterstitialAd {
@@ -117,10 +120,6 @@ object MediationRewardedInterstitialAd {
             return
         }
         try {
-          /*  if (AdsUtils.isOnline(activity).not()) {
-                this.showRewardCallback!!.onAdsError(error = "Network Error ")
-                return
-            }*/
             showSelectedRewardedInterstitial()
         } catch (error: Exception) {
             this.showRewardCallback!!.onAdsError(error = " Show Reward Interstitial Ads Error: ${error.localizedMessage}")
@@ -146,7 +145,9 @@ object MediationRewardedInterstitialAd {
     private fun admobRewardInterstitialAdShow() {
         try {
             if (rewardedInterstitialAd != null) {
-                if (MediationOpenAd.isShowingAd.not()) {
+                if (MediationOpenAd.isShowingAd || MediationAdInterstitial.isAdsShow || MediationRewardedAd.isAdsShow) {
+                    logD("Other Ads Show")
+                } else {
                     rewardedInterstitialAd!!.show(currentActivity!!) {
                         this.showRewardCallback!!.onAdsReward(it)
                     }
@@ -176,7 +177,6 @@ object MediationRewardedInterstitialAd {
 
                             override fun onAdImpression() {
                                 super.onAdImpression()
-                                this@MediationRewardedInterstitialAd.isAdsShow = false
                                 this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsImpress()
                             }
 
@@ -185,8 +185,8 @@ object MediationRewardedInterstitialAd {
                                 this@MediationRewardedInterstitialAd.isAdsShow = true
                             }
                         }
+                    initSelectedRewardedInterstitialAds()
                 }
-                initSelectedRewardedInterstitialAds()
             } else {
                 initSelectedRewardedInterstitialAds()
             }

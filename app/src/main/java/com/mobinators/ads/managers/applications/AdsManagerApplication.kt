@@ -145,58 +145,5 @@ class AdsManagerApplication : Application() {
                 }
             })
         AdsApplication.setAnalytics(FirebaseAnalytics.getInstance(this))
-        registerActivityLifecycleCallbacks(AppLifecycleObserver())
-    }
-
-    fun isAppRunning(context: Context, packageName: String): Boolean {
-        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val runningAppProcesses = activityManager.runningAppProcesses ?: return false
-        for (processInfo in runningAppProcesses) {
-            if (processInfo.processName == packageName) {
-                return true
-            }
-        }
-        return false
-    }
-
-    inner class AppLifecycleObserver : ActivityLifecycleCallbacks {
-
-
-        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-            // Your code here
-        }
-
-        override fun onActivityStarted(activity: Activity) {
-            // Your code here
-        }
-
-        override fun onActivityResumed(activity: Activity) {
-            isAppInForeground = true
-        }
-
-        override fun onActivityPaused(activity: Activity) {
-            isAppInForeground = false
-        }
-
-        override fun onActivityStopped(activity: Activity) {
-            // Your code here
-        }
-
-        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-            // Your code here
-        }
-
-        override fun onActivityDestroyed(activity: Activity) {
-            // Your code here
-            logD("App kill : ${isAppRunning(applicationContext, packageName)}")
-        }
-
-        fun isAppInForeground(): Boolean {
-            return isAppInForeground
-        }
-    }
-
-    fun isAppInForeground(): Boolean {
-        return isAppInForeground
     }
 }
