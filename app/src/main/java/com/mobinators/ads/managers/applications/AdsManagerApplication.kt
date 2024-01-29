@@ -1,11 +1,7 @@
 package com.mobinators.ads.managers.applications
 
-import android.app.Activity
-import android.app.ActivityManager
 import android.app.Application
-import android.content.Context
 import android.content.pm.ApplicationInfo
-import android.os.Bundle
 import androidx.multidex.MultiDex
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig

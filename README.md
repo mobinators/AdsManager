@@ -14,7 +14,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.1.6'
+  implementation 'com.github.mobinators:AdsManager:1.1.7'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -668,6 +668,7 @@
             this.exitButtonText = "exit"
             this.exitButtonTextColor = R.color.white
             this.panelBackgroundColor = R.color.lightGray
+            this.isAdsShow = false  // true value is show ads , false  value is not show ads
         })
 
 ```

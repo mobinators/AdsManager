@@ -447,6 +447,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             this.exitButtonText = "exit"
             this.exitButtonTextColor = R.color.white
             this.panelBackgroundColor = R.color.lightGray
+            this.isAdsShow = false  // true value is show ads , false  value is not show ads
         })
     }
 

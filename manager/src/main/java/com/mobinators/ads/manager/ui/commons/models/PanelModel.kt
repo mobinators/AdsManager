@@ -9,6 +9,7 @@ data class PanelModel(
     var exitButtonText: String? = null,
     var exitButtonBgColor: Int? = null,
     var cancelBgColor: Int? = null,
+    var isAdsShow: Boolean = true,
     var titleColor: Int? = null,
     var descColor: Int? = null,
     var title: String? = null,

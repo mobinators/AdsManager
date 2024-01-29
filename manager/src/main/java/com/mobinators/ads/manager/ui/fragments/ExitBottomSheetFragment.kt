@@ -11,12 +11,14 @@ import com.facebook.ads.AdView
 import com.mobinators.ads.manager.R
 import com.mobinators.ads.manager.databinding.FragmentExitBottomSheetBinding
 import com.mobinators.ads.manager.extensions.setBackgroundColors
+import com.mobinators.ads.manager.extensions.then
 import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
 import com.mobinators.ads.manager.ui.commons.base.BaseBottomSheet
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.*
 import com.mobinators.ads.manager.ui.commons.listener.PanelListener
 import com.mobinators.ads.manager.ui.commons.models.PanelModel
+import pak.developer.app.managers.extensions.gone
 import pak.developer.app.managers.extensions.logD
 
 
@@ -63,46 +65,55 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
                 binding.rootLayout.setCardBackgroundColor(resources.getColor(colorId))
             } ?: binding.rootLayout.setCardBackgroundColor(Color.WHITE)
         }
+        try {
+            panelModel?.isAdsShow?.then {
+                logD("Ads is not enable:${panelModel?.isAdsShow}")
+                BannerAdMediation.showBannerAds(
+                    requireActivity(),
+                    false,
+                    binding.exitBannerFrame,
+                    object : BannerAdMediation.BannerAdListener {
+                        override fun onAdsOff() {
+                            logD("Exit Panel onAdsOff")
+                        }
 
-        BannerAdMediation.showBannerAds(
-            requireActivity(),
-            false,
-            binding.exitBannerFrame,
-            object : BannerAdMediation.BannerAdListener {
-                override fun onAdsOff() {
-                    logD("Exit Panel onAdsOff")
-                }
+                        override fun onAdsLoaded() {
+                            logD("Exit Panel onAdsLoaded")
+                        }
 
-                override fun onAdsLoaded() {
-                    logD("Exit Panel onAdsLoaded")
-                }
+                        override fun onAdsClicked() {
+                            logD("Exit Panel onAdsClicked")
+                        }
 
-                override fun onAdsClicked() {
-                    logD("Exit Panel onAdsClicked")
-                }
+                        override fun onAdsClosed() {
+                            logD("Exit Panel onAdsClosed")
+                        }
 
-                override fun onAdsClosed() {
-                    logD("Exit Panel onAdsClosed")
-                }
+                        override fun onAdsOpened() {
+                            logD("Exit Panel onAdsOpened")
+                        }
 
-                override fun onAdsOpened() {
-                    logD("Exit Panel onAdsOpened")
-                }
-
-                override fun onAdsError(adsErrorState: AdsErrorState) {
-                    when (adsErrorState) {
-                        NETWORK_OFF -> logD("Exit Panel Network Off")
-                        APP_PURCHASED -> logD("Exit Panel Purchased")
-                        ADS_STRATEGY_WRONG -> logD("Exit Panel Strategy Wrong")
-                        ADS_ID_NULL -> logD("Exit Panel Ads id Null")
-                        TEST_ADS_ID -> logD("Exit Panel Test Ads ID")
-                        ADS_LOAD_FAILED -> logD("Exit Panel Load Failed")
-                        ADS_DISMISS -> logD("Exit Panel Dismiss")
-                        ADS_DISPLAY_FAILED -> logD("Exit Panel Display Failed")
-                        ADS_IMPRESS -> logD("Exit Panel Impress")
-                    }
-                }
-            })
+                        override fun onAdsError(adsErrorState: AdsErrorState) {
+                            when (adsErrorState) {
+                                NETWORK_OFF -> logD("Exit Panel Network Off")
+                                APP_PURCHASED -> logD("Exit Panel Purchased")
+                                ADS_STRATEGY_WRONG -> logD("Exit Panel Strategy Wrong")
+                                ADS_ID_NULL -> logD("Exit Panel Ads id Null")
+                                TEST_ADS_ID -> logD("Exit Panel Test Ads ID")
+                                ADS_LOAD_FAILED -> logD("Exit Panel Load Failed")
+                                ADS_DISMISS -> logD("Exit Panel Dismiss")
+                                ADS_DISPLAY_FAILED -> logD("Exit Panel Display Failed")
+                                ADS_IMPRESS -> logD("Exit Panel Impress")
+                            }
+                        }
+                    })
+            } ?: run {
+                logD("Ads is not enable : ${panelModel?.isAdsShow}")
+                binding.exitBannerFrame.gone()
+            }
+        } catch (error: Exception) {
+            logD("Exit Panel Ads Error : ${error.localizedMessage}")
+        }
     }
 
     override fun onClick(itemId: View?) {
