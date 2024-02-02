@@ -308,7 +308,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     }
 
     private fun rewardedInterstitialAds() {
-
         MediationRewardedInterstitialAd.showRewardedInterstitialAd(
             this,
             false,
@@ -447,7 +446,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             this.exitButtonText = "exit"
             this.exitButtonTextColor = R.color.white
             this.panelBackgroundColor = R.color.lightGray
-            this.isAdsShow = false  // true value is show ads , false  value is not show ads
+            this.isAdsShow = true  // true value is show ads , false  value is not show ads
         })
     }
 

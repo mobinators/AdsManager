@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.facebook.ads.AdView
 import com.mobinators.ads.manager.R
 import com.mobinators.ads.manager.databinding.FragmentExitBottomSheetBinding
 import com.mobinators.ads.manager.extensions.setBackgroundColors
@@ -74,6 +73,7 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
                     binding.exitBannerFrame,
                     object : BannerAdMediation.BannerAdListener {
                         override fun onAdsOff() {
+                            binding.exitBannerLayout.gone()
                             logD("Exit Panel onAdsOff")
                         }
 
@@ -95,21 +95,55 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
 
                         override fun onAdsError(adsErrorState: AdsErrorState) {
                             when (adsErrorState) {
-                                NETWORK_OFF -> logD("Exit Panel Network Off")
-                                APP_PURCHASED -> logD("Exit Panel Purchased")
-                                ADS_STRATEGY_WRONG -> logD("Exit Panel Strategy Wrong")
-                                ADS_ID_NULL -> logD("Exit Panel Ads id Null")
-                                TEST_ADS_ID -> logD("Exit Panel Test Ads ID")
-                                ADS_LOAD_FAILED -> logD("Exit Panel Load Failed")
-                                ADS_DISMISS -> logD("Exit Panel Dismiss")
-                                ADS_DISPLAY_FAILED -> logD("Exit Panel Display Failed")
-                                ADS_IMPRESS -> logD("Exit Panel Impress")
+                                NETWORK_OFF -> {
+                                    binding.exitBannerLayout.gone()
+                                    logD("Exit Panel Network Off")
+                                }
+
+                                APP_PURCHASED -> {
+                                    binding.exitBannerLayout.gone()
+                                    logD("Exit Panel Purchased")
+                                }
+
+                                ADS_STRATEGY_WRONG -> {
+                                    binding.exitBannerLayout.gone()
+                                    logD("Exit Panel Strategy Wrong")
+                                }
+
+                                ADS_ID_NULL -> {
+                                    binding.exitBannerLayout.gone()
+                                    logD("Exit Panel Ads id Null")
+                                }
+
+                                TEST_ADS_ID -> {
+                                    binding.exitBannerLayout.gone()
+                                    logD("Exit Panel Test Ads ID")
+                                }
+
+                                ADS_LOAD_FAILED -> {
+                                    binding.exitBannerLayout.gone()
+                                    logD("Exit Panel Load Failed")
+                                }
+
+                                ADS_DISMISS -> {
+                                    logD("Exit Panel Dismiss")
+                                }
+
+                                ADS_DISPLAY_FAILED -> {
+                                    binding.exitBannerLayout.gone()
+                                    logD("Exit Panel Display Failed")
+                                }
+
+                                ADS_IMPRESS -> {
+                                    binding.adsLoadingText.gone()
+                                    logD("Exit Panel Impress")
+                                }
                             }
                         }
                     })
             } ?: run {
                 logD("Ads is not enable : ${panelModel?.isAdsShow}")
-                binding.exitBannerFrame.gone()
+                binding.exitBannerLayout.gone()
             }
         } catch (error: Exception) {
             logD("Exit Panel Ads Error : ${error.localizedMessage}")

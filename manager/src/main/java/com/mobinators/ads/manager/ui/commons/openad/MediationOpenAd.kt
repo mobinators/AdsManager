@@ -15,6 +15,7 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.mobinators.ads.manager.applications.AdsApplication
+import com.mobinators.ads.manager.extensions.then
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
@@ -26,7 +27,6 @@ import pak.developer.app.managers.extensions.logException
 
 @SuppressLint("StaticFieldLeak")
 object MediationOpenAd {
-
     private var activityRef: Activity? = null
     private var admobAppOpenAdsID: String? = null
     private var admobAppOPenAd: AppOpenAd? = null
@@ -98,24 +98,29 @@ object MediationOpenAd {
                     return
                 }
             }
-            AppOpenAd.load(
-                this.contextRef!!,
-                this.admobAppOpenAdsID!!,
-                AdsApplication.getAdRequest(),
-                AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
-                object : AppOpenAd.AppOpenAdLoadCallback() {
-                    override fun onAdLoaded(p0: AppOpenAd) {
-                        super.onAdLoaded(p0)
-                        this@MediationOpenAd.admobAppOPenAd = p0
-                        this@MediationOpenAd.loadedCallback!!.onAdsLoaded()
-                    }
+            AdsApplication.getAdsModel()?.isAppOpenAdd?.then {
+                AppOpenAd.load(
+                    this.contextRef!!,
+                    this.admobAppOpenAdsID!!,
+                    AdsApplication.getAdRequest(),
+                    AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
+                    object : AppOpenAd.AppOpenAdLoadCallback() {
+                        override fun onAdLoaded(p0: AppOpenAd) {
+                            super.onAdLoaded(p0)
+                            this@MediationOpenAd.admobAppOPenAd = p0
+                            this@MediationOpenAd.loadedCallback!!.onAdsLoaded()
+                        }
 
-                    override fun onAdFailedToLoad(p0: LoadAdError) {
-                        super.onAdFailedToLoad(p0)
-                        this@MediationOpenAd.admobAppOPenAd = null
-                        this@MediationOpenAd.loadedCallback!!.onAdsError(errorState = AdsErrorState.ADS_LOAD_FAILED)
-                    }
-                })
+                        override fun onAdFailedToLoad(p0: LoadAdError) {
+                            super.onAdFailedToLoad(p0)
+                            this@MediationOpenAd.admobAppOPenAd = null
+                            this@MediationOpenAd.loadedCallback!!.onAdsError(errorState = AdsErrorState.ADS_LOAD_FAILED)
+                        }
+                    })
+            } ?: run {
+                logD("App Open Ads is not enable")
+            }
+
         } catch (error: Exception) {
             logException("Init App Open Ads Error : ${error.localizedMessage}")
         }
@@ -138,45 +143,50 @@ object MediationOpenAd {
                     return
                 }
             }
-            this.maxAppOpenAds = MaxAppOpenAd(this.maxAppOpenAdsId!!, this.contextRef!!)
-            this.maxAppOpenAds!!.setListener(object : MaxAdListener {
-                override fun onAdLoaded(p0: MaxAd) {
-                    this@MediationOpenAd.loadedCallback!!.onAdsLoaded()
-                }
+            AdsApplication.getAdsModel()?.isAppOpenAdd?.then {
+                this.maxAppOpenAds = MaxAppOpenAd(this.maxAppOpenAdsId!!, this.contextRef!!)
+                this.maxAppOpenAds!!.setListener(object : MaxAdListener {
+                    override fun onAdLoaded(p0: MaxAd) {
+                        this@MediationOpenAd.loadedCallback!!.onAdsLoaded()
+                    }
 
-                override fun onAdDisplayed(p0: MaxAd) {
-                    this@MediationOpenAd.isShowingAd = true
-                    this@MediationOpenAd.showCallback?.onAdsDisplay()
-                }
+                    override fun onAdDisplayed(p0: MaxAd) {
+                        this@MediationOpenAd.isShowingAd = true
+                        this@MediationOpenAd.showCallback?.onAdsDisplay()
+                    }
 
-                override fun onAdHidden(p0: MaxAd) {
-                    this@MediationOpenAd.isShowingAd = false
-                    this@MediationOpenAd.showCallback?.onAdsError(errorState = AdsErrorState.ADS_DISMISS)
-                }
+                    override fun onAdHidden(p0: MaxAd) {
+                        this@MediationOpenAd.isShowingAd = false
+                        this@MediationOpenAd.showCallback?.onAdsError(errorState = AdsErrorState.ADS_DISMISS)
+                    }
 
-                override fun onAdClicked(p0: MaxAd) {
-                    this@MediationOpenAd.showCallback!!.onAdsClicked()
-                }
+                    override fun onAdClicked(p0: MaxAd) {
+                        this@MediationOpenAd.showCallback!!.onAdsClicked()
+                    }
 
-                override fun onAdLoadFailed(p0: String, p1: MaxError) {
-                    this@MediationOpenAd.isShowingAd = false
-                    this@MediationOpenAd.loadedCallback!!.onAdsError(errorState = AdsErrorState.ADS_LOAD_FAILED)
-                }
+                    override fun onAdLoadFailed(p0: String, p1: MaxError) {
+                        this@MediationOpenAd.isShowingAd = false
+                        this@MediationOpenAd.loadedCallback!!.onAdsError(errorState = AdsErrorState.ADS_LOAD_FAILED)
+                    }
 
-                override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
-                    this@MediationOpenAd.isShowingAd = false
-                    this@MediationOpenAd.showCallback?.onAdsError(errorState = AdsErrorState.ADS_DISPLAY_FAILED)
+                    override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
+                        this@MediationOpenAd.isShowingAd = false
+                        this@MediationOpenAd.showCallback?.onAdsError(errorState = AdsErrorState.ADS_DISPLAY_FAILED)
+                    }
+                })
+                this.maxAppOpenAds!!.setRevenueListener {
+                    val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
+                    adjustAdRevenue.setRevenue(it.revenue, "USD")
+                    adjustAdRevenue.setAdRevenueNetwork(it.networkName)
+                    adjustAdRevenue.setAdRevenueUnit(it.adUnitId)
+                    adjustAdRevenue.setAdRevenuePlacement(it.placement)
+                    Adjust.trackAdRevenue(adjustAdRevenue)
                 }
-            })
-            this.maxAppOpenAds!!.setRevenueListener {
-                val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
-                adjustAdRevenue.setRevenue(it.revenue, "USD")
-                adjustAdRevenue.setAdRevenueNetwork(it.networkName)
-                adjustAdRevenue.setAdRevenueUnit(it.adUnitId)
-                adjustAdRevenue.setAdRevenuePlacement(it.placement)
-                Adjust.trackAdRevenue(adjustAdRevenue)
+                this.maxAppOpenAds!!.loadAd()
+            } ?: run {
+                logD("App Open Ads is not enable")
             }
-            this.maxAppOpenAds!!.loadAd()
+
         } catch (error: Exception) {
             logException("Init Max App Open Ads Error : ${error.localizedMessage}")
         }
@@ -199,46 +209,51 @@ object MediationOpenAd {
 
     private fun showAdmobAppOpenAds() {
         try {
-            if (this.admobAppOPenAd != null) {
-                if (MediationRewardedAd.isAdsShow || MediationAdInterstitial.isAdsShow || MediationRewardedInterstitialAd.isAdsShow) {
-                    logD("Other Ads Open")
+            AdsApplication.getAdsModel()?.isAppOpenAdd?.then {
+                if (this.admobAppOPenAd != null) {
+                    if (MediationRewardedAd.isAdsShow || MediationAdInterstitial.isAdsShow || MediationRewardedInterstitialAd.isAdsShow || isShowingAd) {
+                        logD("Other Ads Open")
+                    } else {
+                        logD("Other Ads Open : Reward : ${MediationRewardedAd.isAdsShow} : Interstitial : ${MediationAdInterstitial.isAdsShow} : Reward Interstitial : ${MediationRewardedInterstitialAd.isAdsShow}")
+                        this.admobAppOPenAd!!.show(this.activityRef!!)
+                        this.admobAppOPenAd!!.fullScreenContentCallback =
+                            object : FullScreenContentCallback() {
+                                override fun onAdClicked() {
+                                    super.onAdClicked()
+                                    this@MediationOpenAd.showCallback!!.onAdsClicked()
+                                }
+
+                                override fun onAdShowedFullScreenContent() {
+                                    super.onAdShowedFullScreenContent()
+                                    this@MediationOpenAd.isShowingAd = true
+                                }
+
+                                override fun onAdDismissedFullScreenContent() {
+                                    super.onAdDismissedFullScreenContent()
+                                    this@MediationOpenAd.isShowingAd = false
+                                    this@MediationOpenAd.showCallback!!.onAdsError(errorState = AdsErrorState.ADS_DISMISS)
+                                }
+
+                                override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                                    super.onAdFailedToShowFullScreenContent(p0)
+                                    this@MediationOpenAd.isShowingAd = false
+                                    this@MediationOpenAd.showCallback!!.onAdsError(errorState = AdsErrorState.ADS_DISPLAY_FAILED)
+                                }
+
+                                override fun onAdImpression() {
+                                    super.onAdImpression()
+                                    this@MediationOpenAd.showCallback!!.onAdsError(errorState = AdsErrorState.ADS_IMPRESS)
+                                }
+                            }
+                        initSelectedAppOPenAds()
+                    }
                 } else {
-                    logD("Other Ads Open : Reward : ${MediationRewardedAd.isAdsShow} : Interstitial : ${MediationAdInterstitial.isAdsShow} : Reward Interstitial : ${MediationRewardedInterstitialAd.isAdsShow}")
-                    this.admobAppOPenAd!!.show(this.activityRef!!)
-                    this.admobAppOPenAd!!.fullScreenContentCallback =
-                        object : FullScreenContentCallback() {
-                            override fun onAdClicked() {
-                                super.onAdClicked()
-                                this@MediationOpenAd.showCallback!!.onAdsClicked()
-                            }
-
-                            override fun onAdShowedFullScreenContent() {
-                                super.onAdShowedFullScreenContent()
-                                this@MediationOpenAd.isShowingAd = true
-                            }
-
-                            override fun onAdDismissedFullScreenContent() {
-                                super.onAdDismissedFullScreenContent()
-                                this@MediationOpenAd.isShowingAd = false
-                                this@MediationOpenAd.showCallback!!.onAdsError(errorState = AdsErrorState.ADS_DISMISS)
-                            }
-
-                            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                                super.onAdFailedToShowFullScreenContent(p0)
-                                this@MediationOpenAd.isShowingAd = false
-                                this@MediationOpenAd.showCallback!!.onAdsError(errorState = AdsErrorState.ADS_DISPLAY_FAILED)
-                            }
-
-                            override fun onAdImpression() {
-                                super.onAdImpression()
-                                this@MediationOpenAd.showCallback!!.onAdsError(errorState = AdsErrorState.ADS_IMPRESS)
-                            }
-                        }
                     initSelectedAppOPenAds()
                 }
-            } else {
-                initSelectedAppOPenAds()
+            } ?: run {
+                logD("App Open Ads is not enable")
             }
+
         } catch (error: Exception) {
             logException(" Show App Open Ads Error : ${error.localizedMessage}")
         }
@@ -246,16 +261,21 @@ object MediationOpenAd {
 
     private fun showMaxAppOpenAds() {
         try {
-            if (this.maxAppOpenAds!!.isReady) {
-                if (MediationRewardedAd.isAdsShow || MediationAdInterstitial.isAdsShow || MediationRewardedInterstitialAd.isAdsShow) {
-                    logD("Ads Loaded Other")
+            AdsApplication.getAdsModel()?.isAppOpenAdd?.then {
+                if (this.maxAppOpenAds!!.isReady) {
+                    if (MediationRewardedAd.isAdsShow || MediationAdInterstitial.isAdsShow || MediationRewardedInterstitialAd.isAdsShow || isShowingAd) {
+                        logD("Ads Loaded Other")
+                    } else {
+                        this.maxAppOpenAds!!.showAd()
+                        initSelectedAppOPenAds()
+                    }
                 } else {
-                    this.maxAppOpenAds!!.showAd()
                     initSelectedAppOPenAds()
                 }
-            } else {
-                initSelectedAppOPenAds()
+            } ?: run {
+                logD("App Open Ads is not enable")
             }
+
         } catch (error: Exception) {
             logException("Show Max App Open Ads Error : ${error.localizedMessage}")
         }

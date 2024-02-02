@@ -48,6 +48,35 @@
             app:layout_constraintTop_toBottomOf="@id/exitAppText"
             app:layout_constraintVertical_bias="0" />
 
+
+        <FrameLayout
+            android:id="@+id/exitBannerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_50sdp"
+            android:layout_margin="@dimen/_10sdp"
+            android:background="@drawable/shadow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/exitText"
+            app:layout_constraintVertical_bias="0">
+
+            <FrameLayout
+                android:id="@+id/exitBannerFrame"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_50sdp" />
+
+            <TextView
+                android:id="@+id/adsLoadingText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/ads_loading"
+                android:textColor="#C0C0C0"
+                android:textSize="@dimen/_14sdp" />
+
+        </FrameLayout>
+
         <LinearLayout
             android:id="@id/buttonLayout"
             android:layout_width="match_parent"
@@ -59,7 +88,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/exitText"
+            app:layout_constraintTop_toBottomOf="@id/exitBannerLayout"
             app:layout_constraintVertical_bias="0">
 
             <Button
@@ -88,16 +117,6 @@
                 android:textColor="@color/menuColor" />
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/exitBannerFrame"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_50sdp"
-            android:layout_margin="@dimen/_10sdp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonLayout"
-            app:layout_constraintVertical_bias="0" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

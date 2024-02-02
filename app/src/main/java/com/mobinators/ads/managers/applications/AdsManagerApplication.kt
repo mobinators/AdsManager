@@ -1,5 +1,6 @@
 package com.mobinators.ads.managers.applications
 
+import android.app.Activity
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import androidx.multidex.MultiDex
@@ -19,8 +20,7 @@ import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.logException
 
 class AdsManagerApplication : Application() {
-    private var isAppInForeground = false
-
+    private var currentActivity: Activity? = null
     override fun onCreate() {
         super.onCreate()
         MultiDex.install(this)
