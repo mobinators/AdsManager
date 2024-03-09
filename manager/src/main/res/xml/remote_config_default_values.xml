@@ -45,6 +45,9 @@
         <value>YOUR_AD_UNIT_ID</value>
         <key>MAX_APP_OPEN_ADS_ID</key>
         <value>YOUR_AD_UNIT_ID</value>
+
+        <key>RATE_US_DIALOG</key>
+        <value>false</value>
     </entry>
 
 </defaultsMap>

@@ -117,14 +117,14 @@ object AdsApplication : Application() {
             this.isAppOpenAdd = remoteConfig.getBoolean(AdsConstants.ADMOB_OPEN_AD_ENABLE_KEY)
             this.maxAppOpenID = remoteConfig.getString(AdsConstants.MAX_APP_OPEN_ADS_ID_KEY)
             this.admobMediation = remoteConfig.getBoolean(AdsConstants.ADMOB_MEDIATION_KEY)
-            this.admobMediationBannerId =
-                remoteConfig.getString(AdsConstants.ADMOB_MEDIATION_BANNER_ID_KEY)
+            this.admobMediationBannerId = remoteConfig.getString(AdsConstants.ADMOB_MEDIATION_BANNER_ID_KEY)
             this.admobMediationInterstitialId =
                 remoteConfig.getString(AdsConstants.ADMOB_MEDIATION_INTERSTITIAL_ID_KEY)
             this.admobMediationNativeId =
                 remoteConfig.getString(AdsConstants.ADMOB_MEDIATION_NATIVE_ID_KEY)
             this.admobMediationRewardedId =
                 remoteConfig.getString(AdsConstants.ADMOB_MEDIATION_REWARDED_ID_KEY)
+            this.isRateUsDialog = remoteConfig.getBoolean(AdsConstants.RATE_US_DIALOG_KEY)
         }
         checkOpenAddIsEnable(remoteConfig)
         logD("Ads Strategy : ${remoteConfig.getLong(AdsConstants.ADS_STRATEGY)} :")

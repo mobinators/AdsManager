@@ -14,7 +14,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.1.7'
+  implementation 'com.github.mobinators:AdsManager:1.1.9'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -731,4 +731,31 @@
 
 ```
 
+
+-> Analytics
+
+```
+   // Calling this line firstly in Application class 
+   AnalyticsManager.getInstance().setAnalytics(FirebaseAnalytics.getInstance(this))
+
+
+   // After that we can use it for logEvent likely below
+   AnalyticsManager.getInstance().setAnalyticsEvent(
+      resources.getString(R.string.app_name),  // Event name 
+      "RewardAds",  // Key
+      "Ads loaded" // value
+   )
+
+```
+
+-> Rate Us Dialog Box
+
+```
+    RateUsDialog.getInstance().showDialog(this) // Calling show Rate US Dialog Box
+    RateUsDialog.getInstance().dismissDialog()  // Calling Dismiss Rate Us Dialog Box
+    RateUsDialog.getInstance().setRateBtnTextColor(R.color.black)  // set Rate Button Background Color so calling this line
+    RateUsDialog.getInstance().setRateButtonBg(R.color.black) // set Rate Button Text Color so calling this line
+    RateUsDialog.getInstance().setTextColor(R.color.black) // set Rate Text Color so calling this line
+
+```
 

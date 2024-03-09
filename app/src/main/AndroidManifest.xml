@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.mobinators.ads.managers">
 
+
     <application
         android:name=".applications.AdsManagerApplication"
         android:allowBackup="true"
@@ -34,6 +35,7 @@
         </activity>
 
         <meta-data
+
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/app_ads_id" />
         <meta-data
@@ -42,6 +44,9 @@
         <meta-data
             android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
             android:value="true" />
+      <!--  <meta-data
+            android:name="google_analytics_automatic_screen_reporting_enabled"
+            android:value="true" />-->
     </application>
 
 </manifest>

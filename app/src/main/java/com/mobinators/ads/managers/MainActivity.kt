@@ -2,6 +2,8 @@ package com.mobinators.ads.managers
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.OnBackPressedCallback
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.mobinators.ads.manager.extensions.appRateUs
 import com.mobinators.ads.manager.extensions.appUpdate
@@ -19,8 +21,10 @@ import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAds
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
+import com.mobinators.ads.manager.ui.commons.utils.AnalyticsManager
 import com.mobinators.ads.manager.ui.commons.utils.AppPurchaseUtils
 import com.mobinators.ads.manager.ui.commons.utils.DeviceInfoUtils
+import com.mobinators.ads.manager.ui.commons.views.RateUsDialog
 import com.mobinators.ads.managers.databinding.ActivityMainBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,14 +41,29 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             false,
             object : MediationRewardedAd.RewardLoadCallback {
                 override fun onAdsLoaded() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardAds",
+                        "Ads loaded"
+                    )
                     logD("MainActivity Reward Ads : onAdsLoaded")
                 }
 
                 override fun onAdsOff() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardAds",
+                        "Ads is Off"
+                    )
                     logD("MainActivity Reward Ads : onAdsOff")
                 }
 
                 override fun onAdsError(errorState: AdsErrorState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardAds",
+                        errorState.name
+                    )
                     when (errorState) {
                         AdsErrorState.NETWORK_OFF -> logD("MainActivity Reward Ads : Internet Off")
                         AdsErrorState.APP_PURCHASED -> logD("MainActivity Reward Ads : You have Purchased your app")
@@ -57,7 +76,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                         AdsErrorState.ADS_IMPRESS -> logD("MainActivity Reward Ads : Ads Impress Mode")
                     }
                 }
-
             })
         binding.maxAdActivity.setOnClickListener(this)
         binding.loadAds.setOnClickListener(this)
@@ -72,6 +90,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
         logD("Device Info : ${DeviceInfoUtils.getDeviceInfo()}")
         appRateUs(object : AppRateUsCallback {
             override fun onRateUsState(rateState: RateUsState) {
+                AnalyticsManager.getInstance().setAnalyticsEvent(
+                    resources.getString(R.string.app_name),
+                    "RateUs",
+                    rateState.name
+                )
                 when (rateState) {
                     RateUsState.RATE_US_COMPLETED -> logD("Rate US Completed")
                     RateUsState.RATE_US_CANCEL -> logD("Rate US Cancel")
@@ -85,36 +108,102 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
         })
         appUpdate(object : AppListener {
             override fun onDownload() {
-                logD("OnDownload")
+                AnalyticsManager.getInstance().setAnalyticsEvent(
+                    resources.getString(R.string.app_name),
+                    "AppUpdate",
+                    "onDownload"
+                )
+                logD("onDownload")
             }
 
             override fun onInstalled() {
+                AnalyticsManager.getInstance().setAnalyticsEvent(
+                    resources.getString(R.string.app_name),
+                    "AppUpdate",
+                    "onInstalled"
+                )
                 logD("onInstalled")
             }
 
             override fun onCancel() {
+                AnalyticsManager.getInstance().setAnalyticsEvent(
+                    resources.getString(R.string.app_name),
+                    "AppUpdate",
+                    "onCancel"
+                )
                 logD("onCancel")
             }
 
             override fun onFailure(error: Exception) {
+                AnalyticsManager.getInstance().setAnalyticsEvent(
+                    resources.getString(R.string.app_name),
+                    "AppUpdate",
+                    "onFailure: $error"
+                )
                 logD("onFailure : $error")
             }
 
             override fun onNoUpdateAvailable() {
+                AnalyticsManager.getInstance().setAnalyticsEvent(
+                    resources.getString(R.string.app_name),
+                    "AppUpdate",
+                    "onNoUpdateAvailable"
+                )
                 logD("onNoUpdateAvailable")
             }
 
             override fun onStore(updateState: AppUpdateState) {
+                AnalyticsManager.getInstance().setAnalyticsEvent(
+                    resources.getString(R.string.app_name),
+                    "AppUpdate",
+                    "Store Type : ${updateState.name}"
+                )
                 when (updateState) {
                     AppUpdateState.WRONG_STORE -> logD("Wrong Selected Store ID")
                     AppUpdateState.AMAZON_STORE -> logD("Amazon Store Selected")
                     AppUpdateState.HUAWEI_STORE -> logD("Huawei Store Selected")
                 }
             }
-
         }, 1)
         inAppPurchased()
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                exitPanel(supportFragmentManager, object : PanelListener {
+                    override fun onExit() {
+                        AnalyticsManager.getInstance().setAnalyticsEvent(
+                            resources.getString(R.string.app_name),
+                            "ExitPanel",
+                            "onExit"
+                        )
+                        logD("Exit Panel")
+                    }
+
+                    override fun onCancel() {
+                        AnalyticsManager.getInstance().setAnalyticsEvent(
+                            resources.getString(R.string.app_name),
+                            "ExitPanel",
+                            "onCancel"
+                        )
+                        logD("Cancel Panel ")
+                    }
+                }, model = PanelModel().apply {
+                    this.title = "App Exit"
+                    this.titleColor = R.color.black
+                    this.desc = "Your app is exit?"
+                    this.descColor = R.color.black
+                    this.cancelBgColor = R.color.lightGray
+                    this.cancelButtonText = "Cancel"
+                    this.cancelButtonTitleColor = R.color.black
+                    this.exitButtonBgColor = R.color.black
+                    this.exitButtonText = "Exit"
+                    this.exitButtonTextColor = R.color.white
+                    this.panelBackgroundColor = R.color.lightGray
+                    this.isAdsShow = true  // true value is show ads , false  value is not show ads
+                })
+            }
+        })
     }
+
 
     override fun onClick(itemId: View?) {
         when (itemId!!.id) {
@@ -140,33 +229,62 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     }
 
     private fun bannerAds() {
-
         BannerAdMediation.showBannerAds(
             this,
             false,
             binding.adContainer,
             object : BannerAdMediation.BannerAdListener {
                 override fun onAdsOff() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "BannerAds",
+                        "Ads is Off"
+                    )
                     logD("MainActivity Banner Ads : Ads Off")
                 }
 
                 override fun onAdsLoaded() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "BannerAds",
+                        "Ads loaded"
+                    )
                     logD("MainActivity Banner Ads : Ads Loaded")
                 }
 
                 override fun onAdsClicked() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "BannerAds",
+                        "Ads clicked"
+                    )
                     logD("MainActivity Banner Ads : Ads Clicked")
                 }
 
                 override fun onAdsClosed() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "BannerAds",
+                        "Ads closed"
+                    )
                     logD("MainActivity Banner Ads : Ads Closed")
                 }
 
                 override fun onAdsOpened() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "BannerAds",
+                        "Ads opened"
+                    )
                     logD("MainActivity Banner Ads : Ads Open")
                 }
 
                 override fun onAdsError(adsErrorState: AdsErrorState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "BannerAds",
+                        adsErrorState.name
+                    )
                     when (adsErrorState) {
                         AdsErrorState.NETWORK_OFF -> logD("MainActivity Banner Ads : Internet Off")
                         AdsErrorState.APP_PURCHASED -> logD("MainActivity Banner Ads : You have Purchased your app")
@@ -179,7 +297,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                         AdsErrorState.ADS_IMPRESS -> logD("MainActivity Banner Ads : Ads Impress Mode")
                     }
                 }
-
             })
     }
 
@@ -190,26 +307,56 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             binding.adContainer,
             object : MediationNativeAds.ShowNativeAdsCallback {
                 override fun onAdsOff() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "NativeAds",
+                        "Ads is Off"
+                    )
                     logD("MainActivity Ads Off")
                 }
 
                 override fun onAdsOpen() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "NativeAds",
+                        "Ads Open"
+                    )
                     logD("MainActivity onAdsOpen")
                 }
 
                 override fun onAdsClicked() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "NativeAds",
+                        "Ads clicked"
+                    )
                     logD("MainActivity onAdsClicked")
                 }
 
                 override fun onAdsClosed() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "NativeAds",
+                        "Ads closed"
+                    )
                     logD("MainActivity onAdsClosed")
                 }
 
                 override fun onAdsSwipe() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "NativeAds",
+                        "Ads swipe"
+                    )
                     logD("MainActivity onAdsSwipe")
                 }
 
                 override fun onAdsError(errorState: AdsErrorState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "NativeAds",
+                        errorState.name
+                    )
                     when (errorState) {
                         AdsErrorState.NETWORK_OFF -> logD("MainActivity Native Ads Internet Off")
                         AdsErrorState.APP_PURCHASED -> logD("MainActivity Native Ads You have Purchased your app")
@@ -233,26 +380,56 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             binding.adContainer,
             object : MediationNativeAds.ShowNativeAdsCallback {
                 override fun onAdsOff() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "CustomNativeAds",
+                        "Ads is Off"
+                    )
                     logD("MainActivity Ads Off")
                 }
 
                 override fun onAdsOpen() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "CustomNativeAds",
+                        "Ads Open"
+                    )
                     logD("MainActivity onAdsOpen")
                 }
 
                 override fun onAdsClicked() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "CustomNativeAds",
+                        "Ads Clicked"
+                    )
                     logD("MainActivity onAdsClicked")
                 }
 
                 override fun onAdsClosed() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "CustomNativeAds",
+                        "Ads closed"
+                    )
                     logD("MainActivity onAdsClosed")
                 }
 
                 override fun onAdsSwipe() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "CustomNativeAds",
+                        "Ads swipe"
+                    )
                     logD("MainActivity onAdsSwipe")
                 }
 
                 override fun onAdsError(errorState: AdsErrorState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "CustomNativeAds",
+                        errorState.name
+                    )
                     when (errorState) {
                         AdsErrorState.NETWORK_OFF -> logD("MainActivity Native Ads Internet Off")
                         AdsErrorState.APP_PURCHASED -> logD("MainActivity Native Ads You have Purchased your app")
@@ -275,22 +452,47 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             false,
             object : MediationRewardedAd.ShowRewardedAdsCallback {
                 override fun onAdsOff() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardAds",
+                        "Ads is Off"
+                    )
                     logD("MainActivity Reward onAdsOff")
                 }
 
                 override fun onRewardEarned(item: Int, type: String) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardAds",
+                        "Amount : $item  : Type : $type"
+                    )
                     logD("MainActivity Reward onRewardEarned : Amount : $item  : Type : $type")
                 }
 
                 override fun onAdsClicked() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardAds",
+                        "Ads clicked"
+                    )
                     logD("MainActivity Reward onAdsClicked")
                 }
 
                 override fun onAdsDisplay() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardAds",
+                        "Ads display"
+                    )
                     logD("MainActivity Reward onAdsDisplay")
                 }
 
                 override fun onAdsError(errorState: AdsErrorState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardAds",
+                        errorState.name
+                    )
                     when (errorState) {
                         AdsErrorState.NETWORK_OFF -> logD("Internet Off")
                         AdsErrorState.APP_PURCHASED -> logD("You have Purchased your app")
@@ -303,7 +505,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                         AdsErrorState.ADS_IMPRESS -> logD("Ads Impress Mode")
                     }
                 }
-
             })
     }
 
@@ -313,26 +514,56 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             false,
             object : MediationRewardedInterstitialAd.ShowRewardAdsCallback {
                 override fun onAdsOff() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardInterstitialAds",
+                        "Ads is Off"
+                    )
                     logD("MainActivity Reward Interstitial Ads is off")
                 }
 
                 override fun onAdsError(error: String) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardInterstitialAds",
+                        "Ads error : $error"
+                    )
                     logD("MainActivity Reward Interstitial Ads Error : $error")
                 }
 
                 override fun onAdsReward(item: RewardItem) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardInterstitialAds",
+                        "Ads RewardItem : $item"
+                    )
                     logD("MainActivity Reward Interstitial Ads Reward : $item")
                 }
 
                 override fun onAdsClicked() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardInterstitialAds",
+                        "Ads clicked"
+                    )
                     logD("MainActivity Reward Interstitial Ads Clicked")
                 }
 
                 override fun onAdsImpress() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardInterstitialAds",
+                        "Ads Impress"
+                    )
                     logD("MainActivity Reward Interstitial Ads Impress")
                 }
 
                 override fun onAdsDismiss(item: RewardItem) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardInterstitialAds",
+                        "Ads Dismiss"
+                    )
                     logD(" MainActivity Reward Interstitial Ads Dismiss : $item")
                 }
             })
@@ -344,10 +575,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             false,
             object : MediationAdInterstitial.AdsShowCallback {
                 override fun onAdsOff() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "ShowInterstitialAds",
+                        "Ads is Off"
+                    )
                     logD("MainActivity Interstitial Ads is off")
                 }
 
                 override fun onAdsError(errorState: AdsErrorState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "ShowInterstitialAds",
+                        errorState.name
+                    )
                     when (errorState) {
                         AdsErrorState.NETWORK_OFF -> logD("MainActivity Interstitial Ads : Internet Off")
                         AdsErrorState.APP_PURCHASED -> logD("MainActivity Interstitial Ads : You have Purchased your app")
@@ -362,6 +603,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                 }
 
                 override fun onAdsClicked() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "ShowInterstitialAds",
+                        "Ads clicked"
+                    )
                     logD("MainActivity Interstitial Ads click")
                 }
             })
@@ -373,18 +619,38 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             false,
             object : MediationOpenAd.AdsShowAppOpenCallback {
                 override fun onAdsOff() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "ShowAppOpenAds",
+                        "Ads is Off"
+                    )
                     logD("MainActivity App Open Ads is off")
                 }
 
                 override fun onAdsClicked() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "ShowAppOpenAds",
+                        "Ads clicked"
+                    )
                     logD("MainActivity App Open Ads Clicked")
                 }
 
                 override fun onAdsDisplay() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "ShowAppOpenAds",
+                        "Ads display"
+                    )
                     logD("MainActivity App Open Ads onAdsDisplay")
                 }
 
                 override fun onAdsError(errorState: AdsErrorState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "ShowAppOpenAds",
+                        errorState.name
+                    )
                     when (errorState) {
                         AdsErrorState.NETWORK_OFF -> logD("Internet Off")
                         AdsErrorState.APP_PURCHASED -> logD("You have Purchased your app")
@@ -400,13 +666,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
             })
     }
 
-
     private fun inAppPurchased() {
         AppPurchaseUtils.initConnection(
             this,
             "base64_key_example",
             object : AppPurchaseUtils.BillingCallback {
                 override fun onRequiredNetwork() {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "InAppPurchased ",
+                        "RequiredNetwork"
+                    )
                     logD("Internet is not available")
                 }
 
@@ -415,39 +685,23 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                     isPremium: Boolean,
                     isLocked: Boolean
                 ) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "InAppPurchased ",
+                        "onSubscriber : isSuccess : $isSuccess , isPremium: $isPremium, isLocked: $isLocked"
+                    )
                     logD("isSuccess : $isSuccess , isPremium: $isPremium, isLocked: $isLocked")
                 }
 
                 override fun onError(error: String) {
-                    logD("$error")
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "In App Purchased ",
+                        "Error : $error"
+                    )
+                    logD(error)
                 }
             })
-    }
-
-
-    override fun onBackPressed() {
-        exitPanel(supportFragmentManager, object : PanelListener {
-            override fun onExit() {
-                logD("Exit Panel")
-            }
-
-            override fun onCancel() {
-                logD("Cancel Panel ")
-            }
-        }, model = PanelModel().apply {
-            this.title = "App Exit"
-            this.titleColor = R.color.black
-            this.desc = "Your app is exit?"
-            this.descColor = R.color.black
-            this.cancelBgColor = R.color.lightGray
-            this.cancelButtonText = "Cancel"
-            this.cancelButtonTitleColor = R.color.black
-            this.exitButtonBgColor = R.color.black
-            this.exitButtonText = "exit"
-            this.exitButtonTextColor = R.color.white
-            this.panelBackgroundColor = R.color.lightGray
-            this.isAdsShow = true  // true value is show ads , false  value is not show ads
-        })
     }
 
     override fun onDestroy() {
@@ -455,4 +709,5 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
         AppPurchaseUtils.clientDestroy()
         MediationNativeAds.onDestroy()
     }
+
 }

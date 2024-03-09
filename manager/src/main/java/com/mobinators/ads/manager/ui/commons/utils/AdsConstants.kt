@@ -14,7 +14,7 @@ object AdsConstants {
     const val TEST_MAX_REWARD_ADS_ID = "YOUR_AD_UNIT_ID"
     const val TEST_MAX_Native_ADS_ID = "YOUR_AD_UNIT_ID"
     const val TEST_MAX_APP_OPEN_ADS_ID = "YOUR_AD_UNIT_ID"
-    const val PLAY_STORE_URL = "http://play.google.com/store/apps/details?id="
+    const val PLAY_STORE_URL = "https://play.google.com/store/apps/details?id="
     const val PLAY_STORE_URL_1 = "market://details?id="
     const val ADS_OFF = 0
     const val AD_MOB_MEDIATION = 1
@@ -39,6 +39,7 @@ object AdsConstants {
     const val ADMOB_MEDIATION_REWARDED_ID_KEY = "ADMOB_MEDIATION_REWARDED_ID"
     const val ADMOB_MEDIATION_INTERSTITIAL_ID_KEY = "ADMOB_MEDIATION_INTERSTITIAL_ID"
     const val ADMOB_MEDIATION_KEY = "ADMOB_MEDIATION_KEY"
+    const val RATE_US_DIALOG_KEY = "RATE_US_DIALOG"
     const val ADS_STRATEGY = "Strategy"
     const val FIREBASE_ANALYTICS_KEY = "Ads_Manager_Event"
     const val ADMOB_OPEN_AD_ENABLE_KEY = "ADMOB_OPEN_AD_ENABLE"

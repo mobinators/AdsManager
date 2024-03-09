@@ -7,9 +7,125 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:903846469578:android:123ad9e77cb6a7de8ef933",
+        "mobilesdk_app_id": "1:903846469578:android:cd2b3df659c4123e8ef933",
         "android_client_info": {
-          "package_name": "com.mobinators.ads.adsmanagertest"
+          "package_name": "ai.chat.bot.chatai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATXwD5QVlKsmQgsLKrRqL99uFh58VtBxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903846469578:android:65c4eaaa42dc6b6a8ef933",
+        "android_client_info": {
+          "package_name": "appytune.sixpack.sixpackabs.absworkout"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATXwD5QVlKsmQgsLKrRqL99uFh58VtBxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903846469578:android:0e0ee328bb1d67e68ef933",
+        "android_client_info": {
+          "package_name": "com.appytune.directchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATXwD5QVlKsmQgsLKrRqL99uFh58VtBxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903846469578:android:4b90988c11f577708ef933",
+        "android_client_info": {
+          "package_name": "com.businessplan.businesscalculator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATXwD5QVlKsmQgsLKrRqL99uFh58VtBxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903846469578:android:3ba8d11efc0509c28ef933",
+        "android_client_info": {
+          "package_name": "com.mobinators.ads.adsmanager"
         }
       },
       "oauth_client": [
@@ -39,6 +155,151 @@
         "mobilesdk_app_id": "1:903846469578:android:f7a7ad2e964e6cfd8ef933",
         "android_client_info": {
           "package_name": "com.mobinators.ads.managers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATXwD5QVlKsmQgsLKrRqL99uFh58VtBxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903846469578:android:5d6b494566bcbb888ef933",
+        "android_client_info": {
+          "package_name": "com.mobinators.musicplayer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATXwD5QVlKsmQgsLKrRqL99uFh58VtBxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903846469578:android:95cbb3f725eadeac8ef933",
+        "android_client_info": {
+          "package_name": "com.photo.video.editor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATXwD5QVlKsmQgsLKrRqL99uFh58VtBxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903846469578:android:f9bae9b41f4fcbf98ef933",
+        "android_client_info": {
+          "package_name": "com.statussaver.savevideos.deleted"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATXwD5QVlKsmQgsLKrRqL99uFh58VtBxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903846469578:android:bb07abdf3a5b042a8ef933",
+        "android_client_info": {
+          "package_name": "fine.instasaver.videos.downloader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATXwD5QVlKsmQgsLKrRqL99uFh58VtBxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903846469578-q7ai6idqim189d8sj23m3jec8skp2gpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903846469578:android:afc5e7b3f9009c648ef933",
+        "android_client_info": {
+          "package_name": "gps.videoeditor.videorecorder.screenrecorder"
         }
       },
       "oauth_client": [

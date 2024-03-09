@@ -18,4 +18,8 @@
         <item name="android:width">15dp</item>
         <item name="android:height">15dp</item>
     </style>
+    <style name="ratingBar" parent="Theme.AppCompat">
+        <item name="colorControlNormal">#A9A9A9</item>
+        <item name="colorControlActivated">#FFFF9800</item>
+    </style>
 </resources>

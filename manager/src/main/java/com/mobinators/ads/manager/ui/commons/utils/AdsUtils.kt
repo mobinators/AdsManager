@@ -1,11 +1,13 @@
 package com.mobinators.ads.manager.ui.commons.utils
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.Uri
+import android.os.Build
 import android.text.TextUtils
 import com.applovin.sdk.AppLovinSdk
 import pak.developer.app.managers.extensions.logD
@@ -16,7 +18,14 @@ object AdsUtils {
     fun isPackageInstalled(context: Context, pkgName: String): Boolean {
         return try {
             val packageName: PackageManager = context.packageManager
-            packageName.getPackageInfo(pkgName, PackageManager.GET_ACTIVITIES)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageName.getPackageInfo(
+                    pkgName,
+                    PackageManager.PackageInfoFlags.of(PackageManager.GET_ACTIVITIES.toLong())
+                )
+            } else {
+                packageName.getPackageInfo(pkgName, PackageManager.GET_ACTIVITIES)
+            }
             true
         } catch (error: PackageManager.NameNotFoundException) {
             logException("Failed to load meta-data, NameNotFound: ${error.localizedMessage}")
@@ -54,7 +63,7 @@ object AdsUtils {
                     Uri.parse(AdsConstants.PLAY_STORE_URL_1 + packageName)
                 )
             )
-        } catch (error: android.content.ActivityNotFoundException) {
+        } catch (error: ActivityNotFoundException) {
             logException("Error : ${error.localizedMessage}")
             context.startActivity(
                 Intent(
@@ -68,16 +77,12 @@ object AdsUtils {
     fun findIntegerValueInMap(key: String, map: Map<String, Int>): Int {
         val updateKey = key.toUpperCase(java.util.Locale.ROOT)
         var value = 1
-        if (map == null) {
-            logD("findValueInMap: key : $key")
-        } else {
-            for (entry in map.entries) {
-                logD("findValueInMap:  ${entry.key}")
-                if ((entry.key == key.lowercase())) {
-                    value = entry.value
-                    logD("findValueInMap:  ${value}")
-                    break
-                }
+        for (entry in map.entries) {
+            logD("findValueInMap:  ${entry.key}")
+            if ((entry.key == key.lowercase())) {
+                value = entry.value
+                logD("findValueInMap:  ${value}")
+                break
             }
         }
         return value

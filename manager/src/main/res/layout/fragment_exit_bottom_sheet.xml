@@ -50,32 +50,120 @@
 
 
         <FrameLayout
-            android:id="@+id/exitBannerLayout"
+            android:id="@+id/mainLayoutRoot"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_50sdp"
-            android:layout_margin="@dimen/_10sdp"
-            android:background="@drawable/shadow"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/exitText"
             app:layout_constraintVertical_bias="0">
 
-            <FrameLayout
-                android:id="@+id/exitBannerFrame"
+            <LinearLayout
+                android:id="@+id/rateUsLayout"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_50sdp" />
-
-            <TextView
-                android:id="@+id/adsLoadingText"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/ads_loading"
-                android:textColor="#C0C0C0"
-                android:textSize="@dimen/_14sdp" />
+                android:orientation="vertical">
 
+                <ImageView
+                    android:layout_width="85dp"
+                    android:layout_height="85dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/rating"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textAllCaps="false"
+                    android:text="Enjoying the App?"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="15dp"
+                    android:gravity="center"
+                    android:textAllCaps="false"
+                    android:text="We're working hard for a beter experience.\nWe'd greatly appreciate if you can rate us."
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
+
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:stepSize="1"
+                    android:theme="@style/ratingBar" />
+
+                <TextView
+                    android:id="@+id/rateCountText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:textAllCaps="false"
+                    android:text="The best we can get is 5 stars ;)"
+                    android:textColor="@color/rateColor"
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
+
+                <Button
+                    android:id="@+id/rateBtn"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:backgroundTint="@color/rateColor"
+                    android:text="RATE"
+                    android:visibility="gone"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
+            <FrameLayout
+                android:id="@+id/exitBannerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:background="@drawable/shadow"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/exitText"
+                app:layout_constraintVertical_bias="0">
+
+                <FrameLayout
+                    android:id="@+id/exitBannerFrame"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/adsLoadingText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/ads_loading"
+                    android:textColor="#C0C0C0"
+                    android:textSize="@dimen/_14sdp" />
+
+            </FrameLayout>
         </FrameLayout>
+
 
         <LinearLayout
             android:id="@id/buttonLayout"
@@ -88,7 +176,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/exitBannerLayout"
+            app:layout_constraintTop_toBottomOf="@id/mainLayoutRoot"
             app:layout_constraintVertical_bias="0">
 
             <Button
