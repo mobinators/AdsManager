@@ -3,7 +3,6 @@ package com.mobinators.ads.managers
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
-import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.mobinators.ads.manager.extensions.appRateUs
 import com.mobinators.ads.manager.extensions.appUpdate
@@ -24,7 +23,7 @@ import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInte
 import com.mobinators.ads.manager.ui.commons.utils.AnalyticsManager
 import com.mobinators.ads.manager.ui.commons.utils.AppPurchaseUtils
 import com.mobinators.ads.manager.ui.commons.utils.DeviceInfoUtils
-import com.mobinators.ads.manager.ui.commons.views.RateUsDialog
+import com.mobinators.ads.managers.compose.ComposeAdsActivity
 import com.mobinators.ads.managers.databinding.ActivityMainBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -87,6 +86,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
         binding.interAds.setOnClickListener(this)
         binding.billingButton.setOnClickListener(this)
         binding.collapseBannerButton.setOnClickListener(this)
+        binding.composeButton.setOnClickListener(this)
         logD("Device Info : ${DeviceInfoUtils.getDeviceInfo()}")
         appRateUs(object : AppRateUsCallback {
             override fun onRateUsState(rateState: RateUsState) {
@@ -225,6 +225,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                 this,
                 CollapseBannerActivity::class.java
             )
+            binding.composeButton.id -> navigateActivity(this, ComposeAdsActivity::class.java)
         }
     }
 

@@ -61,7 +61,7 @@ class AdsManagerApplication : Application() {
                                     resources.getString(R.string.app_name),
                                     "InterstitialAds",
                                     errorState.name
-                                    )
+                                )
                                 when (errorState) {
                                     AdsErrorState.NETWORK_OFF -> logD("Interstitial Ads : Internet Off")
                                     AdsErrorState.APP_PURCHASED -> logD("Interstitial Ads : You have Purchased your app")
@@ -202,6 +202,5 @@ class AdsManagerApplication : Application() {
                         })
                 }
             })
-
     }
 }

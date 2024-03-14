@@ -136,6 +136,18 @@
             app:layout_constraintTop_toBottomOf="@id/billingButton"
             app:layout_constraintVertical_bias="0" />
 
+        <Button
+            android:id="@+id/composeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_20sdp"
+            android:text="Compose Activity"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/billingButton"
+            app:layout_constraintVertical_bias="0" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>

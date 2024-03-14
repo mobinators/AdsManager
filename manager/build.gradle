@@ -8,12 +8,10 @@ plugins {
 
 android {
     namespace 'com.mobinators.ads.manager'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 21
-        versionCode 20
-        versionName "1.1.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -25,22 +23,31 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         viewBinding true
         buildConfig true
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.10.1'  // 1.10.1
+    implementation 'androidx.core:core-ktx:1.12.0'  // 1.10.1
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0' // 1.9.0
+    implementation 'com.google.android.material:material:1.11.0' // 1.9.0
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -50,7 +57,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.1'
 
     //Config
-    implementation 'com.google.firebase:firebase-config-ktx:21.6.2' // 21.6.0
+    implementation 'com.google.firebase:firebase-config-ktx:21.6.3' // 21.6.0
 
     // Analytics
     implementation 'com.google.firebase:firebase-analytics-ktx:21.5.1' //21.5.0
@@ -65,12 +72,12 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.16.0'
 
     //Ads
-    implementation 'com.google.android.gms:play-services-ads:22.6.0' // 22.5.0
+    implementation 'com.google.android.gms:play-services-ads:23.0.0' // 22.5.0
     implementation 'com.facebook.android:audience-network-sdk:6.13.7'
     api "com.google.ads.mediation:facebook:6.16.0.0"
     implementation 'com.google.ads.mediation:applovin:12.3.0.0' // 12.1.0.0
     implementation 'com.adjust.sdk:adjust-android:4.28.7'
-    implementation 'androidx.lifecycle:lifecycle-process:2.6.2'  //2.6.2
+    implementation 'androidx.lifecycle:lifecycle-process:2.7.0'  //2.6.2
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
 
     // App Update or Review
@@ -81,6 +88,20 @@ dependencies {
     implementation "com.android.billingclient:billing:6.2.0"  // 6.1.0
     implementation "com.android.billingclient:billing-ktx:6.2.0"  //6.1.0
     implementation 'com.google.firebase:firebase-crashlytics-buildtools:2.9.9'
+
+    // Compose
+    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation(platform("androidx.compose:compose-bom:2024.02.02")) // 2023.08.00
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended:1.6.3")  // 1.6.1
+    implementation "androidx.compose.ui:ui-viewbinding:1.6.3"
+   /* androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02")) //2024.08.00
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")*/
 }
 
 afterEvaluate {
