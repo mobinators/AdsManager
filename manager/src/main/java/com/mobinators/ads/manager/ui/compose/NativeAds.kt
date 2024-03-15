@@ -8,8 +8,17 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import com.adjust.sdk.Adjust
+import com.adjust.sdk.AdjustAdRevenue
+import com.adjust.sdk.AdjustConfig
+import com.applovin.mediation.MaxAd
+import com.applovin.mediation.MaxError
+import com.applovin.mediation.nativeAds.MaxNativeAdListener
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
+import com.applovin.mediation.nativeAds.MaxNativeAdView
+import com.applovin.mediation.nativeAds.MaxNativeAdViewBinder
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.LoadAdError
@@ -17,6 +26,7 @@ import com.google.android.gms.ads.VideoController
 import com.google.android.gms.ads.VideoOptions
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
+import com.mobinators.ads.manager.R
 import com.mobinators.ads.manager.applications.AdsApplication
 import com.mobinators.ads.manager.databinding.AdmobNativeAdLayoutBinding
 import com.mobinators.ads.manager.databinding.CustomNativeBinding
@@ -37,6 +47,10 @@ private var maxNativeAds: MaxNativeAdLoader? = null
 
 @SuppressLint("StaticFieldLeak")
 private var composeActivity: Activity? = null
+private var maxNativeAdsKey: String? = null
+private var maxNativeAd: MaxAd? = null
+@SuppressLint("StaticFieldLeak")
+private var maxNativeAdView: MaxNativeAdView? = null
 
 
 @Composable
@@ -76,7 +90,7 @@ private fun InitSelectedNativeLoaded() {
         AdsConstants.ADS_OFF -> loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_OFF)
         AdsConstants.AD_MOB_MEDIATION -> AdmobNativeAdsLoad()
         AdsConstants.AD_MOB -> AdmobNativeAdsLoad()
-        AdsConstants.MAX_MEDIATION -> {}
+        AdsConstants.MAX_MEDIATION -> MaxNativeAdsLoad()
         else -> loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_STRATEGY_WRONG)
     }
 }
@@ -87,7 +101,7 @@ private fun ShowSelectedNativeAds() {
         AdsConstants.ADS_OFF -> showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_OFF)
         AdsConstants.AD_MOB_MEDIATION -> BindNativeAdmobView()
         AdsConstants.AD_MOB -> BindNativeAdmobView()
-        AdsConstants.MAX_MEDIATION -> {}
+        AdsConstants.MAX_MEDIATION -> BindNativeMaxView()
         else -> showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_STRATEGY_WRONG)
     }
 }
@@ -171,6 +185,64 @@ private fun AdmobNativeAdsLoad() {
 
 
 @Composable
+private fun MaxNativeAdsLoad() {
+    maxNativeAdsKey = if (AdsConstants.testMode) {
+        AdsConstants.TEST_MAX_Native_ADS_ID
+    } else {
+        AdsApplication.getAdsModel()!!.maxNativeID
+    }
+    if (maxNativeAdsKey.isNullOrEmpty() || maxNativeAdsKey.isNullOrBlank()) {
+        loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_ID_NULL)
+        return
+    }
+    if (AdsConstants.testMode.not()) {
+        if (maxNativeAdsKey == AdsConstants.TEST_MAX_Native_ADS_ID) {
+            loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.TEST_ADS_ID)
+            return
+        }
+    }
+    BindNativeMaxView()
+    maxNativeAds = MaxNativeAdLoader(maxNativeAdsKey!!, LocalContext.current)
+    maxNativeAds!!.setRevenueListener { ad ->
+        val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
+        adjustAdRevenue.setRevenue(ad.revenue, "USD")
+        adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
+        adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
+        adjustAdRevenue.setAdRevenuePlacement(ad.placement)
+        Adjust.trackAdRevenue(adjustAdRevenue)
+    }
+    maxNativeAds!!.setNativeAdListener(object : MaxNativeAdListener() {
+        override fun onNativeAdLoaded(p0: MaxNativeAdView?, p1: MaxAd) {
+            super.onNativeAdLoaded(p0, p1)
+            if (maxNativeAd != null) {
+                maxNativeAds!!.destroy(maxNativeAd!!)
+            }
+            maxNativeAd = p1
+//            containerView!!.removeAllViews()
+//            containerView?.addView(p0)
+            loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_LOADED)
+        }
+
+        override fun onNativeAdLoadFailed(p0: String, p1: MaxError) {
+            super.onNativeAdLoadFailed(p0, p1)
+//            containerView?.gone()
+            loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_LOAD_FAILED)
+        }
+
+        override fun onNativeAdClicked(p0: MaxAd) {
+            super.onNativeAdClicked(p0)
+            showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_CLICKED)
+        }
+
+        override fun onNativeAdExpired(p0: MaxAd) {
+            super.onNativeAdExpired(p0)
+            showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_CLOSED)
+        }
+    })
+    maxNativeAds!!.loadAd(maxNativeAdView)
+}
+
+@Composable
 private fun BindNativeAdmobView() {
     if (admobNativeAd != null) {
         isCustomAdsView.then {
@@ -178,6 +250,30 @@ private fun BindNativeAdmobView() {
         } ?: run {
             NativeAdViewLayout()
         }
+        InitSelectedNativeLoaded()
+    } else {
+        InitSelectedNativeLoaded()
+    }
+}
+
+
+@Composable
+private fun BindNativeMaxView() {
+    if (maxNativeAd != null) {
+        AndroidView(factory = {
+            val binder: MaxNativeAdViewBinder =
+                MaxNativeAdViewBinder.Builder(R.layout.max_native_ad_layout)
+                    .setTitleTextViewId(R.id.title_text_view)
+                    .setBodyTextViewId(R.id.body_text_view)
+                    .setAdvertiserTextViewId(R.id.advertiser_textView)
+                    .setIconImageViewId(R.id.icon_image_view)
+                    .setMediaContentViewGroupId(R.id.media_view_container)
+                    .setOptionsContentViewGroupId(R.id.options_view)
+                    .setCallToActionButtonId(R.id.cta_button)
+                    .build()
+            maxNativeAdView = MaxNativeAdView(binder, it)
+            maxNativeAdView!!
+        })
         InitSelectedNativeLoaded()
     } else {
         InitSelectedNativeLoaded()

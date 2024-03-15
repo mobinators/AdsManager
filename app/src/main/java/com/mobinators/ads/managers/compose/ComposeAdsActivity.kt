@@ -2,6 +2,7 @@ package com.mobinators.ads.managers.compose
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,9 +21,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -30,19 +34,25 @@ import com.google.android.gms.ads.rewarded.RewardItem
 import com.mobinators.ads.manager.extensions.then
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
+import com.mobinators.ads.manager.ui.commons.models.PanelModel
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
 import com.mobinators.ads.manager.ui.compose.AdsState
 import com.mobinators.ads.manager.ui.compose.BannerAdsListener
+import com.mobinators.ads.manager.ui.compose.BottomSheet
 import com.mobinators.ads.manager.ui.compose.LoadNativeAds
 import com.mobinators.ads.manager.ui.compose.LoadNativeState
 import com.mobinators.ads.manager.ui.compose.NativeAdsLoaderCallback
 import com.mobinators.ads.manager.ui.compose.NativeAdsShowListener
+import com.mobinators.ads.manager.ui.compose.RateUsDialog
 import com.mobinators.ads.manager.ui.compose.ShowBannerAds
 import com.mobinators.ads.manager.ui.compose.ShowNativeAds
 import com.mobinators.ads.manager.ui.compose.ShowNativeAdsState
+import com.mobinators.ads.managers.R
+import kotlinx.coroutines.launch
 import pak.developer.app.managers.extensions.logD
+import kotlin.system.exitProcess
 
 class ComposeAdsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -78,11 +88,55 @@ class ComposeAdsActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun App() {
+        val scope = rememberCoroutineScope()
+        val isBottomSheetVisible = rememberSaveable { mutableStateOf(false) }
+        val sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
+        )
+        isBottomSheetVisible.value.then {
+            BottomSheet(
+                this@ComposeAdsActivity,
+                isBottomSheetVisible = isBottomSheetVisible.value,
+                sheetState = sheetState,
+                panelModel = PanelModel().apply {
+                    this.title = "App Exit"
+                    this.titleColor = R.color.black
+                    this.desc = "Your app is exit?"
+                    this.descColor = R.color.black
+                    this.cancelBgColor = R.color.lightGray
+                    this.cancelButtonText = "Cancel"
+                    this.cancelButtonTitleColor = R.color.black
+                    this.exitButtonBgColor = R.color.black
+                    this.exitButtonText = "Exit"
+                    this.exitButtonTextColor = R.color.white
+                    this.panelBackgroundColor = R.color.lightGray
+                    this.isAdsShow = true  // true value is show ads , false  value is not show ads
+                },
+                onDismiss = {
+                    scope.launch { sheetState.hide() }
+                        .invokeOnCompletion { isBottomSheetVisible.value = false }
+                },
+                onExit = {
+                    scope.launch { sheetState.hide() }
+                        .invokeOnCompletion { isBottomSheetVisible.value = false }
+                    finishAffinity()
+                }
+            )
+        }
+        BackHandler {
+            isBottomSheetVisible.value = true
+        }
         val bannerHider = remember { mutableStateOf(false) }
         val nativeHider = remember { mutableStateOf(false) }
         val nativeCustom = remember { mutableStateOf(false) }
+
+        val rateDialog = remember {
+            mutableStateOf(false)
+        }
+        RateUsDialog(context = this@ComposeAdsActivity, showDialog = rateDialog)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -319,8 +373,17 @@ class ComposeAdsActivity : ComponentActivity() {
                 ) {
                     Text(text = "App Open Ads")
                 }
+                Spacer(modifier = Modifier.height(5.dp))
+                Button(
+                    onClick = {
+                        rateDialog.value = true
+                    }, modifier = Modifier
+                        .padding(10.dp, 0.dp, 10.dp, 0.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(text = "Rate US Dialog")
+                }
             }
         }
-
     }
 }
