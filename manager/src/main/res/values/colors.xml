@@ -18,5 +18,7 @@
     <color name="menuColor">#FF5D0C</color>
     <color name="black">#FF000000</color>
     <color name="rateColor">#FFFF9800</color>
+    <color name="colorAccent">#FFA000</color>
+
 
 </resources>

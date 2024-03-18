@@ -1,12 +1,29 @@
 package com.mobinators.ads.managers
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.graphics.ImageDecoder
+import android.media.RingtoneManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
 import com.mobinators.ads.manager.extensions.appRateUs
 import com.mobinators.ads.manager.extensions.appUpdate
 import com.mobinators.ads.manager.extensions.exitPanel
+import com.mobinators.ads.manager.services.GeneralService
 import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
@@ -20,6 +37,7 @@ import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAds
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
+import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import com.mobinators.ads.manager.ui.commons.utils.AnalyticsManager
 import com.mobinators.ads.manager.ui.commons.utils.AppPurchaseUtils
 import com.mobinators.ads.manager.ui.commons.utils.DeviceInfoUtils
@@ -32,9 +50,33 @@ import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.navigateActivity
 import pak.developer.app.managers.ui.commons.base.BaseActivity
 
-class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
+
+class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener,
+    GeneralService.FCMListener {
     override fun getActivityView() = ActivityMainBinding.inflate(layoutInflater)
     override fun initView(savedInstanceState: Bundle?) {
+        GeneralService.setListener(this)
+        val pInfo: PackageInfo =
+            packageManager.getPackageInfo(packageName, 0)
+        logD(
+            "Version Name : ${pInfo.versionName}  : Version Code : ${pInfo.versionCode}  : App Install: ${
+                AdsUtils.isExistApp(
+                    this,
+                    packageName
+                )
+            }"
+        )
+
+        askNotificationPermission()
+        notificationSetting()
+
+        FirebaseMessaging.getInstance().subscribeToTopic("AppUpdate").addOnCompleteListener {
+            if (it.isSuccessful) {
+                logD("Send Notification Successfully")
+            } else {
+                logD("Failed to send Notification")
+            }
+        }
         MediationRewardedAd.loadRewardAds(
             this,
             false,
@@ -225,6 +267,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                 this,
                 CollapseBannerActivity::class.java
             )
+
             binding.composeButton.id -> navigateActivity(this, ComposeAdsActivity::class.java)
         }
     }
@@ -711,4 +754,106 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
         MediationNativeAds.onDestroy()
     }
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Toast.makeText(this, "Notifications permission granted", Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            Toast.makeText(
+                this,
+                "FCM can't post notifications without POST_NOTIFICATIONS permission",
+                Toast.LENGTH_LONG,
+            ).show()
+        }
+    }
+
+    private fun askNotificationPermission() {
+        // This is only necessary for API Level > 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // FCM SDK (and your app) can post notifications.
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    override fun onMessageReceive(remoteMessage: RemoteMessage) {
+        remoteMessage.notification?.let {
+            it.body?.let { body ->
+                sendNotification(body)
+            }
+        }
+    }
+
+    override fun onToken(token: String) {
+
+    }
+
+    private fun sendNotification(messageBody: String) {
+        val requestCode = 0
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        val channelId =
+            getString(com.mobinators.ads.manager.R.string.default_notification_channel_id)
+        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setContentTitle(getString(R.string.fcm_message))
+            .setContentText(messageBody)
+            .setAutoCancel(true)
+            .setSound(defaultSoundUri)
+            .setContentIntent(pendingIntent)
+
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Channel human readable title",
+                NotificationManager.IMPORTANCE_DEFAULT,
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+        val notificationId = 0
+        notificationManager.notify(notificationId, notificationBuilder.build())
+    }
+
+
+    private fun notificationSetting() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create channel to show notifications.
+            val channelId = "MyNotification"
+            val channelName = "MyNotification"
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager?.createNotificationChannel(
+                NotificationChannel(
+                    channelId,
+                    channelName,
+                    NotificationManager.IMPORTANCE_DEFAULT,
+                ),
+            )
+        }
+        intent.extras?.let {
+            for (key in it.keySet()) {
+                val value = intent.extras?.getString(key)
+                logD("Key: $key Value: $value")
+            }
+        }
+    }
 }

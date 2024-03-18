@@ -5,4 +5,5 @@
     // AppLovin Ads
     <string name="SDK_KEY">sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-1DcTfCWvH5LVcPGq9Nol8469q4z7rp1WTNRTTB12ENHdoQyLpX</string>
     <string name="splash_screen">Splash Screen</string>
+    <string name="fcm_message">FCM Message</string>
 </resources>

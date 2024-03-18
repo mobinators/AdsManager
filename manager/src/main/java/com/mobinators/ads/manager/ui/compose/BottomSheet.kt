@@ -44,9 +44,11 @@ import androidx.core.content.ContextCompat
 import com.mobinators.ads.manager.R
 import com.mobinators.ads.manager.applications.AdsApplication
 import com.mobinators.ads.manager.extensions.then
-import com.mobinators.ads.manager.ui.commons.models.PanelModel
+import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
+import com.mobinators.ads.manager.ui.compose.extensions.animatedBorder
 import pak.developer.app.managers.extensions.logD
+import pak.developer.app.managers.extensions.preferenceUtils
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,12 +57,23 @@ fun BottomSheet(
     activity: Activity,
     isBottomSheetVisible: Boolean,
     sheetState: SheetState,
-    panelModel: PanelModel? = null,
+    panelBgColor: Color? = null,
+    panelTitle: String? = null,
+    panelTitleColor: Color? = null,
+    panelDes: String? = null,
+    panelDesColor: Color? = null,
+    panelCancelBtnBgColor: Color? = null,
+    panelCancelTitleColor: Color? = null,
+    panelExitBtnBgColor: Color? = null,
+    panelExitTitleColor: Color? = null,
+    isAdsShow: Boolean = false,
     onDismiss: () -> Unit,
     onExit: () -> Unit
 ) {
+    var backPressCounter =
+        LocalContext.current.preferenceUtils.getIntegerValue(AdsConstants.RATE_US_DIALOG_COUNT_KEY)
     var ratingOne: Float by rememberSaveable { mutableFloatStateOf(1.4f) }
-    val isRateShow: Boolean = AdsApplication.getAdsModel()!!.isRateUsDialog
+    val isRateShow: Long = AdsApplication.getAdsModel()!!.isRateUsDialog
     if (isBottomSheetVisible) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,
@@ -72,24 +85,17 @@ fun BottomSheet(
             scrimColor = Color.Black.copy(alpha = .5f),
             windowInsets = WindowInsets(0, 0, 0, 0)
         ) {
-            AdsApplication.getAdsModel()!!.isRateUsDialog
             Column(
                 modifier = Modifier
                     .navigationBarsPadding()
                     .padding(10.dp) // Outer padding
                     .clip(shape = RoundedCornerShape(18.dp))
-                    .background(color = panelModel?.panelBackgroundColor?.let {
-                        Color(
-                            ContextCompat.getColor(
-                                LocalContext.current, it
-                            )
-                        )
-                    } ?: MaterialTheme.colorScheme.background)
+                    .background(color = panelBgColor ?: MaterialTheme.colorScheme.background)
                     .fillMaxWidth()
                     .padding(20.dp) // Inner padding
             ) {
                 Text(
-                    text = panelModel?.title ?: ContextCompat.getString(
+                    text = panelTitle ?: ContextCompat.getString(
                         LocalContext.current,
                         R.string.exit_app
                     ),
@@ -97,20 +103,20 @@ fun BottomSheet(
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     ),
-                    color = Color(
+                    color = panelTitleColor ?: Color(
                         ContextCompat.getColor(
                             LocalContext.current,
-                            panelModel?.titleColor ?: R.color.menuColor
+                            R.color.menuColor
                         )
                     )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                isRateShow.not().then {
+                if (backPressCounter <= isRateShow) {
                     Box(
                         modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = panelModel?.desc ?: ContextCompat.getString(
+                            text = panelDes ?: ContextCompat.getString(
                                 LocalContext.current,
                                 R.string.sure_you_want_to_exit
                             ),
@@ -118,17 +124,21 @@ fun BottomSheet(
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             ),
-                            color = Color(
+                            color = panelDesColor ?: Color(
                                 ContextCompat.getColor(
                                     LocalContext.current,
-                                    panelModel?.descColor ?: R.color.menuColor
+                                    R.color.menuColor
                                 )
                             )
                         )
                     }
                 }
                 Spacer(modifier = Modifier.height(20.dp))
-                isRateShow.then {
+                if (backPressCounter >= isRateShow) {
+                    LocalContext.current.preferenceUtils.setIntegerValue(
+                        AdsConstants.RATE_US_DIALOG_COUNT_KEY,
+                        0
+                    )
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -190,21 +200,35 @@ fun BottomSheet(
                         )
                         Spacer(modifier = Modifier.height(5.dp))
                     }
-                } ?: run {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        ShowBannerAds(
-                            modifier = Modifier.height(50.dp),
-                            isPurchased = false,
-                            listener = object : BannerAdsListener {
-                                override fun onBannerAdsState(adsState: AdsState) {
-                                    logD("Banner Ads State : ${adsState.name} ")
+                } else {
+                    backPressCounter++
+                    LocalContext.current.preferenceUtils.setIntegerValue(
+                        AdsConstants.RATE_US_DIALOG_COUNT_KEY,
+                        backPressCounter
+                    )
+                    isAdsShow.then {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp)
+                                .animatedBorder(
+                                    borderColors = listOf(Color.Red, Color.Green, Color.Blue),
+                                    backgroundColor = Color.White,
+                                    shape = RoundedCornerShape(6.dp),
+                                    borderWidth = 1.dp
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ShowBannerAds(
+                                modifier = Modifier.height(50.dp),
+                                isPurchased = false,
+                                listener = object : BannerAdsListener {
+                                    override fun onBannerAdsState(adsState: AdsState) {
+                                        logD("Banner Ads State : ${adsState.name} ")
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(38.dp))
@@ -216,10 +240,10 @@ fun BottomSheet(
                     Button(
                         modifier = Modifier.weight(0.4f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(
+                            containerColor = panelCancelBtnBgColor ?: Color(
                                 ContextCompat.getColor(
                                     activity,
-                                    panelModel?.cancelBgColor ?: R.color.menuColor
+                                    R.color.menuColor
                                 )
                             )
                         ),
@@ -230,10 +254,10 @@ fun BottomSheet(
                                     activity,
                                     R.string.cancel
                                 ),
-                                color = Color(
+                                color = panelCancelTitleColor ?: Color(
                                     ContextCompat.getColor(
                                         activity,
-                                        panelModel?.cancelButtonTitleColor ?: R.color.menuColor
+                                        R.color.menuColor
                                     )
                                 )
                             )
@@ -243,10 +267,10 @@ fun BottomSheet(
                     Button(
                         modifier = Modifier.weight(0.4f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(
+                            containerColor = panelExitBtnBgColor ?: Color(
                                 ContextCompat.getColor(
                                     activity,
-                                    panelModel?.exitButtonBgColor ?: R.color.menuColor
+                                    R.color.menuColor
                                 )
                             )
                         ),
@@ -257,10 +281,10 @@ fun BottomSheet(
                                     activity,
                                     R.string.exit_
                                 ),
-                                color = Color(
+                                color = panelExitTitleColor ?: Color(
                                     ContextCompat.getColor(
                                         activity,
-                                        panelModel?.exitButtonTextColor ?: R.color.menuColor
+                                        R.color.menuColor
                                     )
                                 )
                             )

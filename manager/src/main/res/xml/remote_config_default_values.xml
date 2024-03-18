@@ -47,7 +47,7 @@
         <value>YOUR_AD_UNIT_ID</value>
 
         <key>RATE_US_DIALOG</key>
-        <value>false</value>
+        <value>5</value>
     </entry>
 
 </defaultsMap>

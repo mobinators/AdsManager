@@ -22,5 +22,5 @@ data class AdsModel(
     var maxAppOpenID: String? = null,
     var maxRewardedID: String? = null,
     var isAppOpenAdd: Boolean = false,
-    var isRateUsDialog: Boolean = false
+    var isRateUsDialog: Long = 0
 )

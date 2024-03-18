@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,10 +40,10 @@ import com.mobinators.ads.manager.ui.compose.utils.RatingBarUtils
 
 private val StarRatingKey = SemanticsPropertyKey<Float>("StarRating")
 private var SemanticsPropertyReceiver.starRating by StarRatingKey
-private var starActiveColor = mutableLongStateOf(0xFFFF9800)
-private var startInActiveColor = mutableLongStateOf(0x808080)
-private var starActiveStrokeColor = mutableLongStateOf(0xFFFFCA00)
-private var startInActiveStrokeColor = mutableLongStateOf(0xFF888888)
+private var starActiveColor: Color? = null
+private var startInActiveColor: Color? = null
+private var starActiveStrokeColor: Color? = null
+private var startInActiveStrokeColor: Color? = null
 
 
 sealed interface StepSize {
@@ -58,14 +57,14 @@ sealed class RatingBarStyle(open val activeColor: Color) {
     }
 
     open class Fill(
-        override val activeColor: Color = Color(starActiveColor.longValue),
-        val inActiveColor: Color = Color(startInActiveColor.longValue),
+        override val activeColor: Color = Color(0xFFFF9800),
+        val inActiveColor: Color = Color(0xFF808080),
     ) : RatingBarStyle(activeColor)
 
     class Stroke(
         val width: Float = 1f,
-        override val activeColor: Color = Color(starActiveStrokeColor.longValue),
-        val strokeColor: Color = Color(startInActiveStrokeColor.longValue)
+        override val activeColor: Color = Color(0xFFFF9800),
+        val strokeColor: Color = Color(0xFF808080)
     ) : RatingBarStyle(activeColor)
 }
 
@@ -79,18 +78,18 @@ fun RatingStarBar(
     isIndicator: Boolean = false,
     stepSize: StepSize = StepSize.ONE,
     hideInactiveStars: Boolean = false,
-    activeStartColor: Long = 0xFFFF9800,
-    inActiveStartColor: Long = 0x808080,
-    activeStartStrokeColor: Long = 0xA9A9A9,
-    inActiveStartStrokeColor: Long = 0xA9A9A9,
+    activeStartColor: Color? = null,
+    inActiveStartColor: Color? = null,
+    activeStartStrokeColor: Color? = null,
+    inActiveStartStrokeColor: Color? = null,
     style: RatingBarStyle,
     onValueChange: (Float) -> Unit,
     onRatingChanged: (Float) -> Unit
 ) {
-    starActiveColor.longValue = activeStartColor
-    startInActiveColor.longValue = inActiveStartColor
-    starActiveStrokeColor.longValue = activeStartStrokeColor
-    startInActiveStrokeColor.longValue = inActiveStartStrokeColor
+    starActiveColor = activeStartColor
+    startInActiveColor = inActiveStartColor
+    starActiveStrokeColor = activeStartStrokeColor
+    startInActiveStrokeColor = inActiveStartStrokeColor
     RatingBar(
         value = value,
         modifier = modifier,
@@ -285,19 +284,13 @@ private fun FilledStar(
 ) {
     val path = Path().addStar(size)
 
-//    drawPath(path, color = style.activeColor, style = Fill) // Filled Star
-    drawPath(path, color = Color(starActiveColor.longValue), style = Fill) // Filled Star
-    /* drawPath(
-         path,
-         color = style.activeColor,
-         style = Stroke(width = if (style is RatingBarStyle.Stroke) style.width else 1f)
-     ) // Border*/
-
+    drawPath(path, color = starActiveColor ?: style.activeColor, style = Fill) // Filled Star
     drawPath(
         path,
-        color = Color(starActiveColor.longValue),
+        color = starActiveColor ?: style.activeColor,
         style = Stroke(width = if (style is RatingBarStyle.Stroke) style.width else 1f)
-    )
+    ) // Border
+
 }
 
 @Composable
@@ -315,23 +308,16 @@ private fun EmptyStar(
             )
     ) {
         val path = Path().addStar(size)
-        /* if (style is RatingBarStyle.Fill) drawPath(
-             path,
-             color = style.inActiveColor,
-             style = Fill
-         ) // Border
-         else if (style is RatingBarStyle.Stroke) drawPath(
-             path, color = style.strokeColor, style = Stroke(width = style.width)
-         )*/ // Border
-
         if (style is RatingBarStyle.Fill) drawPath(
             path,
-            color = Color.LightGray,
+            color = startInActiveColor ?: style.inActiveColor,
             style = Fill
         ) // Border
         else if (style is RatingBarStyle.Stroke) drawPath(
-            path, color = Color(startInActiveColor.longValue), style = Stroke(width = style.width)
-        )
+            path,
+            color = startInActiveStrokeColor ?: style.strokeColor,
+            style = Stroke(width = style.width)
+        ) // Border
     }
 
 private fun rtlEmptyStarFractionalShape(fraction: Float): FractionalRectangleShape {

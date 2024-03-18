@@ -30,11 +30,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.mobinators.ads.manager.extensions.then
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
-import com.mobinators.ads.manager.ui.commons.models.PanelModel
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
@@ -52,7 +52,6 @@ import com.mobinators.ads.manager.ui.compose.ShowNativeAdsState
 import com.mobinators.ads.managers.R
 import kotlinx.coroutines.launch
 import pak.developer.app.managers.extensions.logD
-import kotlin.system.exitProcess
 
 class ComposeAdsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -101,20 +100,15 @@ class ComposeAdsActivity : ComponentActivity() {
                 this@ComposeAdsActivity,
                 isBottomSheetVisible = isBottomSheetVisible.value,
                 sheetState = sheetState,
-                panelModel = PanelModel().apply {
-                    this.title = "App Exit"
-                    this.titleColor = R.color.black
-                    this.desc = "Your app is exit?"
-                    this.descColor = R.color.black
-                    this.cancelBgColor = R.color.lightGray
-                    this.cancelButtonText = "Cancel"
-                    this.cancelButtonTitleColor = R.color.black
-                    this.exitButtonBgColor = R.color.black
-                    this.exitButtonText = "Exit"
-                    this.exitButtonTextColor = R.color.white
-                    this.panelBackgroundColor = R.color.lightGray
-                    this.isAdsShow = true  // true value is show ads , false  value is not show ads
-                },
+                panelTitle = "App Exit",
+                panelTitleColor = Color(ContextCompat.getColor(this, R.color.black)),
+                panelDes = "Your app is exit?",
+                panelDesColor = Color(ContextCompat.getColor(this, R.color.black)),
+                panelCancelBtnBgColor = Color.LightGray,
+                panelCancelTitleColor = Color(ContextCompat.getColor(this, R.color.black)),
+                panelExitBtnBgColor = Color(ContextCompat.getColor(this, R.color.black)),
+                panelExitTitleColor = Color.White,
+                isAdsShow = true,
                 onDismiss = {
                     scope.launch { sheetState.hide() }
                         .invokeOnCompletion { isBottomSheetVisible.value = false }

@@ -27,11 +27,12 @@ import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.NETWORK_OFF
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.TEST_ADS_ID
 import com.mobinators.ads.manager.ui.commons.listener.PanelListener
 import com.mobinators.ads.manager.ui.commons.models.PanelModel
+import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.gone
 import pak.developer.app.managers.extensions.logD
+import pak.developer.app.managers.extensions.preferenceUtils
 import pak.developer.app.managers.extensions.visible
-
 
 class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(),
     View.OnClickListener {
@@ -113,11 +114,19 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
             )
         }
         try {
-            AdsApplication.getAdsModel()?.isRateUsDialog?.then {
+            var dialogCounter: Int =
+                preferenceUtils.getIntegerValue(AdsConstants.RATE_US_DIALOG_COUNT_KEY)
+            if (dialogCounter >= AdsApplication.getAdsModel()!!.isRateUsDialog) {
+                preferenceUtils.setIntegerValue(AdsConstants.RATE_US_DIALOG_COUNT_KEY, 0)
                 binding.exitText.gone()
                 binding.exitBannerLayout.gone()
                 binding.rateUsLayout.visible()
-            } ?: run {
+            } else {
+                dialogCounter++
+                preferenceUtils.setIntegerValue(
+                    AdsConstants.RATE_US_DIALOG_COUNT_KEY,
+                    dialogCounter
+                )
                 binding.rateUsLayout.gone()
                 binding.exitText.visible()
                 binding.exitBannerLayout.visible()

@@ -1,10 +1,10 @@
 {
   "parameters": {
-    "RATE_US_DIALOG": {
+    "RATE_US_DIALOG_COUNT": {
       "defaultValue": {
-        "value": "false"
+        "value": "5"
       },
-      "valueType": "BOOLEAN"
+      "valueType": "NUMBER"
     },
     "ADMOB_MEDIATION_KEY": {
       "defaultValue": {
