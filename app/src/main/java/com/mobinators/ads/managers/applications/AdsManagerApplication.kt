@@ -1,7 +1,11 @@
 package com.mobinators.ads.managers.applications
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.os.Build
 import androidx.multidex.MultiDex
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -27,6 +31,20 @@ class AdsManagerApplication : Application() {
         logD("Debug Mode : ${BuildConfig.DEBUG}  : ${0 != applicationContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE}")
         AnalyticsManager.getInstance().setAnalytics(FirebaseAnalytics.getInstance(this))
         AnalyticsManager.getInstance().setUserId(resources.getString(R.string.app_name))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create channel to show notifications.
+            val channelId = getString(com.mobinators.ads.manager.R.string.default_notification_channel_id)
+            val channelName = getString(com.mobinators.ads.manager.R.string.default_notification_channel_id)
+            val notificationManager =getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(
+                NotificationChannel(
+                    channelId,
+                    channelName,
+                    NotificationManager.IMPORTANCE_DEFAULT,
+                ),
+            )
+        }
         AdsApplication.getValueFromConfig(
             FirebaseRemoteConfig.getInstance(),
             this,

@@ -44,6 +44,10 @@ object AdsConstants {
     const val FIREBASE_ANALYTICS_KEY = "Ads_Manager_Event"
     const val ADMOB_OPEN_AD_ENABLE_KEY = "ADMOB_OPEN_AD_ENABLE"
     const val STORE_STRATEGY_KEY = "STORE_STRATEGY"
+    const val APP_UPDATE_KEY = "AppUpdate"
+    const val APP_UPDATE = "Update"
+    const val APP_RATE_US_DIALOG = "RateUsDialog"
+    const val APP_UPDATE_VERSION_KEY = "AppUpdateVersion"
     var testMode: Boolean = false
     var isAdPreloadEnable = false
     var isInit = false

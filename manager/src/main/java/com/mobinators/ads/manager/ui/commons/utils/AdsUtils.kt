@@ -73,6 +73,20 @@ object AdsUtils {
             )
         }
     }
+    fun openPlayStore(packageName: String):Intent{
+        return try {
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(AdsConstants.PLAY_STORE_URL_1 + packageName)
+            )
+        }catch (error: ActivityNotFoundException){
+            logException("Error : ${error.localizedMessage}")
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(AdsConstants.PLAY_STORE_URL + packageName)
+            )
+        }
+    }
 
     fun findIntegerValueInMap(key: String, map: Map<String, Int>): Int {
         val updateKey = key.toUpperCase(java.util.Locale.ROOT)
