@@ -14,7 +14,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.1.9'
+  implementation 'com.github.mobinators:AdsManager:1.2.0'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -239,7 +239,7 @@
     // Requiered native Ads width is match_paren and height is 300dp or above 
     
     
-    // Calling This line First show Interstitial Ads in onCreate() function or Application class 
+    // Calling This line First show Native Ads in onCreate() function or Application class 
     MediationNativeAds.loadNativeAds(
                         applicationContext,
                         false,
@@ -758,4 +758,104 @@
     RateUsDialog.getInstance().setTextColor(R.color.black) // set Rate Text Color so calling this line
 
 ```
+->  Compose Banner Ads
 
+```
+    ShowBannerAds(modifier = Modifier.height(50.dp),
+                        false,
+                        object : BannerAdsListener {
+                            override fun onBannerAdsState(adsState: AdsState) {
+                                when (adsState) {
+                                    AdsState.ADS_OFF -> logD("ADS_OFF")
+                                    AdsState.NETWORK_OFF -> logD("NETWORK_OFF")
+                                    AdsState.APP_PURCHASED -> logD("APP_PURCHASED")
+                                    AdsState.ADS_STRATEGY_WRONG -> logD("ADS_STRATEGY_WRONG")
+                                    AdsState.ADS_ID_NULL -> logD("ADS_ID_NULL")
+                                    AdsState.TEST_ADS_ID -> logD("TEST_ADS_ID")
+                                    AdsState.ADS_LOAD_FAILED -> logD("ADS_LOAD_FAILED")
+                                    AdsState.ADS_DISMISS -> logD("ADS_DISMISS")
+                                    AdsState.ADS_DISPLAY_FAILED -> logD("ADS_DISPLAY_FAILED")
+                                    AdsState.ADS_DISPLAY -> logD("ADS_DISPLAY")
+                                    AdsState.ADS_IMPRESS -> logD("ADS_IMPRESS")
+                                    AdsState.ADS_LOADED -> logD("ADS_LOADED")
+                                    AdsState.ADS_CLICKED -> logD("ADS_CLICKED")
+                                    AdsState.ADS_CLOSED -> logD("ADS_CLOSED")
+                                    AdsState.ADS_OPENED -> logD("ADS_OPENED")
+                                }
+                            }
+                        })
+
+
+```
+
+-> Comopse Native Ads
+
+```
+    // Calling This line First show Native Ads in onCreate() function or Application class 
+      LoadNativeAds(
+                activity = this@ComposeAdsActivity,
+                isPurchased = false,
+                listener = object : NativeAdsLoaderCallback {
+                    override fun onNativeAdsState(loadState: LoadNativeState) {
+                        logD("Native Ads Loaded : State : ${loadState.name}")
+                    }
+                })
+    
+    // After Calling below function when show the ads and height 300.dp requried
+
+
+      ShowNativeAds(isPurchased = false, listener = object : NativeAdsShowListener {
+                        override fun onNativeAdsShowState(showState: ShowNativeAdsState) {
+                            logD("Native Ads : ${showState.name}")
+                        }
+                    }, nativeCustom.value)
+
+```
+
+-> Other AdMob Ads in calling in compose same way because native and banner ads required view therefore create the new function for those ads 
+
+-> Compoe Rate Us Dialog Box
+
+```
+    val rateDialog = remember {
+            mutableStateOf(false)
+        }
+        RateUsDialog(context = this@ComposeAdsActivity, showDialog = rateDialog)
+
+```
+
+-> Compose Exit Panel 
+
+```
+    val scope = rememberCoroutineScope()
+        val isBottomSheetVisible = rememberSaveable { mutableStateOf(false) }
+        val sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
+        )
+        isBottomSheetVisible.value.then {
+            BottomSheet(
+                this@ComposeAdsActivity,
+                isBottomSheetVisible = isBottomSheetVisible.value,
+                sheetState = sheetState,
+                panelTitle = "App Exit",
+                panelTitleColor = Color(ContextCompat.getColor(this, R.color.black)),
+                panelDes = "Your app is exit?",
+                panelDesColor = Color(ContextCompat.getColor(this, R.color.black)),
+                panelCancelBtnBgColor = Color.LightGray,
+                panelCancelTitleColor = Color(ContextCompat.getColor(this, R.color.black)),
+                panelExitBtnBgColor = Color(ContextCompat.getColor(this, R.color.black)),
+                panelExitTitleColor = Color.White,
+                isAdsShow = true,
+                onDismiss = {
+                    scope.launch { sheetState.hide() }
+                        .invokeOnCompletion { isBottomSheetVisible.value = false }
+                },
+                onExit = {
+                    scope.launch { sheetState.hide() }
+                        .invokeOnCompletion { isBottomSheetVisible.value = false }
+                    finishAffinity()
+                }
+            )
+        }
+
+```

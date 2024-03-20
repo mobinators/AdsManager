@@ -1,6 +1,7 @@
 package com.mobinators.ads.manager.ui.commons.utils
 
 import android.app.Activity
+import android.app.ActivityManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -55,6 +56,18 @@ object AdsUtils {
         }
     }
 
+
+    fun isAppRunning(context: Context): Boolean {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val packageName = context.packageName
+        val runningProcesses = activityManager.runningAppProcesses
+        runningProcesses.forEach { processInfo ->
+            if (processInfo.processName == packageName) {
+                return true
+            }
+        }
+        return false
+    }
     fun openPlayStore(context: Context, packageName: String) {
         try {
             context.startActivity(
@@ -95,7 +108,7 @@ object AdsUtils {
             logD("findValueInMap:  ${entry.key}")
             if ((entry.key == key.lowercase())) {
                 value = entry.value
-                logD("findValueInMap:  ${value}")
+                logD("findValueInMap:  $value")
                 break
             }
         }

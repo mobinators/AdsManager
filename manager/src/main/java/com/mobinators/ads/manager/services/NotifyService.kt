@@ -1,6 +1,5 @@
 package com.mobinators.ads.manager.services
 
-import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -22,7 +21,7 @@ import pak.developer.app.managers.extensions.logException
 class NotifyService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        logD("Remote Message : ${remoteMessage.data}  : App Running : ${isAppRunning(this)}")
+        logD("Remote Message : ${remoteMessage.data}  : App Running : ${AdsUtils.isAppRunning(this)}")
         when (remoteMessage.data[AdsConstants.APP_UPDATE_KEY]) {
             AdsConstants.APP_UPDATE -> {
                 try {
@@ -76,25 +75,12 @@ class NotifyService : FirebaseMessagingService() {
         logD("sendRegistrationTokenToServer($token)")
     }
 
-
-    fun isAppRunning(context: Context): Boolean {
-        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val packageName = context.packageName
-        val runningProcesses = activityManager.runningAppProcesses
-        runningProcesses.forEach { processInfo ->
-            if (processInfo.processName == packageName) {
-                return true
-            }
-        }
-        return false
-    }
-
     private fun sendNotification(remoteMessage: RemoteMessage) {
         val requestCode = 0
         val pendingIntent = PendingIntent.getActivity(
             this,
             requestCode,
-            AdsUtils.openPlayStore("appytune.pregnancy.tracker"),
+            AdsUtils.openPlayStore(packageName),
             PendingIntent.FLAG_IMMUTABLE,
         )
         val mNotificationManager =
@@ -128,11 +114,7 @@ class NotifyService : FirebaseMessagingService() {
                         else -> "App Update"
                     }
                 )
-                .setContentText(remoteMessage.notification?.let {
-                    it.body?.let { body ->
-                        body
-                    }
-                })
+                .setContentText(remoteMessage.notification?.body)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setSmallIcon(R.drawable.notification)
                 .setStyle(
