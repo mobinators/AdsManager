@@ -35,20 +35,16 @@ import com.google.android.gms.ads.rewarded.RewardItem
 import com.mobinators.ads.manager.extensions.then
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
+import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAds
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
 import com.mobinators.ads.manager.ui.compose.AdsState
 import com.mobinators.ads.manager.ui.compose.BannerAdsListener
 import com.mobinators.ads.manager.ui.compose.BottomSheet
-import com.mobinators.ads.manager.ui.compose.LoadNativeAds
-import com.mobinators.ads.manager.ui.compose.LoadNativeState
-import com.mobinators.ads.manager.ui.compose.NativeAdsLoaderCallback
-import com.mobinators.ads.manager.ui.compose.NativeAdsShowListener
 import com.mobinators.ads.manager.ui.compose.RateUsDialog
 import com.mobinators.ads.manager.ui.compose.ShowBannerAds
 import com.mobinators.ads.manager.ui.compose.ShowNativeAds
-import com.mobinators.ads.manager.ui.compose.ShowNativeAdsState
 import com.mobinators.ads.managers.R
 import kotlinx.coroutines.launch
 import pak.developer.app.managers.extensions.logD
@@ -58,14 +54,6 @@ class ComposeAdsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LoadNativeAds(
-                activity = this@ComposeAdsActivity,
-                isPurchased = false,
-                listener = object : NativeAdsLoaderCallback {
-                    override fun onNativeAdsState(loadState: LoadNativeState) {
-                        logD("Native Ads Loaded : State : ${loadState.name}")
-                    }
-                })
             Scaffold(
                 topBar = {
                     TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
@@ -80,7 +68,6 @@ class ComposeAdsActivity : ComponentActivity() {
                     .background(Color.White)
             ) {
                 Box(modifier = Modifier.padding(it)) {
-
                     App()
                 }
             }
@@ -168,11 +155,47 @@ class ComposeAdsActivity : ComponentActivity() {
                         })
                 }
                 nativeHider.value.then {
-                    ShowNativeAds(isPurchased = false, listener = object : NativeAdsShowListener {
-                        override fun onNativeAdsShowState(showState: ShowNativeAdsState) {
-                            logD("Native Ads : ${showState.name}")
-                        }
-                    }, nativeCustom.value)
+                    ShowNativeAds(
+                        activity = this@ComposeAdsActivity,
+                        isPurchased = false,
+                        listener = object : MediationNativeAds.ShowNativeAdsCallback {
+                            override fun onAdsOff() {
+                                logD("Native Ads : onAdsOff")
+                            }
+
+                            override fun onAdsOpen() {
+                                logD("Native Ads : onAdsOpen")
+                            }
+
+                            override fun onAdsClicked() {
+                                logD("Native Ads : onAdsClicked")
+                            }
+
+                            override fun onAdsClosed() {
+                                logD("Native Ads : onAdsClosed")
+                            }
+
+                            override fun onAdsSwipe() {
+                                logD("Native Ads : onAdsSwipe")
+                            }
+
+                            override fun onAdsError(errorState: AdsErrorState) {
+                                when (errorState) {
+                                    AdsErrorState.NETWORK_OFF -> logD("Native Ads : NETWORK_OFF")
+                                    AdsErrorState.APP_PURCHASED -> logD("Native Ads : APP_PURCHASED")
+                                    AdsErrorState.ADS_STRATEGY_WRONG -> logD("Native Ads : ADS_STRATEGY_WRONG")
+                                    AdsErrorState.ADS_ID_NULL -> logD("Native Ads : ADS_ID_NULL")
+                                    AdsErrorState.TEST_ADS_ID -> logD("Native Ads : TEST_ADS_ID")
+                                    AdsErrorState.ADS_LOAD_FAILED -> logD("Native Ads : ADS_LOAD_FAILED")
+                                    AdsErrorState.ADS_DISMISS -> logD("Native Ads : ADS_DISMISS")
+                                    AdsErrorState.ADS_DISPLAY_FAILED -> logD("Native Ads : ADS_DISPLAY_FAILED")
+                                    AdsErrorState.ADS_IMPRESS -> logD("Native Ads : ADS_IMPRESS")
+                                }
+                            }
+
+                        },
+                        nativeCustom.value
+                    )
                 }
             }
             Spacer(

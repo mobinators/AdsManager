@@ -1,7 +1,7 @@
 package com.mobinators.ads.manager.ui.fragments
 
 
-import android.annotation.SuppressLint
+import  android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -32,6 +32,7 @@ import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.gone
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.preferenceUtils
+import pak.developer.app.managers.extensions.showToast
 import pak.developer.app.managers.extensions.visible
 
 class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(),
@@ -46,8 +47,15 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
 
     @SuppressLint("ResourceAsColor", "ResourceType")
     override fun initView() {
-        binding.cancelButton.setOnClickListener(this)
-        binding.exitButton.setOnClickListener(this)
+        binding.cancelButton.setOnClickListener {
+            listener!!.onCancel()
+            dismiss()
+        }
+        binding.exitButton.setOnClickListener {
+            listener!!.onExit()
+            dismiss()
+            requireActivity().finishAffinity()
+        }
         panelModel?.let {
             binding.cancelButton.setBackgroundColors(
                 requireContext(),
@@ -116,7 +124,7 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
         try {
             var dialogCounter: Int =
                 preferenceUtils.getIntegerValue(AdsConstants.RATE_US_DIALOG_COUNT_KEY)
-            if (dialogCounter >= AdsApplication.getAdsModel()!!.isRateUsDialog) {
+            if (dialogCounter >= (AdsApplication.getAdsModel()?.isRateUsDialog ?: 5)) {
                 preferenceUtils.setIntegerValue(AdsConstants.RATE_US_DIALOG_COUNT_KEY, 0)
                 binding.exitText.gone()
                 binding.exitBannerLayout.gone()
@@ -217,11 +225,20 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
         }
         binding.ratingBar.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
             logD("Rate US Bar : $ratingBar : $rating  : $fromUser")
-            AdsUtils.openPlayStore(requireContext(), requireContext().packageName)
+            checkStore()
             dismiss()
         }
     }
 
+
+    private fun checkStore(){
+        when(AdsConstants.selectedStore){
+            AdsConstants.GOOGLE_PLAY_STORE-> AdsUtils.openPlayStore(requireContext(), requireContext().packageName)
+            AdsConstants.AMAZON_APP_STORE-> AdsUtils.openAmazonStore(requireContext(),requireContext().packageName)
+            AdsConstants.HUAWEI_APP_GALLERY->{}
+            else ->showToast(requireActivity(),"wrong selected store")
+        }
+    }
 
     override fun onClick(itemId: View?) {
         when (itemId!!.id) {

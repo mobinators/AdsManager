@@ -73,7 +73,7 @@ fun BottomSheet(
     var backPressCounter =
         LocalContext.current.preferenceUtils.getIntegerValue(AdsConstants.RATE_US_DIALOG_COUNT_KEY)
     var ratingOne: Float by rememberSaveable { mutableFloatStateOf(1.4f) }
-    val isRateShow: Long = AdsApplication.getAdsModel()!!.isRateUsDialog
+    val isRateShow: Long = AdsApplication.getAdsModel()?.isRateUsDialog ?: 5
     if (isBottomSheetVisible) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,

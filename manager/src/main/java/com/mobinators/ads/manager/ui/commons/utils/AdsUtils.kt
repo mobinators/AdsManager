@@ -86,6 +86,14 @@ object AdsUtils {
             )
         }
     }
+    fun openAmazonStore(context: Context, packageName: String){
+        context.startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(AdsConstants.AMAZON_STORE_URL + packageName)
+            )
+        )
+    }
     fun openPlayStore(packageName: String):Intent{
         return try {
             Intent(

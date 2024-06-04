@@ -1,477 +1,60 @@
 package com.mobinators.ads.manager.ui.compose
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.util.Log
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
+import android.widget.LinearLayout
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.viewinterop.AndroidViewBinding
-import com.adjust.sdk.Adjust
-import com.adjust.sdk.AdjustAdRevenue
-import com.adjust.sdk.AdjustConfig
-import com.applovin.mediation.MaxAd
-import com.applovin.mediation.MaxError
-import com.applovin.mediation.nativeAds.MaxNativeAdListener
-import com.applovin.mediation.nativeAds.MaxNativeAdLoader
-import com.applovin.mediation.nativeAds.MaxNativeAdView
-import com.applovin.mediation.nativeAds.MaxNativeAdViewBinder
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdLoader
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.VideoController
-import com.google.android.gms.ads.VideoOptions
-import com.google.android.gms.ads.nativead.NativeAd
-import com.google.android.gms.ads.nativead.NativeAdOptions
-import com.mobinators.ads.manager.R
-import com.mobinators.ads.manager.applications.AdsApplication
-import com.mobinators.ads.manager.databinding.AdmobNativeAdLayoutBinding
-import com.mobinators.ads.manager.databinding.CustomNativeBinding
-import com.mobinators.ads.manager.extensions.then
-import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
-import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
-import pak.developer.app.managers.extensions.gone
-import pak.developer.app.managers.extensions.logException
-import pak.developer.app.managers.extensions.visible
-
-
-private var loadNativeListener: NativeAdsLoaderCallback? = null
-private var showNativeListener: NativeAdsShowListener? = null
-private var nativeAdsKey: String? = null
-private var admobNativeAd: NativeAd? = null
-private var isCustomAdsView: Boolean = false
-private var maxNativeAds: MaxNativeAdLoader? = null
-
-@SuppressLint("StaticFieldLeak")
-private var composeActivity: Activity? = null
-private var maxNativeAdsKey: String? = null
-private var maxNativeAd: MaxAd? = null
-@SuppressLint("StaticFieldLeak")
-private var maxNativeAdView: MaxNativeAdView? = null
-
-
-@Composable
-fun LoadNativeAds(activity: Activity, isPurchased: Boolean, listener: NativeAdsLoaderCallback) {
-    loadNativeListener = listener
-    composeActivity = activity
-    isPurchased.then {
-        loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.APP_PURCHASED)
-    } ?: run {
-        if (AdsUtils.isOnline(LocalContext.current).not()) {
-            loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.NETWORK_OFF)
-            return
-        }
-        InitSelectedNativeLoaded()
-    }
-}
-
+import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
+import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAds
 
 @Composable
 fun ShowNativeAds(
+    activity: Activity,
     isPurchased: Boolean,
-    listener: NativeAdsShowListener,
+    listener: MediationNativeAds.ShowNativeAdsCallback,
     isCustomView: Boolean = false
 ) {
-    isCustomAdsView = isCustomView
-    showNativeListener = listener
-    isPurchased.then {
-        showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.APP_PURCHASED)
-    } ?: run {
-        ShowSelectedNativeAds()
-    }
-}
+    AndroidView(
+        modifier = Modifier
+            .height(300.dp)
+            .fillMaxWidth(),
+        factory = { context ->
+            LinearLayout(context).apply {
+                MediationNativeAds.showNativeAds(
+                    activity,
+                    isPurchased,
+                    this,
+                    object : MediationNativeAds.ShowNativeAdsCallback {
+                        override fun onAdsOff() {
+                            listener.onAdsOff()
+                        }
 
-@Composable
-private fun InitSelectedNativeLoaded() {
-    when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-        AdsConstants.ADS_OFF -> loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_OFF)
-        AdsConstants.AD_MOB_MEDIATION -> AdmobNativeAdsLoad()
-        AdsConstants.AD_MOB -> AdmobNativeAdsLoad()
-        AdsConstants.MAX_MEDIATION -> MaxNativeAdsLoad()
-        else -> loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_STRATEGY_WRONG)
-    }
-}
+                        override fun onAdsOpen() {
+                            listener.onAdsOpen()
+                        }
 
-@Composable
-private fun ShowSelectedNativeAds() {
-    when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-        AdsConstants.ADS_OFF -> showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_OFF)
-        AdsConstants.AD_MOB_MEDIATION -> BindNativeAdmobView()
-        AdsConstants.AD_MOB -> BindNativeAdmobView()
-        AdsConstants.MAX_MEDIATION -> BindNativeMaxView()
-        else -> showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_STRATEGY_WRONG)
-    }
-}
+                        override fun onAdsClicked() {
+                            listener.onAdsClicked()
+                        }
 
-@Composable
-private fun AdmobNativeAdsLoad() {
-    nativeAdsKey = if (AdsConstants.testMode) {
-        AdsConstants.TEST_ADMOB_NATIVE_ID
-    } else {
-        if (AdsApplication.getAdsModel()!!.admobMediation) {
-            AdsApplication.getAdsModel()!!.admobMediationNativeId
-        } else {
-            AdsApplication.getAdsModel()!!.admobNativeID
-        }
-    }
-    if (nativeAdsKey.isNullOrEmpty() || nativeAdsKey.isNullOrBlank()) {
-        loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_ID_NULL)
-        return
-    }
-    if (AdsConstants.testMode.not()) {
-        if (nativeAdsKey == AdsConstants.TEST_ADMOB_NATIVE_ID) {
-            loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.TEST_ADS_ID)
-            return
-        }
-    }
-    val builder = AdLoader.Builder(LocalContext.current, nativeAdsKey!!)
-    builder.forNativeAd {
-        try {
-            val activityDestroy = composeActivity!!.isDestroyed
-            val activity = composeActivity!!
-            if (activityDestroy || activity.isFinishing || activity.isChangingConfigurations) {
-                it.destroy()
-                return@forNativeAd
+                        override fun onAdsClosed() {
+                            listener.onAdsClosed()
+                        }
+
+                        override fun onAdsSwipe() {
+                            listener.onAdsSwipe()
+                        }
+
+                        override fun onAdsError(errorState: AdsErrorState) {
+                            listener.onAdsError(errorState = errorState)
+                        }
+                    },
+                    isCustomView
+                )
             }
-        } catch (error: Exception) {
-            Log.d("Tag", "AdmobNativeAdsLoad:  Activity Ref is null")
-        }
-        admobNativeAd?.destroy()
-        admobNativeAd = it
-    }
-    val videoOption = VideoOptions.Builder().setStartMuted(true).build()
-    val nativeAdOption = NativeAdOptions.Builder().setVideoOptions(videoOption).build()
-    builder.withNativeAdOptions(nativeAdOption)
-    val adLoader = builder.withAdListener(object : AdListener() {
-        override fun onAdLoaded() {
-            super.onAdLoaded()
-            loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_LOADED)
-        }
-
-        override fun onAdFailedToLoad(p0: LoadAdError) {
-            super.onAdFailedToLoad(p0)
-            loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_LOAD_FAILED)
-        }
-
-        override fun onAdClicked() {
-            super.onAdClicked()
-            showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_CLICKED)
-        }
-
-        override fun onAdClosed() {
-            super.onAdClosed()
-            showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_CLOSED)
-        }
-
-        override fun onAdImpression() {
-            super.onAdImpression()
-            showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_IMPRESS)
-        }
-
-        override fun onAdOpened() {
-            super.onAdOpened()
-            showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_OPENED)
-        }
-
-        override fun onAdSwipeGestureClicked() {
-            super.onAdSwipeGestureClicked()
-        }
-    }).build()
-    adLoader.loadAd(AdsApplication.getAdRequest())
-}
-
-
-@Composable
-private fun MaxNativeAdsLoad() {
-    maxNativeAdsKey = if (AdsConstants.testMode) {
-        AdsConstants.TEST_MAX_Native_ADS_ID
-    } else {
-        AdsApplication.getAdsModel()!!.maxNativeID
-    }
-    if (maxNativeAdsKey.isNullOrEmpty() || maxNativeAdsKey.isNullOrBlank()) {
-        loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_ID_NULL)
-        return
-    }
-    if (AdsConstants.testMode.not()) {
-        if (maxNativeAdsKey == AdsConstants.TEST_MAX_Native_ADS_ID) {
-            loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.TEST_ADS_ID)
-            return
-        }
-    }
-    BindNativeMaxView()
-    maxNativeAds = MaxNativeAdLoader(maxNativeAdsKey!!, LocalContext.current)
-    maxNativeAds!!.setRevenueListener { ad ->
-        val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
-        adjustAdRevenue.setRevenue(ad.revenue, "USD")
-        adjustAdRevenue.setAdRevenueNetwork(ad.networkName)
-        adjustAdRevenue.setAdRevenueUnit(ad.adUnitId)
-        adjustAdRevenue.setAdRevenuePlacement(ad.placement)
-        Adjust.trackAdRevenue(adjustAdRevenue)
-    }
-    maxNativeAds!!.setNativeAdListener(object : MaxNativeAdListener() {
-        override fun onNativeAdLoaded(p0: MaxNativeAdView?, p1: MaxAd) {
-            super.onNativeAdLoaded(p0, p1)
-            if (maxNativeAd != null) {
-                maxNativeAds!!.destroy(maxNativeAd!!)
-            }
-            maxNativeAd = p1
-//            containerView!!.removeAllViews()
-//            containerView?.addView(p0)
-            loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_LOADED)
-        }
-
-        override fun onNativeAdLoadFailed(p0: String, p1: MaxError) {
-            super.onNativeAdLoadFailed(p0, p1)
-//            containerView?.gone()
-            loadNativeListener?.onNativeAdsState(loadState = LoadNativeState.ADS_LOAD_FAILED)
-        }
-
-        override fun onNativeAdClicked(p0: MaxAd) {
-            super.onNativeAdClicked(p0)
-            showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_CLICKED)
-        }
-
-        override fun onNativeAdExpired(p0: MaxAd) {
-            super.onNativeAdExpired(p0)
-            showNativeListener?.onNativeAdsShowState(showState = ShowNativeAdsState.ADS_CLOSED)
-        }
-    })
-    maxNativeAds!!.loadAd(maxNativeAdView)
-}
-
-@Composable
-private fun BindNativeAdmobView() {
-    if (admobNativeAd != null) {
-        isCustomAdsView.then {
-            NativeCustomAdViewLayout()
-        } ?: run {
-            NativeAdViewLayout()
-        }
-        InitSelectedNativeLoaded()
-    } else {
-        InitSelectedNativeLoaded()
-    }
-}
-
-
-@Composable
-private fun BindNativeMaxView() {
-    if (maxNativeAd != null) {
-        AndroidView(factory = {
-            val binder: MaxNativeAdViewBinder =
-                MaxNativeAdViewBinder.Builder(R.layout.max_native_ad_layout)
-                    .setTitleTextViewId(R.id.title_text_view)
-                    .setBodyTextViewId(R.id.body_text_view)
-                    .setAdvertiserTextViewId(R.id.advertiser_textView)
-                    .setIconImageViewId(R.id.icon_image_view)
-                    .setMediaContentViewGroupId(R.id.media_view_container)
-                    .setOptionsContentViewGroupId(R.id.options_view)
-                    .setCallToActionButtonId(R.id.cta_button)
-                    .build()
-            maxNativeAdView = MaxNativeAdView(binder, it)
-            maxNativeAdView!!
         })
-        InitSelectedNativeLoaded()
-    } else {
-        InitSelectedNativeLoaded()
-    }
-}
-
-@Composable
-private fun NativeAdViewLayout() {
-    AndroidViewBinding(
-        factory = AdmobNativeAdLayoutBinding::inflate,
-        modifier = Modifier
-            .navigationBarsPadding()
-            .wrapContentHeight(unbounded = true)
-    ) {
-        val nativeAdView = this.root
-        nativeAdView.mediaView = this.adMedia
-        nativeAdView.headlineView = this.adHeadline
-        nativeAdView.bodyView = this.adBody
-        nativeAdView.callToActionView = this.adAction
-        nativeAdView.iconView = this.squareIcon
-        nativeAdView.priceView = this.adPrice
-        nativeAdView.starRatingView = this.adStars
-        nativeAdView.storeView = this.adStore
-        nativeAdView.advertiserView = this.advertiser
-        this.adHeadline.text = admobNativeAd!!.headline
-        admobNativeAd!!.mediaContent?.let {
-            this.adMedia.mediaContent = it
-        }
-        if (admobNativeAd!!.body == null) {
-            this.adBody.gone()
-        } else {
-            this.adBody.visible()
-            this.adBody.text = admobNativeAd!!.body
-        }
-
-        if (admobNativeAd!!.callToAction == null) {
-            this.adAction.gone()
-        } else {
-            this.adAction.visible()
-            this.adAction.text = admobNativeAd!!.callToAction
-        }
-
-        if (admobNativeAd!!.icon == null) {
-            this.squareIcon.gone()
-        } else {
-            this.squareIcon.setImageDrawable(admobNativeAd!!.icon?.drawable)
-            this.squareIcon.visible()
-        }
-
-        if (admobNativeAd!!.price == null) {
-            this.adPrice.gone()
-        } else {
-            this.adPrice.visible()
-            this.adPrice.text = admobNativeAd!!.price
-        }
-        if (admobNativeAd!!.store == null) {
-            this.adStore.gone()
-        } else {
-            this.adStore.visible()
-            this.adStore.text = admobNativeAd!!.store
-        }
-        if (admobNativeAd!!.starRating == null) {
-            this.adStars.gone()
-        } else {
-            this.adStars.rating =
-                admobNativeAd!!.starRating!!.toFloat()
-            this.adStars.visible()
-        }
-        if (admobNativeAd!!.advertiser == null) {
-            this.advertiser.gone()
-        } else {
-            this.advertiser.text = admobNativeAd!!.advertiser
-            this.advertiser.visible()
-        }
-        nativeAdView.setNativeAd(admobNativeAd!!)
-        val vc = admobNativeAd!!.mediaContent?.videoController
-        if (vc != null && vc.hasVideoContent()) {
-            vc.videoLifecycleCallbacks =
-                object : VideoController.VideoLifecycleCallbacks() {
-                    @SuppressLint("SetTextI18n")
-                    override fun onVideoEnd() {
-                        logException("Video status: Video playback has ended.")
-                        super.onVideoEnd()
-                    }
-                }
-        } else {
-            logException("Video status: Ad does not contain a video asset.")
-        }
-    }
-}
-
-@Composable
-private fun NativeCustomAdViewLayout() {
-    AndroidViewBinding(
-        factory = CustomNativeBinding::inflate,
-        modifier = Modifier
-            .navigationBarsPadding()
-            .wrapContentHeight(unbounded = true)
-    ) {
-        val nativeAdView = this.root
-        nativeAdView.mediaView = this.adMedia
-        nativeAdView.headlineView = this.adHeadline
-        nativeAdView.bodyView = this.adBody
-        nativeAdView.callToActionView = this.adCallToAction
-        nativeAdView.iconView = this.adAppIcon
-        nativeAdView.priceView = this.adPrice
-        nativeAdView.starRatingView = this.adStars
-        nativeAdView.storeView = this.adStore
-        nativeAdView.advertiserView = this.adAdvertiser
-        this.adHeadline.text = admobNativeAd!!.headline
-        admobNativeAd!!.mediaContent?.let { this.adMedia.mediaContent = it }
-        if (admobNativeAd!!.callToAction == null) {
-            this.adCallToAction.gone()
-        } else {
-            this.adCallToAction.visible()
-            this.adCallToAction.text = admobNativeAd!!.callToAction
-        }
-
-        if (admobNativeAd!!.icon == null) {
-            this.adAppIcon.gone()
-        } else {
-            this.adAppIcon.setImageDrawable(admobNativeAd!!.icon?.drawable)
-            this.adAppIcon.visible()
-        }
-
-        if (admobNativeAd!!.price == null) {
-            this.adPrice.gone()
-        } else {
-            this.adPrice.visible()
-            this.adPrice.text = admobNativeAd!!.price
-        }
-        if (admobNativeAd!!.store == null) {
-            this.adStore.gone()
-        } else {
-            this.adStore.visible()
-            this.adStore.text = admobNativeAd!!.store
-        }
-        if (admobNativeAd!!.starRating == null) {
-            this.adStars.gone()
-        } else {
-            this.adStars.rating = admobNativeAd!!.starRating!!.toFloat()
-            this.adStars.visible()
-        }
-        if (admobNativeAd!!.advertiser == null) {
-            this.adAdvertiser.gone()
-        } else {
-            this.adAdvertiser.text = admobNativeAd!!.advertiser
-            this.adAdvertiser.visible()
-        }
-        nativeAdView.setNativeAd(admobNativeAd!!)
-        val vc = admobNativeAd!!.mediaContent?.videoController
-        if (vc != null && vc.hasVideoContent()) {
-            vc.videoLifecycleCallbacks =
-                object : VideoController.VideoLifecycleCallbacks() {
-                    @SuppressLint("SetTextI18n")
-                    override fun onVideoEnd() {
-                        logException("Video status: Video playback has ended.")
-                        super.onVideoEnd()
-                    }
-                }
-        } else {
-            logException("Video status: Ad does not contain a video asset.")
-        }
-    }
-}
-
-
-@Composable
-fun DestroyNativeAds() {
-    admobNativeAd?.destroy()
-    maxNativeAds?.destroy()
-}
-
-interface NativeAdsLoaderCallback {
-    fun onNativeAdsState(loadState: LoadNativeState)
-}
-
-interface NativeAdsShowListener {
-    fun onNativeAdsShowState(showState: ShowNativeAdsState)
-}
-
-enum class LoadNativeState {
-    APP_PURCHASED,
-    NETWORK_OFF,
-    ADS_OFF,
-    ADS_STRATEGY_WRONG,
-    ADS_ID_NULL,
-    TEST_ADS_ID,
-    ADS_LOADED,
-    ADS_LOAD_FAILED
-}
-
-enum class ShowNativeAdsState {
-    APP_PURCHASED,
-    ADS_OFF,
-    ADS_STRATEGY_WRONG,
-    ADS_CLICKED,
-    ADS_CLOSED,
-    ADS_IMPRESS,
-    ADS_OPENED,
 }

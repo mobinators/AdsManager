@@ -146,7 +146,7 @@
             <com.google.android.gms.ads.nativead.MediaView
                 android:id="@+id/adMedia"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="200dp"
                 android:layout_marginTop="5dp"
                 android:maxWidth="@dimen/_120sdp"
                 android:maxHeight="@dimen/_120sdp"

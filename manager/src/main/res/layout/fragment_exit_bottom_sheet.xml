@@ -79,8 +79,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:textAllCaps="false"
                     android:text="Enjoying the App?"
+                    android:textAllCaps="false"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -92,8 +92,8 @@
                     android:layout_gravity="center"
                     android:layout_margin="15dp"
                     android:gravity="center"
+                    android:text="We're working hard for a better experience.\nWe'd greatly appreciate if you can rate us."
                     android:textAllCaps="false"
-                    android:text="We're working hard for a beter experience.\nWe'd greatly appreciate if you can rate us."
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     tools:ignore="HardcodedText" />
@@ -113,8 +113,8 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="5dp"
                     android:gravity="center"
-                    android:textAllCaps="false"
                     android:text="The best we can get is 5 stars ;)"
+                    android:textAllCaps="false"
                     android:textColor="@color/rateColor"
                     android:textSize="16sp"
                     tools:ignore="HardcodedText" />
@@ -126,14 +126,15 @@
                     android:layout_margin="20dp"
                     android:backgroundTint="@color/rateColor"
                     android:text="RATE"
-                    android:visibility="gone"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold"
+                    android:visibility="gone"
                     tools:ignore="HardcodedText" />
 
             </LinearLayout>
+
             <FrameLayout
                 android:id="@+id/exitBannerLayout"
                 android:layout_width="match_parent"

@@ -39,7 +39,7 @@ import pak.developer.app.managers.extensions.sdk33AndUp
 import pak.developer.app.managers.extensions.showToast
 
 
-class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener{
+class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     override fun getActivityView() = ActivityMainBinding.inflate(layoutInflater)
     override fun initView(savedInstanceState: Bundle?) {
         askNotificationPermission()
@@ -226,7 +226,23 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener{
             binding.interAds.id -> interstitialAds()
             binding.billingButton.id -> {
                 CoroutineScope(Dispatchers.Main).launch {
-                    AppPurchaseUtils.onSubscription("product_id_example")
+
+                    // In-App Purchased info
+                    AppPurchaseUtils.getInAppPurchaseInfo("product_id_example") {
+                        logD("Info Detail : $it")
+                    }
+
+                  /*  // In-App Purchased
+                    AppPurchaseUtils.inAppPurchase("product_id_example")
+
+
+                     // OR In-App Subscription info
+                    AppPurchaseUtils.getInAppSubscriptionInfo("product_id_example"){
+                        logD("Info Detail : $it")
+                    }
+
+                    // In-App Subscription
+                    AppPurchaseUtils.inAppSubscription("product_id_example")*/
                 }
             }
 
@@ -681,6 +697,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener{
         AppPurchaseUtils.initConnection(
             this,
             "base64_key_example",
+            isAppPurchased = true,
             object : AppPurchaseUtils.BillingCallback {
                 override fun onRequiredNetwork() {
                     AnalyticsManager.getInstance().setAnalyticsEvent(
@@ -704,7 +721,21 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener{
                     logD("isSuccess : $isSuccess , isPremium: $isPremium, isLocked: $isLocked")
                 }
 
-                override fun onError(error: String) {
+                override fun onBillingState(billingState: AppPurchaseUtils.BillingState) {
+                    when (billingState) {
+                        AppPurchaseUtils.BillingState.FEATURE_NOT_SUPPORTED -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.BILLING_UNAVAILABLE -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.USER_CANCELED -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.DEVELOPER_ERROR -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.ITEM_UNAVAILABLE -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.NETWORK_ERROR -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.SERVICE_DISCONNECTED -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.PENDING -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.UNSPECIFIED_STATE -> logD("FEATURE_NOT_SUPPORTED")
+                    }
+                }
+
+                override fun onBillingError(error: String) {
                     AnalyticsManager.getInstance().setAnalyticsEvent(
                         resources.getString(R.string.app_name),
                         "In App Purchased ",
@@ -737,9 +768,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener{
             if (ContextCompat.checkSelfPermission(
                     this,
                     android.Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED
+                ) != PackageManager.PERMISSION_GRANTED
             ) {
-            } else {
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
         }

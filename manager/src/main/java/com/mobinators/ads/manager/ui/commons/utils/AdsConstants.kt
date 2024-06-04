@@ -16,6 +16,7 @@ object AdsConstants {
     const val TEST_MAX_APP_OPEN_ADS_ID = "YOUR_AD_UNIT_ID"
     const val PLAY_STORE_URL = "https://play.google.com/store/apps/details?id="
     const val PLAY_STORE_URL_1 = "market://details?id="
+    const val AMAZON_STORE_URL="https://www.amazon.com/gp/mas/dl/android?p="
     const val ADS_OFF = 0
     const val AD_MOB_MEDIATION = 1
     const val AD_MOB = 2

@@ -14,7 +14,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.2.0'
+  implementation 'com.github.mobinators:AdsManager:1.2.1'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -71,7 +71,6 @@
      <string name="app_ads_id">ca-app-pub-3940256099942544~3347511713</string>  provide origin App id for show original ads
     <string name="SDK_KEY">sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-9Nol8469q4z7rp11DcTfCWvHWTNRTTB12ENHdoQyLpX5LVcPGq</string>  provide original AppLovin Sdk id
 ```
-
 
 -> Ads Strategy
 
@@ -603,12 +602,18 @@
 
 ```
 
-     AppPurchaseUtils.initConnection(
+      AppPurchaseUtils.initConnection(
             this,
-           base64_key_example,
-            object : PurchaseUtils.BillingCallback {
+            "base64_key_example",
+             isAppPurchased = true,  //  if you wants purchased app then pass tru value otherwise pass false for subscribtion
+            object : AppPurchaseUtils.BillingCallback {
                 override fun onRequiredNetwork() {
-                   Log.d("Tag","Internet is not available")
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "InAppPurchased ",
+                        "RequiredNetwork"
+                    )
+                    logD("Internet is not available")
                 }
 
                 override fun onSubscribe(
@@ -616,28 +621,73 @@
                     isPremium: Boolean,
                     isLocked: Boolean
                 ) {
-                    Log.d("Tag","isSuccess : $isSuccess , isPremium: $isPremium, isLocked: $isLocked")
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "InAppPurchased ",
+                        "onSubscriber : isSuccess : $isSuccess , isPremium: $isPremium, isLocked: $isLocked"
+                    )
+                    logD("isSuccess : $isSuccess , isPremium: $isPremium, isLocked: $isLocked")
                 }
 
-                override fun onError(error: String) {
-                   Log.d("Tag","$error")
+                override fun onBillingState(billingState: AppPurchaseUtils.BillingState) {
+                    when (billingState) {
+                        AppPurchaseUtils.BillingState.FEATURE_NOT_SUPPORTED -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.BILLING_UNAVAILABLE -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.USER_CANCELED -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.DEVELOPER_ERROR -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.ITEM_UNAVAILABLE -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.NETWORK_ERROR -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.SERVICE_DISCONNECTED -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.PENDING -> logD("FEATURE_NOT_SUPPORTED")
+                        AppPurchaseUtils.BillingState.UNSPECIFIED_STATE -> logD("FEATURE_NOT_SUPPORTED")
+                    }
+                }
+
+                override fun onBillingError(error: String) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "In App Purchased ",
+                        "Error : $error"
+                    )
+                    logD(error)
                 }
             })
   
+
+         // Only Subscritption Funtion like Subscribe and info
         
         // Subscription 
          CoroutineScope(Dispatchers.Main).launch {
-            AppPurchaseUtils.onSubscription("product_id_example")
+             AppPurchaseUtils.inAppSubscription("product_id_example")
         }
-        
-    
+
          // info for Subcription
          CoroutineScope(Dispatchers.Main).launch {
-           AppPurchaseUtils.getSubscriptionInfo(AppConstants.WEEKLY_SUBSCRIPTION) {
-              Log.d("Tag","Price: $it")
-            }
+           AppPurchaseUtils.getInAppSubscriptionInfo("product_id_example"){
+                        logD("Info Detail : $it")
+                    }
         }
-         
+
+
+          // OR
+
+
+        // Only In-App Purchase function and info
+
+
+       // In-App Purchased
+        CoroutineScope(Dispatchers.Main).launch {
+          AppPurchaseUtils.inAppPurchase("product_id_example")
+        }
+
+        // info for In-App Puchased
+         CoroutineScope(Dispatchers.Main).launch {
+           AppPurchaseUtils.getInAppPurchaseInfo("product_id_example"){
+                        logD("Info Detail : $it")
+                    }
+        }
+
+
          
          // Disconnect 
         AppPurchaseUtils.clientDestroy()
@@ -735,22 +785,23 @@
 -> Analytics
 
 ```
-   // Calling this line firstly in Application class 
-   AnalyticsManager.getInstance().setAnalytics(FirebaseAnalytics.getInstance(this))
 
+    // Calling this line firstly in Application class
+     AnalyticsManager.getInstance().setAnalytics(FirebaseAnalytics.getInstance(this))
 
-   // After that we can use it for logEvent likely below
-   AnalyticsManager.getInstance().setAnalyticsEvent(
-      resources.getString(R.string.app_name),  // Event name 
-      "RewardAds",  // Key
-      "Ads loaded" // value
-   )
+    // After that we can use it for logEvent likely below
+     AnalyticsManager.getInstance().setAnalyticsEvent(
+     resources.getString(R.string.app_name), // Event name
+     "RewardAds", // Key
+     "Ads loaded" // value
+      )
 
 ```
 
 -> Rate Us Dialog Box
 
 ```
+
     RateUsDialog.getInstance().showDialog(this) // Calling show Rate US Dialog Box
     RateUsDialog.getInstance().dismissDialog()  // Calling Dismiss Rate Us Dialog Box
     RateUsDialog.getInstance().setRateBtnTextColor(R.color.black)  // set Rate Button Background Color so calling this line
@@ -761,6 +812,7 @@
 ->  Compose Banner Ads
 
 ```
+
     ShowBannerAds(modifier = Modifier.height(50.dp),
                         false,
                         object : BannerAdsListener {
@@ -785,30 +837,127 @@
                             }
                         })
 
-
 ```
 
 -> Comopse Native Ads
 
 ```
-    // Calling This line First show Native Ads in onCreate() function or Application class 
-      LoadNativeAds(
-                activity = this@ComposeAdsActivity,
-                isPurchased = false,
-                listener = object : NativeAdsLoaderCallback {
-                    override fun onNativeAdsState(loadState: LoadNativeState) {
-                        logD("Native Ads Loaded : State : ${loadState.name}")
-                    }
-                })
+
+     // Requiered native Ads width is match_paren and height is 300dp or above 
     
-    // After Calling below function when show the ads and height 300.dp requried
+    
+    // Calling This line First show Native Ads in onCreate() function or Application class 
+    MediationNativeAds.loadNativeAds(
+                        applicationContext,
+                        false,
+                        object : MediationNativeAds.NativeLoadAdsCallback {
+                            override fun onAdsOff() {
+                                logD("Native Ads Loaded off")
+                            }
 
+                            override fun onAdsLoaded() {
+                                logD("Native Ads Loaded")
+                            }
 
-      ShowNativeAds(isPurchased = false, listener = object : NativeAdsShowListener {
-                        override fun onNativeAdsShowState(showState: ShowNativeAdsState) {
-                            logD("Native Ads : ${showState.name}")
-                        }
-                    }, nativeCustom.value)
+                            override fun onAdsError(errorState: AdsErrorState) {
+                                when (errorState) {
+                                    AdsErrorState.NETWORK_OFF -> logD("Native Ads Internet Off")
+                                    AdsErrorState.APP_PURCHASED -> logD("Native AdsYou have Purchased your app")
+                                    AdsErrorState.ADS_STRATEGY_WRONG -> logD("Native Ads Strategy wrong")
+                                    AdsErrorState.ADS_ID_NULL -> logD("Native Ads  Is Null found")
+                                    AdsErrorState.TEST_ADS_ID -> logD("Native Test Id found in released mode your app")
+                                    AdsErrorState.ADS_LOAD_FAILED -> logD("Native Ads  load failed")
+                                    AdsErrorState.ADS_DISMISS -> logD("Native Ads Dismiss")
+                                    AdsErrorState.ADS_DISPLAY_FAILED -> logD("Native Display Ads failed")
+                                    AdsErrorState.ADS_IMPRESS -> logD("Native  Ads Impress Mode")
+                                }
+                            }
+                        })
+                        
+    // After Calling below function when show the ads
+      ShowNativeAds(activity = this@ComposeAdsActivity,
+                        isPurchased = false,
+                        listener = object : MediationNativeAds.ShowNativeAdsCallback {
+                            override fun onAdsOff() {
+                                logD("Native Ads : onAdsOff")
+                            }
+
+                            override fun onAdsOpen() {
+                                logD("Native Ads : onAdsOpen")
+                            }
+
+                            override fun onAdsClicked() {
+                                logD("Native Ads : onAdsClicked")
+                            }
+
+                            override fun onAdsClosed() {
+                                logD("Native Ads : onAdsClosed")
+                            }
+
+                            override fun onAdsSwipe() {
+                                logD("Native Ads : onAdsSwipe")
+                            }
+
+                            override fun onAdsError(errorState: AdsErrorState) {
+                               when(errorState){
+                                   AdsErrorState.NETWORK_OFF -> logD("Native Ads : NETWORK_OFF")
+                                   AdsErrorState.APP_PURCHASED -> logD("Native Ads : APP_PURCHASED")
+                                   AdsErrorState.ADS_STRATEGY_WRONG -> logD("Native Ads : ADS_STRATEGY_WRONG")
+                                   AdsErrorState.ADS_ID_NULL -> logD("Native Ads : ADS_ID_NULL")
+                                   AdsErrorState.TEST_ADS_ID -> logD("Native Ads : TEST_ADS_ID")
+                                   AdsErrorState.ADS_LOAD_FAILED -> logD("Native Ads : ADS_LOAD_FAILED")
+                                   AdsErrorState.ADS_DISMISS -> logD("Native Ads : ADS_DISMISS")
+                                   AdsErrorState.ADS_DISPLAY_FAILED -> logD("Native Ads : ADS_DISPLAY_FAILED")
+                                   AdsErrorState.ADS_IMPRESS -> logD("Native Ads : ADS_IMPRESS")
+                               }
+                            }
+
+                        },
+                       false
+                    )
+        or 
+        
+        
+      ShowNativeAds(activity = this@ComposeAdsActivity,
+                        isPurchased = false,
+                        listener = object : MediationNativeAds.ShowNativeAdsCallback {
+                            override fun onAdsOff() {
+                                logD("Native Ads : onAdsOff")
+                            }
+
+                            override fun onAdsOpen() {
+                                logD("Native Ads : onAdsOpen")
+                            }
+
+                            override fun onAdsClicked() {
+                                logD("Native Ads : onAdsClicked")
+                            }
+
+                            override fun onAdsClosed() {
+                                logD("Native Ads : onAdsClosed")
+                            }
+
+                            override fun onAdsSwipe() {
+                                logD("Native Ads : onAdsSwipe")
+                            }
+
+                            override fun onAdsError(errorState: AdsErrorState) {
+                               when(errorState){
+                                   AdsErrorState.NETWORK_OFF -> logD("Native Ads : NETWORK_OFF")
+                                   AdsErrorState.APP_PURCHASED -> logD("Native Ads : APP_PURCHASED")
+                                   AdsErrorState.ADS_STRATEGY_WRONG -> logD("Native Ads : ADS_STRATEGY_WRONG")
+                                   AdsErrorState.ADS_ID_NULL -> logD("Native Ads : ADS_ID_NULL")
+                                   AdsErrorState.TEST_ADS_ID -> logD("Native Ads : TEST_ADS_ID")
+                                   AdsErrorState.ADS_LOAD_FAILED -> logD("Native Ads : ADS_LOAD_FAILED")
+                                   AdsErrorState.ADS_DISMISS -> logD("Native Ads : ADS_DISMISS")
+                                   AdsErrorState.ADS_DISPLAY_FAILED -> logD("Native Ads : ADS_DISPLAY_FAILED")
+                                   AdsErrorState.ADS_IMPRESS -> logD("Native Ads : ADS_IMPRESS")
+                               }
+                            }
+
+                        },
+                        true
+                    )
 
 ```
 
@@ -817,6 +966,7 @@
 -> Compoe Rate Us Dialog Box
 
 ```
+
     val rateDialog = remember {
             mutableStateOf(false)
         }
@@ -827,6 +977,7 @@
 -> Compose Exit Panel 
 
 ```
+
     val scope = rememberCoroutineScope()
         val isBottomSheetVisible = rememberSaveable { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState(
