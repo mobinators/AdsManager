@@ -14,7 +14,6 @@ import com.applovin.mediation.MaxError
 import com.applovin.mediation.nativeAds.MaxNativeAdListener
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
-import com.applovin.mediation.nativeAds.MaxNativeAdViewBinder
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.LoadAdError
@@ -22,7 +21,6 @@ import com.google.android.gms.ads.VideoController
 import com.google.android.gms.ads.VideoOptions
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
-import com.mobinators.ads.manager.R
 import com.mobinators.ads.manager.applications.AdsApplication
 import com.mobinators.ads.manager.databinding.AdmobNativeAdLayoutBinding
 import com.mobinators.ads.manager.databinding.CustomNativeBinding
@@ -191,7 +189,11 @@ object MediationNativeAds {
                     return
                 }
             }
-            bindMaxContentAd()
+            /* try {
+                 bindMaxContentAd()
+             } catch (error: Exception) {
+                 logException("Error : ${error.message}")
+             }*/
             this.maxNativeAds = MaxNativeAdLoader(this.maxNativeAdsKey!!, this.contextRef!!)
             this.maxNativeAds!!.setRevenueListener { ad ->
                 val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)
@@ -229,7 +231,7 @@ object MediationNativeAds {
                     this@MediationNativeAds.showAdsCallback?.onAdsClosed()
                 }
             })
-            this.maxNativeAds!!.loadAd(this.maxNativeAdView)
+//            this.maxNativeAds!!.loadAd(this.maxNativeAdView)
         } catch (error: Exception) {
             logException("Init Max Native Ads Error : ${error.localizedMessage}")
         }
@@ -277,17 +279,18 @@ object MediationNativeAds {
 
     private fun bindMaxContentAd() {
         try {
-            val binder: MaxNativeAdViewBinder =
-                MaxNativeAdViewBinder.Builder(R.layout.max_native_ad_layout)
-                    .setTitleTextViewId(R.id.title_text_view)
-                    .setBodyTextViewId(R.id.body_text_view)
-                    .setAdvertiserTextViewId(R.id.advertiser_textView)
-                    .setIconImageViewId(R.id.icon_image_view)
-                    .setMediaContentViewGroupId(R.id.media_view_container)
-                    .setOptionsContentViewGroupId(R.id.options_view)
-                    .setCallToActionButtonId(R.id.cta_button)
-                    .build()
-            this.maxNativeAdView = MaxNativeAdView(binder, this.activityRef!!)
+            /* val binder: MaxNativeAdViewBinder =
+                 MaxNativeAdViewBinder.Builder(R.layout.max_native_ad_layout)
+                     .setTitleTextViewId(R.id.title_text_view)
+                     .setBodyTextViewId(R.id.body_text_view)
+                     .setAdvertiserTextViewId(R.id.advertiser_textView)
+                     .setIconImageViewId(R.id.icon_image_view)
+                     .setMediaContentViewGroupId(R.id.media_view_container)
+                     .setOptionsContentViewGroupId(R.id.options_view)
+                     .setCallToActionButtonId(R.id.cta_button)
+                     .build()
+             this.maxNativeAdView = MaxNativeAdView(binder, this.activityRef!!)*/
+            this.maxNativeAds!!.loadAd()
             initSelectedNativeAds()
         } catch (error: Exception) {
             initSelectedNativeAds()

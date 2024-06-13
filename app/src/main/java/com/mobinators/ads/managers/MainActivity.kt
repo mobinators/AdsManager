@@ -34,14 +34,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.navigateActivity
-import pak.developer.app.managers.ui.commons.base.BaseActivity
 import pak.developer.app.managers.extensions.sdk33AndUp
 import pak.developer.app.managers.extensions.showToast
+import pak.developer.app.managers.ui.commons.base.BaseActivity
 
 
 class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
     override fun getActivityView() = ActivityMainBinding.inflate(layoutInflater)
     override fun initView(savedInstanceState: Bundle?) {
+
         askNotificationPermission()
         notificationSetting()
         MediationRewardedAd.loadRewardAds(
@@ -211,6 +212,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                 })
             }
         })
+        DeviceInfoUtils.getLocalIpAddress(this) {
+            logD(" Local Ip Address : $it")
+        }
+
     }
 
 
@@ -232,17 +237,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                         logD("Info Detail : $it")
                     }
 
-                  /*  // In-App Purchased
-                    AppPurchaseUtils.inAppPurchase("product_id_example")
+                    /*  // In-App Purchased
+                      AppPurchaseUtils.inAppPurchase("product_id_example")
 
 
-                     // OR In-App Subscription info
-                    AppPurchaseUtils.getInAppSubscriptionInfo("product_id_example"){
-                        logD("Info Detail : $it")
-                    }
+                       // OR In-App Subscription info
+                      AppPurchaseUtils.getInAppSubscriptionInfo("product_id_example"){
+                          logD("Info Detail : $it")
+                      }
 
-                    // In-App Subscription
-                    AppPurchaseUtils.inAppSubscription("product_id_example")*/
+                      // In-App Subscription
+                      AppPurchaseUtils.inAppSubscription("product_id_example")*/
                 }
             }
 

@@ -17,7 +17,7 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
     override fun getActivityView() = ActivityMaxAdsBinding.inflate(layoutInflater)
 
     override fun initView(savedInstanceState: Bundle?) {
-        AdsUtils.maxTestAds(this)
+//        AdsUtils.maxTestAds(this)
         MediationRewardedAd.loadRewardAds(
             this,
             false,

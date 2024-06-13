@@ -3,9 +3,11 @@ buildscript {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        maven { url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" }
+        maven { url 'https://artifacts.applovin.com/android' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.4' // 7.4.2 and gradle 7.5
+        classpath 'com.android.tools.build:gradle:8.1.4'
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0'
         classpath "com.github.dcendents:android-maven-gradle-plugin:2.1"
         classpath 'com.google.gms:google-services:4.4.1'
@@ -17,6 +19,7 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        maven { url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" }
     }
 }
 task clean(type: Delete) {

@@ -8,20 +8,30 @@ import android.os.Handler
 import android.os.Looper
 import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkConfiguration
+import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.android.gms.ads.initialization.AdapterStatus
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import com.mbridge.msdk.MBridgeConstans
+import com.mbridge.msdk.out.MBridgeSDKFactory
 import com.mobinators.ads.manager.R
 import com.mobinators.ads.manager.ui.commons.listener.FetchRemoteCallback
 import com.mobinators.ads.manager.ui.commons.models.AdsModel
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.logException
 import pak.developer.app.managers.extensions.preferenceUtils
+import java.util.Collections
+import java.util.concurrent.Executors
 
 object AdsApplication : Application() {
     private var admobLimit = "false"
@@ -30,6 +40,7 @@ object AdsApplication : Application() {
     private var firebaseAnalytics: FirebaseAnalytics? = null
     private var onFetchRemoteCallbackListener: FetchRemoteCallback? = null
     private var adsModel: AdsModel? = null
+    private val backgroundScope = CoroutineScope(Dispatchers.IO)
     fun getAdsModel(): AdsModel? {
         return adsModel
     }
@@ -39,25 +50,28 @@ object AdsApplication : Application() {
     }
 
     private fun initMediation(context: Context) {
-        val testDeviceIds: List<String> = mutableListOf("49CB5184DFD9ACB6581265EA7DF47D8A")
-        val configuration: RequestConfiguration =
-            RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build()
-        MobileAds.setRequestConfiguration(configuration)
-        MobileAds.initialize(context) {
-            val statusMap: Map<String, AdapterStatus> = it.adapterStatusMap
-            for (adapterClass in statusMap.keys) {
-                val status: AdapterStatus? = statusMap[adapterClass]
-                status?.let { state ->
-                    logD("Adapter name : $adapterClass , Description : ${state.description} , Latency : ${state.latency}")
+
+        backgroundScope.launch {
+            val sdk = MBridgeSDKFactory.getMBridgeSDK()
+            sdk.setConsentStatus(context, MBridgeConstans.IS_SWITCH_ON)
+            sdk.setDoNotTrackStatus(false)
+            val testDeviceIds: List<String> = mutableListOf("49CB5184DFD9ACB6581265EA7DF47D8A")
+            val configuration: RequestConfiguration =
+                RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build()
+            MobileAds.setRequestConfiguration(configuration)
+            MobileAds.initialize(context) {
+                val statusMap: Map<String, AdapterStatus> = it.adapterStatusMap
+                for (adapterClass in statusMap.keys) {
+                    val status: AdapterStatus? = statusMap[adapterClass]
+                    status?.let { state ->
+                        logD("Adapter name : $adapterClass , Description : ${state.description} , Latency : ${state.latency}")
+                    }
                 }
             }
         }
     }
 
-    private fun initMaxMediation(context: Context) {
-        AppLovinSdk.getInstance(context).mediationProvider = AppLovinMediationProvider.MAX
-        AppLovinSdk.initializeSdk(context) {}
-    }
+
 
     fun getValueFromConfig(
         firebaseConfig: FirebaseRemoteConfig,
@@ -77,7 +91,6 @@ object AdsApplication : Application() {
         firebaseConfig.setDefaultsAsync(R.xml.remote_config_default_values)
         handler.postDelayed({ fetchDataFromRemoteConfig(firebaseConfig) }, 0)
         initMediation(context)
-        initMaxMediation(context)
     }
 
     private fun fetchDataFromRemoteConfig(remoteConfig: FirebaseRemoteConfig) {
@@ -117,7 +130,8 @@ object AdsApplication : Application() {
             this.isAppOpenAdd = remoteConfig.getBoolean(AdsConstants.ADMOB_OPEN_AD_ENABLE_KEY)
             this.maxAppOpenID = remoteConfig.getString(AdsConstants.MAX_APP_OPEN_ADS_ID_KEY)
             this.admobMediation = remoteConfig.getBoolean(AdsConstants.ADMOB_MEDIATION_KEY)
-            this.admobMediationBannerId = remoteConfig.getString(AdsConstants.ADMOB_MEDIATION_BANNER_ID_KEY)
+            this.admobMediationBannerId =
+                remoteConfig.getString(AdsConstants.ADMOB_MEDIATION_BANNER_ID_KEY)
             this.admobMediationInterstitialId =
                 remoteConfig.getString(AdsConstants.ADMOB_MEDIATION_INTERSTITIAL_ID_KEY)
             this.admobMediationNativeId =

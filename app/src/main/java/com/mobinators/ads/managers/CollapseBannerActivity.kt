@@ -2,7 +2,6 @@ package com.mobinators.ads.managers
 
 import android.os.Bundle
 import android.view.ViewTreeObserver
-import com.facebook.ads.AdView
 import com.mobinators.ads.manager.ui.commons.collapsiblebanner.CollapseBannerState
 import com.mobinators.ads.manager.ui.commons.collapsiblebanner.MediationCollapsibleBanner
 import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState

@@ -16,7 +16,12 @@ import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
+import com.applovin.sdk.AppLovinMediationProvider
+import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.bumptech.glide.Glide
+import com.facebook.ads.AdSettings
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.InstallState
@@ -37,6 +42,8 @@ import com.mobinators.ads.manager.ui.fragments.ExitBottomSheetFragment
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.logException
 import pak.developer.app.managers.extensions.preferenceUtils
+import java.util.Collections
+import java.util.concurrent.Executors
 
 
 private var appUpdateManager: AppUpdateManager? = null
@@ -60,16 +67,38 @@ fun Application.updateManifest(appId: String, maxAppId: String) {
             logD("Null Apploving Sdk key")
             return
         }
-        // Applovin Sdk Key
-        val maxAppKey: String? = bundle.getString("applovin.sdk.key")
-        logD("Name Found APPLOVIN : $maxAppKey")
-        applicationInfo.metaData.putString("applovin.sdk.key", maxAppId)
-        val maxAiKey: String? = bundle.getString("applovin.sdk.key")
-        logD("Name Found APPLOVIN : $maxAiKey")
+        initMaxMediation(maxAppId)
+        /* // Applovin Sdk Key
+         val maxAppKey: String? = bundle.getString("applovin.sdk.key")
+         logD("Name Found APPLOVIN : $maxAppKey")
+         applicationInfo.metaData.putString("applovin.sdk.key", maxAppId)
+         val maxAiKey: String? = bundle.getString("applovin.sdk.key")
+         logD("Name Found APPLOVIN : $maxAiKey")*/
     } catch (error: PackageManager.NameNotFoundException) {
         logException("Failed to load meta-data, NameNotFound: ${error.localizedMessage}")
     } catch (error: NullPointerException) {
         logException("Failed to load meta-data, NullPointer: ${error.localizedMessage}")
+    }
+}
+
+private fun Application.initMaxMediation(sdkKey: String) {
+    try {
+        val executor = Executors.newSingleThreadExecutor()
+        executor.execute {
+            AdSettings.setDataProcessingOptions( arrayOf<String>() )
+            val initConfigBuilder = AppLovinSdkInitializationConfiguration.builder(sdkKey, this)
+            initConfigBuilder.mediationProvider = AppLovinMediationProvider.MAX
+            val currentGaid = AdvertisingIdClient.getAdvertisingIdInfo(this).id
+            if (currentGaid != null) {
+                initConfigBuilder.testDeviceAdvertisingIds = Collections.singletonList(currentGaid)
+            }
+            AppLovinSdk.getInstance(this).initialize(initConfigBuilder.build()) { sdkConfig ->
+                logD(" Apploving Sdk : $sdkConfig")
+            }
+            executor.shutdown()
+        }
+    } catch (error: Exception) {
+        logException("Max Mediation Error : ${error.message}")
     }
 }
 
@@ -246,3 +275,5 @@ inline fun <reified T> sdk30AndUp(onSdk30: () -> T): T? {
 
 
 inline infix fun <T> Boolean.then(param: () -> T): T? = if (this) param() else null
+
+

@@ -14,7 +14,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.2.1'
+  implementation 'com.github.mobinators:AdsManager:1.2.2'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -55,9 +55,7 @@
     <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/app_ads_id" />
-        <meta-data
-            android:name="applovin.sdk.key"
-            android:value="@string/SDK_KEY" />
+       
         <meta-data
             android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
             android:value="true" />
@@ -69,7 +67,7 @@
 
 ```
      <string name="app_ads_id">ca-app-pub-3940256099942544~3347511713</string>  provide origin App id for show original ads
-    <string name="SDK_KEY">sVWGuOQVG4gzyhb-2Qb6sRTv8qavlPzA-5V-9Nol8469q4z7rp11DcTfCWvHWTNRTTB12ENHdoQyLpX5LVcPGq</string>  provide original AppLovin Sdk id
+   
 ```
 
 -> Ads Strategy
@@ -595,8 +593,7 @@
           }
         })
         
-        
-
+```
 
 -> In App Purchase
 
@@ -723,7 +720,7 @@
 
 ```
 
--> App Update 
+-> App Update
 
 ```
 
@@ -760,7 +757,6 @@
 
 ```
 
-
 -> App Rate Us
 
 ```
@@ -780,7 +776,6 @@
         })  
 
 ```
-
 
 -> Analytics
 
@@ -809,6 +804,7 @@
     RateUsDialog.getInstance().setTextColor(R.color.black) // set Rate Text Color so calling this line
 
 ```
+
 ->  Compose Banner Ads
 
 ```
@@ -839,7 +835,7 @@
 
 ```
 
--> Comopse Native Ads
+-> Compose Native Ads
 
 ```
 
@@ -961,9 +957,10 @@
 
 ```
 
--> Other AdMob Ads in calling in compose same way because native and banner ads required view therefore create the new function for those ads 
+-> Other AdMob Ads in calling in compose same way because native and banner ads required view
+therefore create the new function for those ads
 
--> Compoe Rate Us Dialog Box
+-> Compose Rate Us Dialog Box
 
 ```
 
@@ -974,7 +971,7 @@
 
 ```
 
--> Compose Exit Panel 
+-> Compose Exit Panel
 
 ```
 
@@ -1007,6 +1004,20 @@
                     finishAffinity()
                 }
             )
+        }
+
+```
+
+-> DeviceInfoUtils
+
+```
+    // get short device info
+    DeviceInfoUtils.getDeviceInfo() 
+
+   // get local IP Address 
+
+   DeviceInfoUtils.getLocalIpAddress(this) {
+            logD(" Local Ip Address : $it")
         }
 
 ```

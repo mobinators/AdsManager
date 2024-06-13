@@ -11,6 +11,7 @@ import com.applovin.mediation.MaxAdFormat
 import com.applovin.mediation.MaxAdViewAdListener
 import com.applovin.mediation.MaxError
 import com.applovin.mediation.ads.MaxAdView
+import com.applovin.sdk.AppLovinSdkUtils
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -225,8 +226,10 @@ object BannerAdMediation {
                 adjustAdRevenue.setAdRevenuePlacement(it.placement)
                 Adjust.trackAdRevenue(adjustAdRevenue)
             }
-            maxBannerView.layoutParams =
-                ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50)
+            val isTablet = AppLovinSdkUtils.isTablet(this.activity!!)
+            val heightPx = AppLovinSdkUtils.dpToPx(this.activity!!, if (isTablet) 90 else 50)
+
+            maxBannerView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)
             maxBannerView.loadAd()
             maxBannerView.startAutoRefresh()
         } catch (error: Exception) {
