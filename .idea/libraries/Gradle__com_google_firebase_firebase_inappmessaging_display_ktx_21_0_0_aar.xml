@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.firebase:firebase-inappmessaging-display-ktx:21.0.0@aar" external-system-id="GRADLE">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/283b2f996208a806b89ceee416b6dc42/transformed/jetified-firebase-inappmessaging-display-ktx-21.0.0/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/283b2f996208a806b89ceee416b6dc42/transformed/jetified-firebase-inappmessaging-display-ktx-21.0.0/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.adjust.sdk:adjust-android:4.28.7" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.adjust.sdk" artifactId="adjust-android" version="4.28.7" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/modules-2/files-2.1/com.adjust.sdk/adjust-android/4.28.7/fc732fbcc2dad5a289f8fd85c548edd7645c88e1/adjust-android-4.28.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

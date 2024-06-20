@@ -3,12 +3,14 @@ package com.mobinators.ads.managers
 import android.os.Bundle
 import android.view.View
 import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
+import com.mobinators.ads.manager.ui.commons.enums.AdsLoadingState
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
 import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAds
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
+import com.mobinators.ads.manager.ui.commons.utils.AnalyticsManager
 import com.mobinators.ads.managers.databinding.ActivityMaxAdsBinding
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.ui.commons.base.BaseActivity
@@ -22,28 +24,23 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             this,
             false,
             object : MediationRewardedAd.RewardLoadCallback {
-                override fun onAdsLoaded() {
-                    logD("MainActivity Reward onAdsLoaded")
-                }
-
-                override fun onAdsOff() {
-                    logD("MainActivity Reward onAdsOff")
-                }
-
-                override fun onAdsError(errorState: AdsErrorState) {
-                    when (errorState) {
-                        AdsErrorState.NETWORK_OFF -> logD("Internet Off")
-                        AdsErrorState.APP_PURCHASED -> logD("You have Purchased your app")
-                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("Ads Strategy wrong")
-                        AdsErrorState.ADS_ID_NULL -> logD("Ads Is Null found")
-                        AdsErrorState.TEST_ADS_ID -> logD("Test Id found in released mode your app")
-                        AdsErrorState.ADS_LOAD_FAILED -> logD("ads load failed")
-                        AdsErrorState.ADS_DISMISS -> logD("Ads Dismiss")
-                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("Display Ads failed")
-                        AdsErrorState.ADS_IMPRESS -> logD("Ads Impress Mode")
+                override fun onAdsLoadState(adsLoadingState: AdsLoadingState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardAds",
+                        adsLoadingState.name
+                    )
+                    when (adsLoadingState) {
+                        AdsLoadingState.APP_PURCHASED -> logD("MainActivity Reward Ads : You have Purchased your app")
+                        AdsLoadingState.NETWORK_OFF -> logD("MainActivity Reward Ads : Internet Off")
+                        AdsLoadingState.ADS_OFF -> logD("MainActivity Reward Ads : onAdsOff")
+                        AdsLoadingState.ADS_STRATEGY_WRONG -> logD("MainActivity Reward Ads : Ads Strategy wrong")
+                        AdsLoadingState.ADS_ID_NULL -> logD("MainActivity Reward Ads : Ads ID is Null found")
+                        AdsLoadingState.TEST_ADS_ID -> logD("MainActivity Reward Ads : Test Id found in released mode your app")
+                        AdsLoadingState.ADS_LOADED -> logD("MainActivity Reward Ads : onAdsLoaded")
+                        AdsLoadingState.ADS_LOAD_FAILED -> logD("MainActivity Reward Ads : Ads load failed")
                     }
                 }
-
             })
         binding.maxBanner.setOnClickListener(this)
         binding.maxNative.setOnClickListener(this)
@@ -72,37 +69,36 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             false,
             binding.maxContainer,
             object : BannerAdMediation.BannerAdListener {
-                override fun onAdsOff() {
-                    logD("MaxActivity Banner Ads : Ads Off")
-                }
-
                 override fun onAdsLoaded() {
-                    logD("MaxActivity Banner Ads : Ads Loaded")
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "BannerAds",
+                        "Ads loaded"
+                    )
+                    logD("MainActivity Banner Ads : Ads Loaded")
                 }
 
-                override fun onAdsClicked() {
-                    logD("MaxActivity Banner Ads : Ads Clicked")
-                }
-
-                override fun onAdsClosed() {
-                    logD("MaxActivity Banner Ads : Ads Closed")
-                }
-
-                override fun onAdsOpened() {
-                    logD("MaxActivity Banner Ads : Ads Open")
-                }
-
-                override fun onAdsError(adsErrorState: AdsErrorState) {
-                    when (adsErrorState) {
-                        AdsErrorState.NETWORK_OFF -> logD("MaxActivity Banner Ads : Internet Off")
-                        AdsErrorState.APP_PURCHASED -> logD("MaxActivity Banner Ads : You have Purchased your app")
-                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("MaxActivity Banner Ads : Ads Strategy wrong")
-                        AdsErrorState.ADS_ID_NULL -> logD("MaxActivity Banner Ads : Ads ID is Null found")
-                        AdsErrorState.TEST_ADS_ID -> logD("MaxActivity Banner Ads : Test Id found in released mode your app")
-                        AdsErrorState.ADS_LOAD_FAILED -> logD("MaxActivity Banner Ads : Ads load failed")
-                        AdsErrorState.ADS_DISMISS -> logD("MaxActivity Banner Ads : Ads Dismiss")
-                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("MaxActivity Banner Ads : Display Ads failed")
-                        AdsErrorState.ADS_IMPRESS -> logD("MaxActivity Banner Ads : Ads Impress Mode")
+                override fun onAdsState(adsShowState: AdsShowState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "BannerAds",
+                        adsShowState.name
+                    )
+                    when (adsShowState) {
+                        AdsShowState.APP_PURCHASED -> logD("MainActivity Banner Ads : You have Purchased your app")
+                        AdsShowState.NETWORK_OFF -> logD("MainActivity Banner Ads : Internet Off")
+                        AdsShowState.ADS_OFF -> logD("MainActivity Banner Ads : Ads Off")
+                        AdsShowState.ADS_STRATEGY_WRONG -> logD("MainActivity Banner Ads : Ads Strategy wrong")
+                        AdsShowState.ADS_ID_NULL -> logD("MainActivity Banner Ads : Ads ID is Null found")
+                        AdsShowState.TEST_ADS_ID -> logD("MainActivity Banner Ads : Test Id found in released mode your app")
+                        AdsShowState.ADS_LOAD_FAILED -> logD("MainActivity Banner Ads : Ads load failed")
+                        AdsShowState.ADS_DISMISS -> logD("MainActivity Banner Ads : Ads Dismiss")
+                        AdsShowState.ADS_DISPLAY_FAILED -> logD("MainActivity Banner Ads : Display Ads failed")
+                        AdsShowState.ADS_DISPLAY -> logD("MainActivity Banner Ads : Ads Display")
+                        AdsShowState.ADS_IMPRESS -> logD("MainActivity Banner Ads : Ads Impress Mode")
+                        AdsShowState.ADS_CLICKED -> logD("MainActivity Banner Ads : Ads Clicked")
+                        AdsShowState.ADS_CLOSED -> logD("MainActivity Banner Ads : Ads Closed")
+                        AdsShowState.ADS_OPEN -> logD("MainActivity Banner Ads : Ads Open")
                     }
                 }
             })
@@ -114,37 +110,36 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             false,
             binding.maxContainer,
             object : MediationNativeAds.ShowNativeAdsCallback {
-                override fun onAdsOff() {
-                    logD("MaxActivity Ads Off")
-                }
-
-                override fun onAdsOpen() {
-                    logD("MaxActivity onAdsOpen")
-                }
-
-                override fun onAdsClicked() {
-                    logD("MaxActivity onAdsClicked")
-                }
-
-                override fun onAdsClosed() {
-                    logD("MaxActivity onAdsClosed")
-                }
-
                 override fun onAdsSwipe() {
-                    logD("MaxActivity onAdsSwipe")
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "NativeAds",
+                        "Ads swipe"
+                    )
+                    logD("MainActivity onAdsSwipe")
                 }
 
-                override fun onAdsError(errorState: AdsErrorState) {
-                    when (errorState) {
-                        AdsErrorState.NETWORK_OFF -> logD("MaxActivity Native Ads Internet Off")
-                        AdsErrorState.APP_PURCHASED -> logD("MaxActivity Native Ads You have Purchased your app")
-                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("MaxActivity Native Ads Ads Strategy wrong")
-                        AdsErrorState.ADS_ID_NULL -> logD("MaxActivity Native Ads Ads Is Null found")
-                        AdsErrorState.TEST_ADS_ID -> logD("MaxActivity Native Ads Test Id found in released mode your app")
-                        AdsErrorState.ADS_LOAD_FAILED -> logD("MaxActivity Native Ads ads load failed")
-                        AdsErrorState.ADS_DISMISS -> logD("MaxActivity Native Ads Ads Dismiss")
-                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("MaxActivity Native Ads Display Ads failed")
-                        AdsErrorState.ADS_IMPRESS -> logD("MaxActivity Native Ads Ads Impress Mode")
+                override fun onAdsShowState(adsShowState: AdsShowState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "NativeAds",
+                        adsShowState.name
+                    )
+                    when (adsShowState) {
+                        AdsShowState.APP_PURCHASED -> logD("MainActivity Native Ads : You have Purchased your app")
+                        AdsShowState.NETWORK_OFF -> logD("MainActivity Native Ads : Internet Off")
+                        AdsShowState.ADS_OFF -> logD("MainActivity Native Ads : Ads Off")
+                        AdsShowState.ADS_STRATEGY_WRONG -> logD("MainActivity Native Ads : Ads Strategy wrong")
+                        AdsShowState.ADS_ID_NULL -> logD("MainActivity Native Ads : Ads ID is Null found")
+                        AdsShowState.TEST_ADS_ID -> logD("MainActivity Native Ads : Test Id found in released mode your app")
+                        AdsShowState.ADS_LOAD_FAILED -> logD("MainActivity Native Ads : Ads load failed")
+                        AdsShowState.ADS_DISMISS -> logD("MainActivity Native Ads : Ads Dismiss")
+                        AdsShowState.ADS_DISPLAY_FAILED -> logD("MainActivity Native Ads : Display Ads failed")
+                        AdsShowState.ADS_DISPLAY -> logD("MainActivity Native Ads : Ads Display")
+                        AdsShowState.ADS_IMPRESS -> logD("MainActivity Native Ads : Ads Impress Mode")
+                        AdsShowState.ADS_CLICKED -> logD("MainActivity Native Ads : Ads Clicked")
+                        AdsShowState.ADS_CLOSED -> logD("MainActivity Native Ads : Ads Closed")
+                        AdsShowState.ADS_OPEN -> logD("MainActivity Native Ads : Ads Open")
                     }
                 }
             }
@@ -157,37 +152,36 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             false,
             binding.maxContainer,
             object : MediationNativeAds.ShowNativeAdsCallback {
-                override fun onAdsOff() {
-                    logD("MaxActivity Ads Off")
-                }
-
-                override fun onAdsOpen() {
-                    logD("MaxActivity onAdsOpen")
-                }
-
-                override fun onAdsClicked() {
-                    logD("MaxActivity onAdsClicked")
-                }
-
-                override fun onAdsClosed() {
-                    logD("MaxActivity onAdsClosed")
-                }
-
                 override fun onAdsSwipe() {
-                    logD("MaxActivity onAdsSwipe")
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "NativeAds",
+                        "Ads swipe"
+                    )
+                    logD("MainActivity onAdsSwipe")
                 }
 
-                override fun onAdsError(errorState: AdsErrorState) {
-                    when (errorState) {
-                        AdsErrorState.NETWORK_OFF -> logD("MaxActivity Native Ads Internet Off")
-                        AdsErrorState.APP_PURCHASED -> logD("MaxActivity Native Ads You have Purchased your app")
-                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("MaxActivity Native Ads Ads Strategy wrong")
-                        AdsErrorState.ADS_ID_NULL -> logD("MaxActivity Native Ads Ads Is Null found")
-                        AdsErrorState.TEST_ADS_ID -> logD("MaxActivity Native Ads Test Id found in released mode your app")
-                        AdsErrorState.ADS_LOAD_FAILED -> logD("MaxActivity Native Ads ads load failed")
-                        AdsErrorState.ADS_DISMISS -> logD("MaxActivity Native Ads Ads Dismiss")
-                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("MaxActivity Native Ads Display Ads failed")
-                        AdsErrorState.ADS_IMPRESS -> logD("MaxActivity Native Ads Ads Impress Mode")
+                override fun onAdsShowState(adsShowState: AdsShowState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "NativeAds",
+                        adsShowState.name
+                    )
+                    when (adsShowState) {
+                        AdsShowState.APP_PURCHASED -> logD("MainActivity Native Ads : You have Purchased your app")
+                        AdsShowState.NETWORK_OFF -> logD("MainActivity Native Ads : Internet Off")
+                        AdsShowState.ADS_OFF -> logD("MainActivity Native Ads : Ads Off")
+                        AdsShowState.ADS_STRATEGY_WRONG -> logD("MainActivity Native Ads : Ads Strategy wrong")
+                        AdsShowState.ADS_ID_NULL -> logD("MainActivity Native Ads : Ads ID is Null found")
+                        AdsShowState.TEST_ADS_ID -> logD("MainActivity Native Ads : Test Id found in released mode your app")
+                        AdsShowState.ADS_LOAD_FAILED -> logD("MainActivity Native Ads : Ads load failed")
+                        AdsShowState.ADS_DISMISS -> logD("MainActivity Native Ads : Ads Dismiss")
+                        AdsShowState.ADS_DISPLAY_FAILED -> logD("MainActivity Native Ads : Display Ads failed")
+                        AdsShowState.ADS_DISPLAY -> logD("MainActivity Native Ads : Ads Display")
+                        AdsShowState.ADS_IMPRESS -> logD("MainActivity Native Ads : Ads Impress Mode")
+                        AdsShowState.ADS_CLICKED -> logD("MainActivity Native Ads : Ads Clicked")
+                        AdsShowState.ADS_CLOSED -> logD("MainActivity Native Ads : Ads Closed")
+                        AdsShowState.ADS_OPEN -> logD("MainActivity Native Ads : Ads Open")
                     }
                 }
             }, true
@@ -199,33 +193,36 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             this,
             false,
             object : MediationRewardedAd.ShowRewardedAdsCallback {
-                override fun onAdsOff() {
-                    logD("MainActivity Reward onAdsOff")
-                }
-
                 override fun onRewardEarned(item: Int, type: String) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardAds",
+                        "Amount : $item  : Type : $type"
+                    )
                     logD("MainActivity Reward onRewardEarned : Amount : $item  : Type : $type")
                 }
 
-                override fun onAdsClicked() {
-                    logD("MainActivity Reward onAdsClicked")
-                }
-
-                override fun onAdsDisplay() {
-                    logD("MainActivity Reward onAdsDisplay")
-                }
-
-                override fun onAdsError(errorState: AdsErrorState) {
-                    when (errorState) {
-                        AdsErrorState.NETWORK_OFF -> logD("Internet Off")
-                        AdsErrorState.APP_PURCHASED -> logD("You have Purchased your app")
-                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("Ads Strategy wrong")
-                        AdsErrorState.ADS_ID_NULL -> logD("Ads Is Null found")
-                        AdsErrorState.TEST_ADS_ID -> logD("Test Id found in released mode your app")
-                        AdsErrorState.ADS_LOAD_FAILED -> logD("ads load failed")
-                        AdsErrorState.ADS_DISMISS -> logD("Ads Dismiss")
-                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("Display Ads failed")
-                        AdsErrorState.ADS_IMPRESS -> logD("Ads Impress Mode")
+                override fun onAdsShowState(adsShowState: AdsShowState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "RewardAds",
+                        adsShowState.name
+                    )
+                    when (adsShowState) {
+                        AdsShowState.APP_PURCHASED -> logD("MainActivity Reward Ads : You have Purchased your app")
+                        AdsShowState.NETWORK_OFF -> logD("MainActivity Reward Ads : Internet Off")
+                        AdsShowState.ADS_OFF -> logD("MainActivity Reward Ads : Ads Off")
+                        AdsShowState.ADS_STRATEGY_WRONG -> logD("MainActivity Reward Ads : Ads Strategy wrong")
+                        AdsShowState.ADS_ID_NULL -> logD("MainActivity Reward Ads : Ads ID is Null found")
+                        AdsShowState.TEST_ADS_ID -> logD("MainActivity Reward Ads : Test Id found in released mode your app")
+                        AdsShowState.ADS_LOAD_FAILED -> logD("MainActivity Reward Ads : Ads load failed")
+                        AdsShowState.ADS_DISMISS -> logD("MainActivity Reward Ads : Ads Dismiss")
+                        AdsShowState.ADS_DISPLAY_FAILED -> logD("MainActivity Reward Ads : Display Ads failed")
+                        AdsShowState.ADS_DISPLAY -> logD("MainActivity Reward Ads : Ads Display")
+                        AdsShowState.ADS_IMPRESS -> logD("MainActivity Reward Ads : Ads Impress Mode")
+                        AdsShowState.ADS_CLICKED -> logD("MainActivity Reward Ads : Ads Clicked")
+                        AdsShowState.ADS_CLOSED -> logD("MainActivity Reward Ads : Ads Closed")
+                        AdsShowState.ADS_OPEN -> logD("MainActivity Reward Ads : Ads Open")
                     }
                 }
 
@@ -237,27 +234,28 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             this,
             false,
             object : MediationAdInterstitial.AdsShowCallback {
-                override fun onAdsOff() {
-                    logD("MaxAds Activity Interstitial Ads is off")
-                }
-
-                override fun onAdsError(errorState: AdsErrorState) {
-                    when (errorState) {
-                        AdsErrorState.NETWORK_OFF -> logD("MaxActivity Interstitial Ads : Internet Off")
-                        AdsErrorState.APP_PURCHASED -> logD("MaxActivity Interstitial Ads : You have Purchased your app")
-                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("MaxActivity Interstitial Ads : Ads Strategy wrong")
-                        AdsErrorState.ADS_ID_NULL -> logD("MaxActivity Interstitial Ads : Ads ID is Null found")
-                        AdsErrorState.TEST_ADS_ID -> logD("MaxActivity Interstitial Ads : Test Id found in released mode your app")
-                        AdsErrorState.ADS_LOAD_FAILED -> logD("MaxActivity Interstitial Ads : Ads load failed")
-                        AdsErrorState.ADS_DISMISS -> logD("MaxActivity Interstitial Ads : Ads Dismiss")
-                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("MaxActivity Interstitial Ads : Display Ads failed")
-                        AdsErrorState.ADS_IMPRESS -> logD("MaxActivity Interstitial Ads : Ads Impress Mode")
+                override fun onAdsShowState(adsShowState: AdsShowState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "ShowInterstitialAds",
+                        adsShowState.name
+                    )
+                    when (adsShowState) {
+                        AdsShowState.APP_PURCHASED -> logD("MainActivity  Interstitial Ads : You have Purchased your app")
+                        AdsShowState.NETWORK_OFF -> logD("MainActivity  Interstitial Ads : Internet Off")
+                        AdsShowState.ADS_OFF -> logD("MainActivity Interstitial Ads : Ads Off")
+                        AdsShowState.ADS_STRATEGY_WRONG -> logD("MainActivity Interstitial Ads : Ads Strategy wrong")
+                        AdsShowState.ADS_ID_NULL -> logD("MainActivity Interstitial Ads : Ads ID is Null found")
+                        AdsShowState.TEST_ADS_ID -> logD("MainActivity Interstitial Ads : Test Id found in released mode your app")
+                        AdsShowState.ADS_LOAD_FAILED -> logD("MainActivity Interstitial Ads : Ads load failed")
+                        AdsShowState.ADS_DISMISS -> logD("MainActivity Interstitial Ads : Ads Dismiss")
+                        AdsShowState.ADS_DISPLAY_FAILED -> logD("MainActivity Interstitial Ads : Display Ads failed")
+                        AdsShowState.ADS_DISPLAY -> logD("MainActivity Interstitial Ads : Ads Display")
+                        AdsShowState.ADS_IMPRESS -> logD("MainActivity Interstitial Ads : Ads Impress Mode")
+                        AdsShowState.ADS_CLICKED -> logD("MainActivity Interstitial Ads : Ads Clicked")
+                        AdsShowState.ADS_CLOSED -> logD("MainActivity Interstitial Ads : Ads Closed")
+                        AdsShowState.ADS_OPEN -> logD("MainActivity Interstitial Ads : Ads Open")
                     }
-
-                }
-
-                override fun onAdsClicked() {
-                    logD("MaxAds Activity Interstitial Ads click")
                 }
 
             })
@@ -268,29 +266,27 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
             this,
             false,
             object : MediationOpenAd.AdsShowAppOpenCallback {
-                override fun onAdsOff() {
-                    logD("MaxActivity App Open Ads is off")
-                }
-
-                override fun onAdsClicked() {
-                    logD("MaxActivity App Open Ads Clicked")
-                }
-
-                override fun onAdsDisplay() {
-                    logD("MaxActivity App Open Ads onAdsDisplay")
-                }
-
-                override fun onAdsError(errorState: AdsErrorState) {
-                    when (errorState) {
-                        AdsErrorState.NETWORK_OFF -> logD("Internet Off")
-                        AdsErrorState.APP_PURCHASED -> logD("You have Purchased your app")
-                        AdsErrorState.ADS_STRATEGY_WRONG -> logD("Ads Strategy wrong")
-                        AdsErrorState.ADS_ID_NULL -> logD("Ads Is Null found")
-                        AdsErrorState.TEST_ADS_ID -> logD("Test Id found in released mode your app")
-                        AdsErrorState.ADS_LOAD_FAILED -> logD("ads load failed")
-                        AdsErrorState.ADS_DISMISS -> logD("Ads Dismiss")
-                        AdsErrorState.ADS_DISPLAY_FAILED -> logD("Display Ads failed")
-                        AdsErrorState.ADS_IMPRESS -> logD("Ads Impress Mode")
+                override fun onAdsShowState(adsShowState: AdsShowState) {
+                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                        resources.getString(R.string.app_name),
+                        "ShowAppOpenAds",
+                        adsShowState.name
+                    )
+                    when (adsShowState) {
+                        AdsShowState.APP_PURCHASED -> logD("MainActivity  AppOpen Ads : You have Purchased your app")
+                        AdsShowState.NETWORK_OFF -> logD("MainActivity  AppOpen Ads : Internet Off")
+                        AdsShowState.ADS_OFF -> logD("MainActivity AppOpen Ads : Ads Off")
+                        AdsShowState.ADS_STRATEGY_WRONG -> logD("MainActivity AppOpen Ads : Ads Strategy wrong")
+                        AdsShowState.ADS_ID_NULL -> logD("MainActivity AppOpen Ads : Ads ID is Null found")
+                        AdsShowState.TEST_ADS_ID -> logD("MainActivity AppOpen Ads : Test Id found in released mode your app")
+                        AdsShowState.ADS_LOAD_FAILED -> logD("MainActivity AppOpen Ads : Ads load failed")
+                        AdsShowState.ADS_DISMISS -> logD("MainActivity AppOpen Ads : Ads Dismiss")
+                        AdsShowState.ADS_DISPLAY_FAILED -> logD("MainActivity AppOpen Ads : Display Ads failed")
+                        AdsShowState.ADS_DISPLAY -> logD("MainActivity AppOpen Ads : Ads Display")
+                        AdsShowState.ADS_IMPRESS -> logD("MainActivity AppOpen Ads : Ads Impress Mode")
+                        AdsShowState.ADS_CLICKED -> logD("MainActivity AppOpen Ads : Ads Clicked")
+                        AdsShowState.ADS_CLOSED -> logD("MainActivity AppOpen Ads : Ads Closed")
+                        AdsShowState.ADS_OPEN -> logD("MainActivity AppOpen Ads : Ads Open")
                     }
                 }
             })

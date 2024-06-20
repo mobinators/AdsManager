@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState
 import com.mobinators.ads.manager.ui.commons.nativead.MediationNativeAds
 
 @Composable
@@ -29,28 +29,12 @@ fun ShowNativeAds(
                     isPurchased,
                     this,
                     object : MediationNativeAds.ShowNativeAdsCallback {
-                        override fun onAdsOff() {
-                            listener.onAdsOff()
-                        }
-
-                        override fun onAdsOpen() {
-                            listener.onAdsOpen()
-                        }
-
-                        override fun onAdsClicked() {
-                            listener.onAdsClicked()
-                        }
-
-                        override fun onAdsClosed() {
-                            listener.onAdsClosed()
-                        }
-
                         override fun onAdsSwipe() {
                             listener.onAdsSwipe()
                         }
 
-                        override fun onAdsError(errorState: AdsErrorState) {
-                            listener.onAdsError(errorState = errorState)
+                        override fun onAdsShowState(adsShowState: AdsShowState) {
+                            listener.onAdsShowState(adsShowState)
                         }
                     },
                     isCustomView

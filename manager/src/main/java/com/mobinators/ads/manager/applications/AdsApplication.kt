@@ -144,7 +144,7 @@ object AdsApplication : Application() {
         logD("Ads Strategy : ${remoteConfig.getLong(AdsConstants.ADS_STRATEGY)} :")
         logD(" Store Strategy : ${remoteConfig.getLong(AdsConstants.STORE_STRATEGY_KEY)}")
         this.onFetchRemoteCallbackListener!!.onUpdateSuccess(
-            appId = adsModel!!.admobAppID!!, maxAppId = adsModel!!.maxAppId!!
+           adsModel = adsModel!!
         )
         AdsConstants.isAdPreloadEnable = when ((adsModel?.strategy ?: 0).toInt()) {
             AdsConstants.ADS_OFF -> false

@@ -11,12 +11,16 @@ import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.mobinators.ads.manager.applications.AdsApplication
+import com.mobinators.ads.manager.ui.commons.enums.AdsLoadingState
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.logD
+import pak.developer.app.managers.extensions.logE
+import pak.developer.app.managers.extensions.logException
 
 @SuppressLint("StaticFieldLeak")
 object MediationRewardedInterstitialAd {
@@ -37,11 +41,11 @@ object MediationRewardedInterstitialAd {
         this.contextRef = activity
         this.rewardedLoadAds = listener
         if (isPurchased) {
-            this.rewardedLoadAds!!.onAdsError("You have purchased")
+            this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.APP_PURCHASED)
             return
         }
         if (AdsUtils.isOnline(this.contextRef!!).not()) {
-            this.rewardedLoadAds!!.onAdsError("Network Off can not loaded reward Interstitial")
+            this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
             return
         }
         this.admobRewardedInterKey = if (AdsConstants.testMode) {
@@ -51,7 +55,7 @@ object MediationRewardedInterstitialAd {
         }
         if (AdsApplication.isAdmobInLimit()) {
             if (AdsApplication.applyLimitOnAdmob) {
-                this.rewardedLoadAds!!.onAdsError("admob limit is applied")
+                logE("admob limit is applied")
                 return
             }
         }
@@ -62,26 +66,26 @@ object MediationRewardedInterstitialAd {
     private fun initSelectedRewardedInterstitialAds() {
         try {
             when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> this.rewardedLoadAds!!.onAdsOff()
+                AdsConstants.ADS_OFF -> this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_OFF)
                 AdsConstants.AD_MOB_MEDIATION -> {}
                 AdsConstants.AD_MOB -> initRewardedInterstitialAds()
                 AdsConstants.MAX_MEDIATION -> {}
-                else -> this.rewardedLoadAds!!.onAdsError(error = "Ads Strategy wrong")
+                else -> this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_STRATEGY_WRONG)
             }
         } catch (error: Exception) {
-            this.rewardedLoadAds!!.onAdsError(error = "initSelectedRewardedInterstitialAds Error : ${error.localizedMessage}")
+            logException("initSelectedRewardedInterstitialAds Error : ${error.localizedMessage}")
         }
     }
 
     private fun initRewardedInterstitialAds() {
         try {
             if (this.admobRewardedInterKey!!.isEmpty() || this.admobRewardedInterKey!!.isBlank()) {
-                this.rewardedLoadAds!!.onAdsError(error = "Reward Interstitial Admob Ads Id is null")
+                this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
                 return
             }
             if (AdsConstants.testMode.not()) {
                 if (this.admobRewardedInterKey == AdsConstants.TEST_ADMOB_REWARDED_INTERSTITIAL_ID) {
-                    this.rewardedLoadAds!!.onAdsError(error = "NULL OR TEST Rewarded Interstitial Ads IDS FOUND")
+                    this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
                     return
                 }
             }
@@ -94,17 +98,17 @@ object MediationRewardedInterstitialAd {
                             .setCustomData("SAMPLE_CUSTOM_DATA_STRING")
                             .build()
                         rewardedInterstitialAd!!.setServerSideVerificationOptions(options)
-                        this@MediationRewardedInterstitialAd.rewardedLoadAds!!.onAdsLoaded()
+                        this@MediationRewardedInterstitialAd.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
                     }
 
                     override fun onAdFailedToLoad(adError: LoadAdError) {
-                        this@MediationRewardedInterstitialAd.rewardedLoadAds!!.onAdsError(error = " Init Reward Interstitial Ads Error :  ${adError.message}")
+                        this@MediationRewardedInterstitialAd.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
                         rewardedInterstitialAd = null
                     }
                 })
 
         } catch (error: Exception) {
-            this.rewardedLoadAds!!.onAdsError(error = "Init Reward Interstitial Ads Error  : ${error.localizedMessage}")
+            logException("Init Reward Interstitial Ads Error  : ${error.localizedMessage}")
         }
     }
 
@@ -116,13 +120,13 @@ object MediationRewardedInterstitialAd {
         this.currentActivity = activity
         this.showRewardCallback = listener
         if (isPurchase) {
-            this.showRewardCallback!!.onAdsError(error = "You have purchase")
+            this.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
             return
         }
         try {
             showSelectedRewardedInterstitial()
         } catch (error: Exception) {
-            this.showRewardCallback!!.onAdsError(error = " Show Reward Interstitial Ads Error: ${error.localizedMessage}")
+            logException(" Show Reward Interstitial Ads Error: ${error.localizedMessage}")
         }
     }
 
@@ -130,14 +134,14 @@ object MediationRewardedInterstitialAd {
     private fun showSelectedRewardedInterstitial() {
         try {
             when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> this.showRewardCallback!!.onAdsOff()
+                AdsConstants.ADS_OFF -> this.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_OFF)
                 AdsConstants.AD_MOB_MEDIATION -> {}
                 AdsConstants.AD_MOB -> admobRewardInterstitialAdShow()
                 AdsConstants.MAX_MEDIATION -> {}
-                else -> this.showRewardCallback!!.onAdsError(error = "Ads Strategy wrong")
+                else -> this.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
             }
         } catch (error: Exception) {
-            this.showRewardCallback!!.onAdsError(error = "initSelectedRewardedInterstitialAds Error : ${error.localizedMessage}")
+            logException("initSelectedRewardedInterstitialAds Error : ${error.localizedMessage}")
         }
     }
 
@@ -155,7 +159,7 @@ object MediationRewardedInterstitialAd {
                         object : FullScreenContentCallback() {
                             override fun onAdClicked() {
                                 super.onAdClicked()
-                                this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsClicked()
+                                this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_CLICKED)
                             }
 
                             override fun onAdDismissedFullScreenContent() {
@@ -170,19 +174,18 @@ object MediationRewardedInterstitialAd {
                             override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                                 super.onAdFailedToShowFullScreenContent(p0)
                                 this@MediationRewardedInterstitialAd.isAdsShow = false
-                                this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsError(
-                                    error = "Display Reward Interstitial Ads Failed : ${p0.message} "
-                                )
+                                this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_DISPLAY_FAILED)
                             }
 
                             override fun onAdImpression() {
                                 super.onAdImpression()
-                                this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsImpress()
+                                this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_IMPRESS)
                             }
 
                             override fun onAdShowedFullScreenContent() {
                                 super.onAdShowedFullScreenContent()
                                 this@MediationRewardedInterstitialAd.isAdsShow = true
+                                this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_DISPLAY)
                             }
                         }
                     initSelectedRewardedInterstitialAds()
@@ -191,23 +194,19 @@ object MediationRewardedInterstitialAd {
                 initSelectedRewardedInterstitialAds()
             }
         } catch (error: Exception) {
-            this.showRewardCallback!!.onAdsError("Show Reward Interstitial Ads Error: ${error.localizedMessage}")
+            logException("Show Reward Interstitial Ads Error: ${error.localizedMessage}")
         }
     }
 
 
     interface RewardedLoadAds {
-        fun onAdsLoaded()
-        fun onAdsOff()
-        fun onAdsError(error: String)
+
+        fun onAdsLoadState(adsLoadingState: AdsLoadingState)
     }
 
     interface ShowRewardAdsCallback {
-        fun onAdsOff()
-        fun onAdsError(error: String)
         fun onAdsReward(item: RewardItem)
-        fun onAdsClicked()
-        fun onAdsImpress()
         fun onAdsDismiss(item: RewardItem)
+        fun onAdsShowState(adsShowState: AdsShowState)
     }
 }

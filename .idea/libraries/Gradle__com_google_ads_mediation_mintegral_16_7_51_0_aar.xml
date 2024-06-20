@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.ads.mediation:mintegral:16.7.51.0@aar" external-system-id="GRADLE">
+    <ANNOTATIONS>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/61391e4c0a66f4a5db4f9dbc3c88b666/transformed/jetified-mintegral-16.7.51.0/annotations.zip!/" />
+    </ANNOTATIONS>
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/61391e4c0a66f4a5db4f9dbc3c88b666/transformed/jetified-mintegral-16.7.51.0/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/61391e4c0a66f4a5db4f9dbc3c88b666/transformed/jetified-mintegral-16.7.51.0/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

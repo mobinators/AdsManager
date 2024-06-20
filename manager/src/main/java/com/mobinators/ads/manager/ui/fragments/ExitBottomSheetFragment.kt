@@ -15,16 +15,16 @@ import com.mobinators.ads.manager.extensions.setBackgroundColors
 import com.mobinators.ads.manager.extensions.then
 import com.mobinators.ads.manager.ui.commons.banner.BannerAdMediation
 import com.mobinators.ads.manager.ui.commons.base.BaseBottomSheet
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.ADS_DISMISS
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.ADS_DISPLAY_FAILED
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.ADS_ID_NULL
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.ADS_IMPRESS
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.ADS_LOAD_FAILED
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.ADS_STRATEGY_WRONG
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.APP_PURCHASED
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.NETWORK_OFF
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState.TEST_ADS_ID
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState.ADS_DISMISS
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState.ADS_DISPLAY_FAILED
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState.ADS_ID_NULL
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState.ADS_IMPRESS
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState.ADS_LOAD_FAILED
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState.ADS_STRATEGY_WRONG
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState.APP_PURCHASED
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState.NETWORK_OFF
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState.TEST_ADS_ID
 import com.mobinators.ads.manager.ui.commons.listener.PanelListener
 import com.mobinators.ads.manager.ui.commons.models.PanelModel
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
@@ -145,29 +145,12 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
                         false,
                         binding.exitBannerFrame,
                         object : BannerAdMediation.BannerAdListener {
-                            override fun onAdsOff() {
-                                binding.exitBannerLayout.gone()
-                                logD("Exit Panel onAdsOff")
-                            }
-
                             override fun onAdsLoaded() {
                                 logD("Exit Panel onAdsLoaded")
                             }
 
-                            override fun onAdsClicked() {
-                                logD("Exit Panel onAdsClicked")
-                            }
-
-                            override fun onAdsClosed() {
-                                logD("Exit Panel onAdsClosed")
-                            }
-
-                            override fun onAdsOpened() {
-                                logD("Exit Panel onAdsOpened")
-                            }
-
-                            override fun onAdsError(adsErrorState: AdsErrorState) {
-                                when (adsErrorState) {
+                            override fun onAdsState(adsShowState: AdsShowState) {
+                                when (adsShowState) {
                                     NETWORK_OFF -> {
                                         binding.exitBannerLayout.gone()
                                         logD("Exit Panel Network Off")
@@ -211,8 +194,15 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
                                         binding.adsLoadingText.gone()
                                         logD("Exit Panel Impress")
                                     }
+
+                                    AdsShowState.ADS_OFF ->  logD("Exit Panel onAdsOff")
+                                    AdsShowState.ADS_DISPLAY ->  logD("Exit Panel ads Display ")
+                                    AdsShowState.ADS_CLICKED -> logD("Exit Panel onAdsClicked")
+                                    AdsShowState.ADS_CLOSED ->  logD("Exit Panel Ads Closed")
+                                    AdsShowState.ADS_OPEN ->  logD("Exit Panel Ads Open")
                                 }
                             }
+
                         })
                 } ?: run {
                     logD("Ads is not enable : ${panelModel?.isAdsShow}")

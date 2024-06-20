@@ -24,7 +24,8 @@ import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.mobinators.ads.manager.applications.AdsApplication
 import com.mobinators.ads.manager.databinding.AdmobNativeAdLayoutBinding
 import com.mobinators.ads.manager.databinding.CustomNativeBinding
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
+import com.mobinators.ads.manager.ui.commons.enums.AdsLoadingState
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import pak.developer.app.managers.extensions.gone
@@ -49,11 +50,11 @@ object MediationNativeAds {
         this.contextRef = context
         this.loadAdsCallback = listener
         if (isPurchased) {
-            this.loadAdsCallback!!.onAdsError(errorState = AdsErrorState.APP_PURCHASED)
+            this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.APP_PURCHASED)
             return
         }
         if (AdsUtils.isOnline(this.contextRef!!).not()) {
-            this.loadAdsCallback!!.onAdsError(errorState = AdsErrorState.NETWORK_OFF)
+            this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
             return
         }
         initSelectedNativeAds()
@@ -71,7 +72,7 @@ object MediationNativeAds {
         this.isCustomAdsView = isCustomView
         this.containerView = containerView
         if (isPurchased) {
-            this.showAdsCallback!!.onAdsError(errorState = AdsErrorState.APP_PURCHASED)
+            this.showAdsCallback!!.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
             return
         }
         showSelectedNativeAds()
@@ -80,11 +81,11 @@ object MediationNativeAds {
     private fun initSelectedNativeAds() {
         try {
             when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> this.loadAdsCallback!!.onAdsOff()
+                AdsConstants.ADS_OFF -> this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_OFF)
                 AdsConstants.AD_MOB_MEDIATION -> initAdmobNativeAds()
                 AdsConstants.AD_MOB -> initAdmobNativeAds()
                 AdsConstants.MAX_MEDIATION -> initMaxNativeAds()
-                else -> this.loadAdsCallback!!.onAdsError(errorState = AdsErrorState.ADS_STRATEGY_WRONG)
+                else -> this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_STRATEGY_WRONG)
             }
         } catch (error: Exception) {
             logException(" Init Selected Native Ads Error : ${error.localizedMessage}")
@@ -103,12 +104,12 @@ object MediationNativeAds {
                 }
             }
             if (this.nativeAdsKey.isNullOrEmpty() || this.nativeAdsKey.isNullOrBlank()) {
-                this.loadAdsCallback!!.onAdsError(errorState = AdsErrorState.ADS_ID_NULL)
+                this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
                 return
             }
             if (AdsConstants.testMode.not()) {
                 if (this.nativeAdsKey == AdsConstants.TEST_ADMOB_NATIVE_ID) {
-                    this.loadAdsCallback!!.onAdsError(errorState = AdsErrorState.TEST_ADS_ID)
+                    this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
                     return
                 }
             }
@@ -133,32 +134,32 @@ object MediationNativeAds {
             val adLoader = builder.withAdListener(object : AdListener() {
                 override fun onAdLoaded() {
                     super.onAdLoaded()
-                    this@MediationNativeAds.loadAdsCallback!!.onAdsLoaded()
+                    this@MediationNativeAds.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
                 }
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     super.onAdFailedToLoad(p0)
-                    this@MediationNativeAds.loadAdsCallback!!.onAdsError(errorState = AdsErrorState.ADS_LOAD_FAILED)
+                    this@MediationNativeAds.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
                 }
 
                 override fun onAdClicked() {
                     super.onAdClicked()
-                    this@MediationNativeAds.showAdsCallback?.onAdsClicked()
+                    this@MediationNativeAds.showAdsCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_CLICKED)
                 }
 
                 override fun onAdClosed() {
                     super.onAdClosed()
-                    this@MediationNativeAds.showAdsCallback?.onAdsClosed()
+                    this@MediationNativeAds.showAdsCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_CLOSED)
                 }
 
                 override fun onAdImpression() {
                     super.onAdImpression()
-                    this@MediationNativeAds.showAdsCallback?.onAdsError(errorState = AdsErrorState.ADS_IMPRESS)
+                    this@MediationNativeAds.showAdsCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_IMPRESS)
                 }
 
                 override fun onAdOpened() {
                     super.onAdOpened()
-                    this@MediationNativeAds.showAdsCallback?.onAdsOpen()
+                    this@MediationNativeAds.showAdsCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_OPEN)
                 }
 
                 override fun onAdSwipeGestureClicked() {
@@ -180,12 +181,12 @@ object MediationNativeAds {
                 AdsApplication.getAdsModel()!!.maxNativeID
             }
             if (this.maxNativeAdsKey.isNullOrEmpty() || this.maxNativeAdsKey.isNullOrBlank()) {
-                this.loadAdsCallback!!.onAdsError(errorState = AdsErrorState.ADS_ID_NULL)
+                this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
                 return
             }
             if (AdsConstants.testMode.not()) {
                 if (this.maxNativeAdsKey == AdsConstants.TEST_MAX_Native_ADS_ID) {
-                    this.loadAdsCallback!!.onAdsError(errorState = AdsErrorState.TEST_ADS_ID)
+                    this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
                     return
                 }
             }
@@ -212,23 +213,23 @@ object MediationNativeAds {
                     this@MediationNativeAds.maxNativeAd = p1
                     this@MediationNativeAds.containerView!!.removeAllViews()
                     this@MediationNativeAds.containerView?.addView(p0)
-                    this@MediationNativeAds.loadAdsCallback?.onAdsLoaded()
+                    this@MediationNativeAds.loadAdsCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
                 }
 
                 override fun onNativeAdLoadFailed(p0: String, p1: MaxError) {
                     super.onNativeAdLoadFailed(p0, p1)
                     this@MediationNativeAds.containerView?.gone()
-                    this@MediationNativeAds.loadAdsCallback!!.onAdsError(errorState = AdsErrorState.ADS_LOAD_FAILED)
+                    this@MediationNativeAds.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
                 }
 
                 override fun onNativeAdClicked(p0: MaxAd) {
                     super.onNativeAdClicked(p0)
-                    this@MediationNativeAds.showAdsCallback?.onAdsClicked()
+                    this@MediationNativeAds.showAdsCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_CLICKED)
                 }
 
                 override fun onNativeAdExpired(p0: MaxAd) {
                     super.onNativeAdExpired(p0)
-                    this@MediationNativeAds.showAdsCallback?.onAdsClosed()
+                    this@MediationNativeAds.showAdsCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_CLOSED)
                 }
             })
 //            this.maxNativeAds!!.loadAd(this.maxNativeAdView)
@@ -241,11 +242,11 @@ object MediationNativeAds {
     private fun showSelectedNativeAds() {
         try {
             when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> this.showAdsCallback!!.onAdsOff()
+                AdsConstants.ADS_OFF -> this.showAdsCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_OFF)
                 AdsConstants.AD_MOB_MEDIATION -> bindAdmobContentAd()
                 AdsConstants.AD_MOB -> bindAdmobContentAd()
                 AdsConstants.MAX_MEDIATION -> bindMaxContentAd()
-                else -> this.showAdsCallback!!.onAdsError(errorState = AdsErrorState.ADS_STRATEGY_WRONG)
+                else -> this.showAdsCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
             }
         } catch (error: Exception) {
             logException(" Show Selected Native Ads Error : ${error.localizedMessage}")
@@ -461,17 +462,11 @@ object MediationNativeAds {
     }
 
     interface NativeLoadAdsCallback {
-        fun onAdsOff()
-        fun onAdsLoaded()
-        fun onAdsError(errorState: AdsErrorState)
+        fun onAdsLoadState(adsLoadingState: AdsLoadingState)
     }
 
     interface ShowNativeAdsCallback {
-        fun onAdsOff()
-        fun onAdsOpen()
-        fun onAdsClicked()
-        fun onAdsClosed()
         fun onAdsSwipe()
-        fun onAdsError(errorState: AdsErrorState)
+        fun onAdsShowState(adsShowState: AdsShowState)
     }
 }

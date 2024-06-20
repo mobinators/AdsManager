@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AdsManager.iml" filepath="$PROJECT_DIR$/.idea/modules/AdsManager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/AdsManager.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/AdsManager.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/AdsManager.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/AdsManager.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/AdsManager.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/AdsManager.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/AdsManager.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/AdsManager.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/manager/AdsManager.manager.iml" filepath="$PROJECT_DIR$/.idea/modules/manager/AdsManager.manager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/manager/AdsManager.manager.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/manager/AdsManager.manager.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/manager/AdsManager.manager.main.iml" filepath="$PROJECT_DIR$/.idea/modules/manager/AdsManager.manager.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/manager/AdsManager.manager.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/manager/AdsManager.manager.unitTest.iml" />
+    </modules>
+  </component>
+</project>

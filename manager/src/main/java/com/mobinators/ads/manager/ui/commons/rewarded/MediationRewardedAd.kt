@@ -17,7 +17,8 @@ import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions
 import com.mobinators.ads.manager.applications.AdsApplication
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
+import com.mobinators.ads.manager.ui.commons.enums.AdsLoadingState
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState
 import com.mobinators.ads.manager.ui.commons.interstitial.MediationAdInterstitial
 import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewardedInter.MediationRewardedInterstitialAd
@@ -41,11 +42,11 @@ object MediationRewardedAd {
         this.activityRef = context
         this.loadedCallback = listener
         if (isPurchased) {
-            this.loadedCallback!!.onAdsError(errorState = AdsErrorState.APP_PURCHASED)
+            this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.APP_PURCHASED)
             return
         }
         if (AdsUtils.isOnline(this.activityRef!!).not()) {
-            this.loadedCallback!!.onAdsError(errorState = AdsErrorState.NETWORK_OFF)
+            this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
             return
         }
         initSelectedRewardAds()
@@ -55,7 +56,7 @@ object MediationRewardedAd {
         this.activityRef = activity
         this.showRewardLoadCallback = listener
         if (isPurchased) {
-            this.showRewardLoadCallback!!.onAdsError(errorState = AdsErrorState.APP_PURCHASED)
+            this.showRewardLoadCallback!!.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
             return
         }
         showSelectedRewardAds()
@@ -64,11 +65,11 @@ object MediationRewardedAd {
     private fun initSelectedRewardAds() {
         try {
             when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> this.loadedCallback!!.onAdsOff()
+                AdsConstants.ADS_OFF -> this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_OFF)
                 AdsConstants.AD_MOB_MEDIATION -> initRewardAds()
                 AdsConstants.AD_MOB -> initRewardAds()
                 AdsConstants.MAX_MEDIATION -> initMaxRewardAds()
-                else -> this.loadedCallback!!.onAdsError(errorState = AdsErrorState.ADS_STRATEGY_WRONG)
+                else -> this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_STRATEGY_WRONG)
             }
         } catch (error: Exception) {
             logException("init Selected Reward Error : ${error.localizedMessage}")
@@ -87,12 +88,12 @@ object MediationRewardedAd {
                 }
             }
             if (this.admobRewardKey.isNullOrEmpty() || this.admobRewardKey.isNullOrBlank()) {
-                this.loadedCallback!!.onAdsError(errorState = AdsErrorState.ADS_ID_NULL)
+                this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
                 return
             }
             if (AdsConstants.testMode.not()) {
                 if (this.admobRewardKey == AdsConstants.TEST_ADMOB_REWARDED_ID) {
-                    this.loadedCallback!!.onAdsError(errorState = AdsErrorState.TEST_ADS_ID)
+                    this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
                     return
                 }
             }
@@ -105,7 +106,7 @@ object MediationRewardedAd {
                         super.onAdLoaded(p0)
                         this@MediationRewardedAd.admobRewardAds = null
                         this@MediationRewardedAd.admobRewardAds = p0
-                        this@MediationRewardedAd.loadedCallback!!.onAdsLoaded()
+                        this@MediationRewardedAd.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
                         val options = ServerSideVerificationOptions.Builder()
                             .setCustomData("SAMPLE_CUSTOM_DATA_STRING")
                             .build()
@@ -118,7 +119,7 @@ object MediationRewardedAd {
                         super.onAdFailedToLoad(p0)
                         logException("Reward Ads Load Failed Error : ${p0.message}")
                         this@MediationRewardedAd.admobRewardAds = null
-                        this@MediationRewardedAd.loadedCallback!!.onAdsError(errorState = AdsErrorState.ADS_LOAD_FAILED)
+                        this@MediationRewardedAd.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
                     }
                 })
         } catch (error: Exception) {
@@ -134,43 +135,43 @@ object MediationRewardedAd {
                 AdsApplication.getAdsModel()!!.maxRewardedID
             }
             if (this.maxRewardKey.isNullOrEmpty() || this.maxRewardKey.isNullOrBlank()) {
-                this.loadedCallback!!.onAdsError(errorState = AdsErrorState.ADS_ID_NULL)
+                this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
                 return
             }
             if (AdsConstants.testMode.not()) {
                 if (this.maxRewardKey == AdsConstants.TEST_MAX_REWARD_ADS_ID) {
-                    this.loadedCallback!!.onAdsError(errorState = AdsErrorState.TEST_ADS_ID)
+                    this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
                     return
                 }
             }
             this.maxRewardedAd = MaxRewardedAd.getInstance(this.maxRewardKey!!, this.activityRef!!)
             this.maxRewardedAd!!.setListener(object : MaxRewardedAdListener {
                 override fun onAdLoaded(p0: MaxAd) {
-                    this@MediationRewardedAd.loadedCallback!!.onAdsLoaded()
+                    this@MediationRewardedAd.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
                 }
 
                 override fun onAdDisplayed(p0: MaxAd) {
                     this@MediationRewardedAd.isAdsShow = true
-                    this@MediationRewardedAd.showRewardLoadCallback?.onAdsDisplay()
+                    this@MediationRewardedAd.showRewardLoadCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_DISPLAY)
                 }
 
                 override fun onAdHidden(p0: MaxAd) {
                     this@MediationRewardedAd.isAdsShow = false
-                    this@MediationRewardedAd.showRewardLoadCallback?.onAdsError(errorState = AdsErrorState.ADS_DISMISS)
+                    this@MediationRewardedAd.showRewardLoadCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_DISMISS)
                 }
 
                 override fun onAdClicked(p0: MaxAd) {
-                    this@MediationRewardedAd.showRewardLoadCallback?.onAdsClicked()
+                    this@MediationRewardedAd.showRewardLoadCallback?.onAdsShowState(adsShowState =AdsShowState.ADS_CLICKED)
                 }
 
                 override fun onAdLoadFailed(p0: String, p1: MaxError) {
                     logException("Max Reward Ads Load Failed : ${p1.message}")
-                    this@MediationRewardedAd.loadedCallback!!.onAdsError(errorState = AdsErrorState.ADS_LOAD_FAILED)
+                    this@MediationRewardedAd.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
                 }
 
                 override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
                     this@MediationRewardedAd.isAdsShow = false
-                    this@MediationRewardedAd.showRewardLoadCallback?.onAdsError(errorState = AdsErrorState.ADS_DISPLAY_FAILED)
+                    this@MediationRewardedAd.showRewardLoadCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_DISPLAY_FAILED)
                 }
 
                 override fun onUserRewarded(p0: MaxAd, p1: MaxReward) {
@@ -207,11 +208,11 @@ object MediationRewardedAd {
     private fun showSelectedRewardAds() {
         try {
             when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> this.showRewardLoadCallback!!.onAdsOff()
+                AdsConstants.ADS_OFF -> this.showRewardLoadCallback!!.onAdsShowState(adsShowState =AdsShowState.ADS_OFF)
                 AdsConstants.AD_MOB_MEDIATION -> showRewardedAds()
                 AdsConstants.AD_MOB -> showRewardedAds()
                 AdsConstants.MAX_MEDIATION -> showMaxRewardedAds()
-                else -> this.showRewardLoadCallback!!.onAdsError(errorState = AdsErrorState.ADS_STRATEGY_WRONG)
+                else -> this.showRewardLoadCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
             }
         } catch (error: Exception) {
             logException("Show Selected Reward Ads Error : ${error.localizedMessage}")
@@ -234,36 +235,30 @@ object MediationRewardedAd {
                         object : FullScreenContentCallback() {
                             override fun onAdClicked() {
                                 super.onAdClicked()
-                                this@MediationRewardedAd.showRewardLoadCallback!!.onAdsClicked()
+                                this@MediationRewardedAd.showRewardLoadCallback!!.onAdsShowState(adsShowState =AdsShowState.ADS_CLICKED)
                             }
 
                             override fun onAdShowedFullScreenContent() {
                                 super.onAdShowedFullScreenContent()
                                 this@MediationRewardedAd.isAdsShow = true
-                                this@MediationRewardedAd.showRewardLoadCallback!!.onAdsDisplay()
+                                this@MediationRewardedAd.showRewardLoadCallback!!.onAdsShowState(adsShowState =AdsShowState.ADS_DISPLAY)
                             }
 
                             override fun onAdDismissedFullScreenContent() {
                                 super.onAdDismissedFullScreenContent()
                                 this@MediationRewardedAd.isAdsShow = false
-                                this@MediationRewardedAd.showRewardLoadCallback!!.onAdsError(
-                                    errorState = AdsErrorState.ADS_DISMISS
-                                )
+                                this@MediationRewardedAd.showRewardLoadCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_DISMISS)
                             }
 
                             override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                                 super.onAdFailedToShowFullScreenContent(p0)
                                 this@MediationRewardedAd.isAdsShow = false
-                                this@MediationRewardedAd.showRewardLoadCallback!!.onAdsError(
-                                    errorState = AdsErrorState.ADS_DISPLAY_FAILED
-                                )
+                                this@MediationRewardedAd.showRewardLoadCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_DISPLAY_FAILED)
                             }
 
                             override fun onAdImpression() {
                                 super.onAdImpression()
-                                this@MediationRewardedAd.showRewardLoadCallback!!.onAdsError(
-                                    errorState = AdsErrorState.ADS_IMPRESS
-                                )
+                                this@MediationRewardedAd.showRewardLoadCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_IMPRESS)
                             }
                         }
                     initSelectedRewardAds()
@@ -296,16 +291,11 @@ object MediationRewardedAd {
     }
 
     interface RewardLoadCallback {
-        fun onAdsLoaded()
-        fun onAdsOff()
-        fun onAdsError(errorState: AdsErrorState)
+        fun onAdsLoadState(adsLoadingState: AdsLoadingState)
     }
 
     interface ShowRewardedAdsCallback {
-        fun onAdsOff()
         fun onRewardEarned(item: Int, type: String)
-        fun onAdsClicked()
-        fun onAdsDisplay()
-        fun onAdsError(errorState: AdsErrorState)
+        fun onAdsShowState(adsShowState: AdsShowState)
     }
 }

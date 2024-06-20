@@ -17,7 +17,7 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.mobinators.ads.manager.applications.AdsApplication
-import com.mobinators.ads.manager.ui.commons.enums.AdsErrorState
+import com.mobinators.ads.manager.ui.commons.enums.AdsShowState
 import com.mobinators.ads.manager.ui.commons.models.AdsModel
 import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
@@ -47,10 +47,14 @@ object BannerAdMediation {
         this.activity = activity
         this.bannerContainer!!.gone()
         if (isPurchased) {
-            listener.onAdsError(adsErrorState = AdsErrorState.APP_PURCHASED)
+            listener.onAdsState(adsShowState = AdsShowState.APP_PURCHASED)
             return
         }
         try {
+            if (AdsUtils.isOnline(activity).not()) {
+                listener.onAdsState(adsShowState = AdsShowState.NETWORK_OFF)
+                return
+            }
             modelClass = AdsApplication.getAdsModel()
             selectAd()
         } catch (error: Exception) {
@@ -62,11 +66,11 @@ object BannerAdMediation {
     private fun selectAd() {
         try {
             when (modelClass?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> this.bannerAdListener!!.onAdsOff()
+                AdsConstants.ADS_OFF -> this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_OFF)
                 AdsConstants.AD_MOB_MEDIATION -> adMobBannerAds()
                 AdsConstants.AD_MOB -> adMobBannerAds()
                 AdsConstants.MAX_MEDIATION -> maxBannerAds()
-                else -> this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_STRATEGY_WRONG)
+                else -> this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
             }
         } catch (error: Exception) {
             logException("Selected Banner Ads Error : ${error.localizedMessage}")
@@ -85,16 +89,16 @@ object BannerAdMediation {
                 }
             }
             if (adMobKey!!.isEmpty() || adMobKey!!.isBlank()) {
-                this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_ID_NULL)
+                this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_ID_NULL)
                 return
             }
             if (AdsUtils.isOnline(this.activity!!).not()) {
-                this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.NETWORK_OFF)
+                this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.NETWORK_OFF)
                 return
             }
             if (AdsConstants.testMode.not()) {
                 if (this.adMobKey == AdsConstants.TEST_ADMOB_BANNER_ID) {
-                    this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.TEST_ADS_ID)
+                    this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.TEST_ADS_ID)
                     return
                 }
             }
@@ -105,17 +109,17 @@ object BannerAdMediation {
             bannerView.adListener = object : AdListener() {
                 override fun onAdClicked() {
                     super.onAdClicked()
-                    this@BannerAdMediation.bannerAdListener!!.onAdsClicked()
+                    this@BannerAdMediation.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_CLICKED)
                 }
 
                 override fun onAdClosed() {
                     super.onAdClosed()
-                    this@BannerAdMediation.bannerAdListener!!.onAdsClosed()
+                    this@BannerAdMediation.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_CLOSED)
                 }
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     super.onAdFailedToLoad(p0)
-                    this@BannerAdMediation.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_LOAD_FAILED)
+                    this@BannerAdMediation.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_LOAD_FAILED)
                     if (AdsApplication.isAdmobInLimit()) {
                         AdsApplication.applyLimitOnAdmob = true
                     }
@@ -123,7 +127,7 @@ object BannerAdMediation {
 
                 override fun onAdImpression() {
                     super.onAdImpression()
-                    this@BannerAdMediation.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_IMPRESS)
+                    this@BannerAdMediation.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_IMPRESS)
                 }
 
                 override fun onAdLoaded() {
@@ -141,7 +145,7 @@ object BannerAdMediation {
                 override fun onAdOpened() {
                     super.onAdOpened()
                     if (bannerAdListener != null) {
-                        bannerAdListener!!.onAdsOpened()
+                        bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_OPEN)
                     }
                 }
 
@@ -163,17 +167,17 @@ object BannerAdMediation {
                 modelClass!!.maxBannerID
             }
             if (this.appLovingKey!!.isEmpty() || this.appLovingKey!!.isBlank()) {
-                this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_ID_NULL)
+                this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_ID_NULL)
                 return
             }
             if (AdsUtils.isOnline(this.activity!!).not()) {
                 this.bannerContainer!!.gone()
-                this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.NETWORK_OFF)
+                this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.NETWORK_OFF)
                 return
             }
             if (AdsConstants.testMode.not()) {
                 if (this.appLovingKey == AdsConstants.TEST_MAX_BANNER_ADS_ID) {
-                    this.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.TEST_ADS_ID)
+                    this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.TEST_ADS_ID)
                     return
                 }
             }
@@ -191,23 +195,23 @@ object BannerAdMediation {
                 }
 
                 override fun onAdDisplayed(p0: MaxAd) {
-                    logD("onAdDisplayed")
+                    this@BannerAdMediation.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_DISPLAY)
                 }
 
                 override fun onAdHidden(p0: MaxAd) {
-                    logD("onAdHidden")
+                    this@BannerAdMediation.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_IMPRESS)
                 }
 
                 override fun onAdClicked(p0: MaxAd) {
-                    this@BannerAdMediation.bannerAdListener!!.onAdsClicked()
+                    this@BannerAdMediation.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_CLICKED)
                 }
 
                 override fun onAdLoadFailed(p0: String, p1: MaxError) {
-                    this@BannerAdMediation.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_LOAD_FAILED)
+                    this@BannerAdMediation.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_LOAD_FAILED)
                 }
 
                 override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
-                    this@BannerAdMediation.bannerAdListener!!.onAdsError(adsErrorState = AdsErrorState.ADS_DISPLAY_FAILED)
+                    this@BannerAdMediation.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_DISPLAY_FAILED)
                 }
 
                 override fun onAdExpanded(p0: MaxAd) {
@@ -229,7 +233,8 @@ object BannerAdMediation {
             val isTablet = AppLovinSdkUtils.isTablet(this.activity!!)
             val heightPx = AppLovinSdkUtils.dpToPx(this.activity!!, if (isTablet) 90 else 50)
 
-            maxBannerView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)
+            maxBannerView.layoutParams =
+                ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)
             maxBannerView.loadAd()
             maxBannerView.startAutoRefresh()
         } catch (error: Exception) {
@@ -238,11 +243,7 @@ object BannerAdMediation {
     }
 
     interface BannerAdListener {
-        fun onAdsOff()
         fun onAdsLoaded()
-        fun onAdsClicked()
-        fun onAdsClosed()
-        fun onAdsOpened()
-        fun onAdsError(adsErrorState: AdsErrorState)
+        fun onAdsState(adsShowState: AdsShowState)
     }
 }

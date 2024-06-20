@@ -49,6 +49,7 @@ object AdsConstants {
     const val APP_UPDATE = "Update"
     const val APP_RATE_US_DIALOG = "RateUsDialog"
     const val APP_UPDATE_VERSION_KEY = "AppUpdateVersion"
+    const val ADMOB_META_KEY="com.google.android.gms.ads.APPLICATION_ID"
     var testMode: Boolean = false
     var isAdPreloadEnable = false
     var isInit = false
