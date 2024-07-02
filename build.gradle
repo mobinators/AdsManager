@@ -5,6 +5,9 @@ buildscript {
         maven { url 'https://jitpack.io' }
         maven { url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" }
         maven { url 'https://artifacts.applovin.com/android' }
+        flatDir {
+            dirs 'libs'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.1.4'

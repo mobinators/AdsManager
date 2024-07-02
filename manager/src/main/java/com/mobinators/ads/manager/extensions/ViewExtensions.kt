@@ -48,7 +48,7 @@ import java.util.concurrent.Executors
 
 
 private var appUpdateManager: AppUpdateManager? = null
-fun Application.updateManifest(adsModel: AdsModel) {
+fun Application.updateManifest(adsModel: AdsModel, onConfig: (String) -> Unit = {}) {
     try {
         adsModel.admobAppID?.let {
             if (AdsConstants.testMode.not()) {
@@ -65,6 +65,9 @@ fun Application.updateManifest(adsModel: AdsModel) {
             applicationInfo.metaData.putString(AdsConstants.ADMOB_META_KEY, it)
             val apiKey: String? = bundle.getString(AdsConstants.ADMOB_META_KEY)
             logD("Name Found ADMOB : $apiKey")
+            if (adsModel.strategy.toInt() == AdsConstants.AD_MOB) {
+                onConfig("AdMOb")
+            }
         }
         adsModel.maxAppId?.let {
             try {
@@ -74,7 +77,9 @@ fun Application.updateManifest(adsModel: AdsModel) {
                         logD("Null AppLoving Sdk key")
                         return
                     }
-                    initMaxMediation(it)
+                    initMaxMediation(it) {
+                        onConfig("AppLoving")
+                    }
                 } else {
                     logD("Ads Strategy is wrong")
                 }
@@ -89,19 +94,26 @@ fun Application.updateManifest(adsModel: AdsModel) {
     }
 }
 
-private fun Application.initMaxMediation(sdkKey: String) {
+private fun Application.initMaxMediation(sdkKey: String, onConfig: () -> Unit = {}) {
     try {
         val executor = Executors.newSingleThreadExecutor()
         executor.execute {
+            // Make sure to set the mediation provider value to "max" to ensure proper functionality
             AdSettings.setDataProcessingOptions(arrayOf<String>())
             val initConfigBuilder = AppLovinSdkInitializationConfiguration.builder(sdkKey, this)
             initConfigBuilder.mediationProvider = AppLovinMediationProvider.MAX
             val currentGaid = AdvertisingIdClient.getAdvertisingIdInfo(this).id
-            if (currentGaid != null) {
-                initConfigBuilder.testDeviceAdvertisingIds = Collections.singletonList(currentGaid)
+            if (AdsConstants.testMode) {
+                logD("Test Ads GAID ID  : $currentGaid  : ${AdsConstants.testMode}")
+                if (currentGaid != null) {
+                    initConfigBuilder.testDeviceAdvertisingIds =
+                        Collections.singletonList(currentGaid)
+                }
             }
+            AppLovinSdk.getInstance(this).mediationProvider = AppLovinMediationProvider.MAX
             AppLovinSdk.getInstance(this).initialize(initConfigBuilder.build()) { sdkConfig ->
-                logD(" Apploving Sdk : $sdkConfig")
+                logD("Apploving Sdk : $sdkConfig")
+                onConfig()
             }
             executor.shutdown()
         }
@@ -281,7 +293,4 @@ inline fun <reified T> sdk30AndUp(onSdk30: () -> T): T? {
     } else null
 }
 
-
 inline infix fun <T> Boolean.then(param: () -> T): T? = if (this) param() else null
-
-

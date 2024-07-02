@@ -63,30 +63,32 @@ class AdsManagerApplication : Application() {
 
                 override fun onUpdateSuccess(adsModel: AdsModel) {
                     logD("onUpdateSuccess : App Id : ${adsModel.admobAppID}  : MAX App Id: ${adsModel.maxAppId}")
-                    updateManifest(adsModel = adsModel)
-                    MediationAdInterstitial.loadInterstitialAds(
-                        this@AdsManagerApplication.applicationContext,
-                        false,
-                        object : MediationAdInterstitial.LoadCallback {
-                            override fun onAdsLoadState(adsLoadingState: AdsLoadingState) {
-                                AnalyticsManager.getInstance().setAnalyticsEvent(
-                                    resources.getString(R.string.app_name),
-                                    "InterstitialAds",
-                                    adsLoadingState.name
-                                )
-                                when (adsLoadingState) {
-                                    AdsLoadingState.APP_PURCHASED -> logD("Interstitial Ads : App Purchased")
-                                    AdsLoadingState.NETWORK_OFF -> logD("Interstitial Ads : Internet Off")
-                                    AdsLoadingState.ADS_OFF -> logD("Interstitial Ads is Off")
-                                    AdsLoadingState.ADS_STRATEGY_WRONG -> logD("Interstitial Ads : Ads Strategy wrong")
-                                    AdsLoadingState.ADS_ID_NULL -> logD("Interstitial Ads : Ads Is Null found")
-                                    AdsLoadingState.TEST_ADS_ID -> logD("Interstitial Ads : Test Id found in released mode your app")
-                                    AdsLoadingState.ADS_LOADED -> logD("Interstitial Ads Loaded")
-                                    AdsLoadingState.ADS_LOAD_FAILED -> logD("Interstitial Ads : Ads  load failed")
+                    updateManifest(adsModel = adsModel) {
+                        logD("Ads Type  : $it")
+                        MediationAdInterstitial.loadInterstitialAds(
+                            this@AdsManagerApplication.applicationContext,
+                            false,
+                            object : MediationAdInterstitial.LoadCallback {
+                                override fun onAdsLoadState(adsLoadingState: AdsLoadingState) {
+                                    AnalyticsManager.getInstance().setAnalyticsEvent(
+                                        resources.getString(R.string.app_name),
+                                        "InterstitialAds",
+                                        adsLoadingState.name
+                                    )
+                                    when (adsLoadingState) {
+                                        AdsLoadingState.APP_PURCHASED -> logD("Interstitial Ads : App Purchased")
+                                        AdsLoadingState.NETWORK_OFF -> logD("Interstitial Ads : Internet Off")
+                                        AdsLoadingState.ADS_OFF -> logD("Interstitial Ads is Off")
+                                        AdsLoadingState.ADS_STRATEGY_WRONG -> logD("Interstitial Ads : Ads Strategy wrong")
+                                        AdsLoadingState.ADS_ID_NULL -> logD("Interstitial Ads : Ads Is Null found")
+                                        AdsLoadingState.TEST_ADS_ID -> logD("Interstitial Ads : Test Id found in released mode your app")
+                                        AdsLoadingState.ADS_LOADED -> logD("Interstitial Ads Loaded")
+                                        AdsLoadingState.ADS_LOAD_FAILED -> logD("Interstitial Ads : Ads  load failed")
+                                    }
                                 }
-                            }
 
-                        })
+                            })
+                    }
                     MediationRewardedInterstitialAd.loadRewardedInterstitialAds(
                         applicationContext,
                         false,

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.mbridge.msdk.oversea:mbnative:16.7.61@aar" external-system-id="GRADLE">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/779332f7377f2a44bfbb44b40df284fd/transformed/jetified-mbnative-16.7.61/jars/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/779332f7377f2a44bfbb44b40df284fd/transformed/jetified-mbnative-16.7.61/jars/libs/classes-2.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/779332f7377f2a44bfbb44b40df284fd/transformed/jetified-mbnative-16.7.61/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/779332f7377f2a44bfbb44b40df284fd/transformed/jetified-mbnative-16.7.61/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

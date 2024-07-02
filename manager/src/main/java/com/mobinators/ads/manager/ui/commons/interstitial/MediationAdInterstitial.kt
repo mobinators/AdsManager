@@ -106,12 +106,16 @@ object MediationAdInterstitial {
                     override fun onAdLoaded(ads: InterstitialAd) {
                         super.onAdLoaded(ads)
                         admobInterstitialAds = ads
-                        this@MediationAdInterstitial.adsLoadCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
+                        this@MediationAdInterstitial.adsLoadCallback!!.onAdsLoadState(
+                            adsLoadingState = AdsLoadingState.ADS_LOADED
+                        )
                     }
 
                     override fun onAdFailedToLoad(err: LoadAdError) {
                         super.onAdFailedToLoad(err)
-                        this@MediationAdInterstitial.adsLoadCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
+                        this@MediationAdInterstitial.adsLoadCallback!!.onAdsLoadState(
+                            adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED
+                        )
                         admobInterstitialAds = null
                     }
                 })
@@ -132,7 +136,7 @@ object MediationAdInterstitial {
                     return
                 }
             }
-            this.maxInterstitialAds = MaxInterstitialAd("YOUR_AD_UNIT_ID", this.activityRef!!)
+            this.maxInterstitialAds = MaxInterstitialAd(this.maxKey, this.activityRef!!)
             this.maxInterstitialAds!!.loadAd()
             this.maxInterstitialAds!!.setListener(object : MaxAdListener {
                 override fun onAdLoaded(p0: MaxAd) {
@@ -184,7 +188,7 @@ object MediationAdInterstitial {
         this.adsShowCallback = listener
         this.activityRef = activity
         if (isPurchased) {
-            this.adsShowCallback!!.onAdsShowState(adsShowState= AdsShowState.APP_PURCHASED)
+            this.adsShowCallback!!.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
             return
         }
         showSelectedInterstitialAds()
@@ -217,24 +221,32 @@ object MediationAdInterstitial {
                         object : FullScreenContentCallback() {
                             override fun onAdClicked() {
                                 super.onAdClicked()
-                                this@MediationAdInterstitial.adsShowCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_CLICKED)
+                                this@MediationAdInterstitial.adsShowCallback!!.onAdsShowState(
+                                    adsShowState = AdsShowState.ADS_CLICKED
+                                )
                             }
 
                             override fun onAdImpression() {
                                 super.onAdImpression()
-                                this@MediationAdInterstitial.adsShowCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_IMPRESS)
+                                this@MediationAdInterstitial.adsShowCallback!!.onAdsShowState(
+                                    adsShowState = AdsShowState.ADS_IMPRESS
+                                )
                             }
 
                             override fun onAdDismissedFullScreenContent() {
                                 super.onAdDismissedFullScreenContent()
                                 this@MediationAdInterstitial.isAdsShow = false
-                                this@MediationAdInterstitial.adsShowCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_DISMISS)
+                                this@MediationAdInterstitial.adsShowCallback!!.onAdsShowState(
+                                    adsShowState = AdsShowState.ADS_DISMISS
+                                )
                             }
 
                             override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                                 super.onAdFailedToShowFullScreenContent(p0)
                                 this@MediationAdInterstitial.isAdsShow = false
-                                this@MediationAdInterstitial.adsShowCallback!!.onAdsShowState(adsShowState= AdsShowState.ADS_DISPLAY_FAILED)
+                                this@MediationAdInterstitial.adsShowCallback!!.onAdsShowState(
+                                    adsShowState = AdsShowState.ADS_DISPLAY_FAILED
+                                )
                                 this@MediationAdInterstitial.admobInterstitialAds = null
                             }
 

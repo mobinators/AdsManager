@@ -73,9 +73,9 @@ dependencies {
 
     /*-----------------Admob and Mediation-----------------*/
 
-    implementation 'com.google.android.gms:play-services-ads:23.1.0'
-    implementation 'com.google.ads.mediation:mintegral:16.7.51.0'
-    implementation 'com.google.ads.mediation:applovin:12.5.0.0'
+    implementation 'com.google.android.gms:play-services-ads:23.2.0'  // 23.1.0
+    implementation 'com.google.ads.mediation:mintegral:16.7.61.0' //16.7.51.0
+    implementation 'com.google.ads.mediation:applovin:12.5.0.1'  // 12.5.0.0
     implementation("com.google.ads.mediation:facebook:6.17.0.0")
     api "com.google.ads.mediation:facebook:6.17.0.0"
 
@@ -118,7 +118,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.mobinators'
                 artifactId = 'managers'
-                version = '1.2.3'
+                version = '1.2.4'
             }
         }
     }

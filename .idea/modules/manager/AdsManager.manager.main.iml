@@ -97,14 +97,14 @@
     <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.2@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.viewpager:viewpager:1.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.customview:customview:1.1.0@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-ads:23.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-ads:23.2.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.browser:browser:1.4.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.privacysandbox.ads:ads-adservices-java:1.0.0-beta05@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.webkit:webkit:1.11.0-alpha02@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-ads-base:23.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-ads-base:23.2.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-ads-identifier:18.1.0@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-ads-lite:23.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-ads-lite:23.2.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.work:work-runtime:2.7.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.startup:startup-runtime:1.1.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-measurement-sdk-api:22.0.1@aar" level="project" />
@@ -169,23 +169,23 @@
     <orderEntry type="library" name="Gradle: com.github.bumptech.glide:gifdecoder:4.16.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.exifinterface:exifinterface:1.3.6@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.tracing:tracing:1.0.0@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.ads.mediation:mintegral:16.7.51.0@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbbid:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:same:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:reward:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:videojs:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbjscommon:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:playercommon:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:videocommon:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:dycreator:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:newreward:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbnative:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:nativeex:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbbanner:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:newinterstitial:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:interstitialvideo:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbsplash:16.7.51@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.ads.mediation:applovin:12.5.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.ads.mediation:mintegral:16.7.61.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbbid:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:same:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:reward:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:videojs:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbjscommon:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:playercommon:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:videocommon:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:dycreator:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:newreward:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbnative:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:nativeex:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbbanner:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:newinterstitial:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:interstitialvideo:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbsplash:16.7.61@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.ads.mediation:applovin:12.5.0.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.applovin:applovin-sdk:12.5.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-process:2.8.2@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.intuit.sdp:sdp-android:1.0.6@aar" level="project" />
