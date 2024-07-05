@@ -16,7 +16,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.2.4'
+  implementation 'com.github.mobinators:AdsManager:1.2.5'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -115,7 +115,9 @@
 
                 override fun onUpdateSuccess(adsModel: AdsModel) {
                     logD("onUpdateSuccess : App Id : ${adsModel.admobAppID}   : MAX App Id: ${adsModel.maxAppId}")
-                    updateManifest(adsModel = adsModel)
+                    updateManifest(adsModel = adsModel){
+                       logD("Sdk Name :$it")
+                    }
 
                 }
             })

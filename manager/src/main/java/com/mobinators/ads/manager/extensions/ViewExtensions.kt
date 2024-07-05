@@ -99,20 +99,11 @@ private fun Application.initMaxMediation(sdkKey: String, onConfig: () -> Unit = 
         val executor = Executors.newSingleThreadExecutor()
         executor.execute {
             // Make sure to set the mediation provider value to "max" to ensure proper functionality
-            AdSettings.setDataProcessingOptions(arrayOf<String>())
-            val initConfigBuilder = AppLovinSdkInitializationConfiguration.builder(sdkKey, this)
-            initConfigBuilder.mediationProvider = AppLovinMediationProvider.MAX
-            val currentGaid = AdvertisingIdClient.getAdvertisingIdInfo(this).id
-            if (AdsConstants.testMode) {
-                logD("Test Ads GAID ID  : $currentGaid  : ${AdsConstants.testMode}")
-                if (currentGaid != null) {
-                    initConfigBuilder.testDeviceAdvertisingIds =
-                        Collections.singletonList(currentGaid)
-                }
-            }
-            AppLovinSdk.getInstance(this).mediationProvider = AppLovinMediationProvider.MAX
-            AppLovinSdk.getInstance(this).initialize(initConfigBuilder.build()) { sdkConfig ->
-                logD("Apploving Sdk : $sdkConfig")
+            val initConfig = AppLovinSdkInitializationConfiguration.builder(sdkKey, this)
+                .setMediationProvider(AppLovinMediationProvider.MAX)
+                .build()
+            AppLovinSdk.getInstance(this).initialize(initConfig) { sdkConfig ->
+                logD("AppLoving Sdk : $sdkConfig")
                 onConfig()
             }
             executor.shutdown()

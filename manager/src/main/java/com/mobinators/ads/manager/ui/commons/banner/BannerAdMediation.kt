@@ -181,6 +181,7 @@ object BannerAdMediation {
                     return
                 }
             }
+            logD("Banner Ads Unit ID: ${this.appLovingKey}")
             val maxBannerView = MaxAdView(this.appLovingKey, MaxAdFormat.BANNER, this.activity)
             maxBannerView.setListener(object : MaxAdViewAdListener {
                 override fun onAdLoaded(p0: MaxAd) {
