@@ -136,7 +136,7 @@ object MediationAdInterstitial {
                     return
                 }
             }
-            this.maxInterstitialAds = MaxInterstitialAd(this.maxKey, this.activityRef!!)
+            this.maxInterstitialAds = MaxInterstitialAd(this.maxKey, this.contextRef!!)
             this.maxInterstitialAds!!.loadAd()
             this.maxInterstitialAds!!.setListener(object : MaxAdListener {
                 override fun onAdLoaded(p0: MaxAd) {
