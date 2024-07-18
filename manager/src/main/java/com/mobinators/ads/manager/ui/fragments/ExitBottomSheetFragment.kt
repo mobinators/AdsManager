@@ -109,6 +109,12 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
                 requireContext(),
                 it.rateButtonBgColor ?: R.color.rateColor
             )
+            binding.rateDescText.setTextColor(
+                ContextCompat.getColor(requireContext(), it.rateDescTextColor ?: R.color.black)
+            )
+            binding.rateTitle.setTextColor(
+                ContextCompat.getColor(requireContext(), it.rateTittleTextColor ?: R.color.black)
+            )
 
             binding.rateBtn.setTextColor(
                 ContextCompat.getColor(
@@ -195,11 +201,16 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
                                         logD("Exit Panel Impress")
                                     }
 
-                                    AdsShowState.ADS_OFF ->  logD("Exit Panel onAdsOff")
-                                    AdsShowState.ADS_DISPLAY ->  logD("Exit Panel ads Display ")
+                                    AdsShowState.ADS_OFF -> logD("Exit Panel onAdsOff")
+                                    AdsShowState.ADS_DISPLAY -> {
+                                        binding.adsLoadingText.gone()
+                                        logD("Exit Panel ads Display ")
+
+                                    }
+
                                     AdsShowState.ADS_CLICKED -> logD("Exit Panel onAdsClicked")
-                                    AdsShowState.ADS_CLOSED ->  logD("Exit Panel Ads Closed")
-                                    AdsShowState.ADS_OPEN ->  logD("Exit Panel Ads Open")
+                                    AdsShowState.ADS_CLOSED -> logD("Exit Panel Ads Closed")
+                                    AdsShowState.ADS_OPEN -> logD("Exit Panel Ads Open")
                                 }
                             }
 
@@ -209,7 +220,6 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
                     binding.exitBannerLayout.gone()
                 }
             }
-
         } catch (error: Exception) {
             logD("Exit Panel Ads Error : ${error.localizedMessage}")
         }
@@ -221,12 +231,20 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
     }
 
 
-    private fun checkStore(){
-        when(AdsConstants.selectedStore){
-            AdsConstants.GOOGLE_PLAY_STORE-> AdsUtils.openPlayStore(requireContext(), requireContext().packageName)
-            AdsConstants.AMAZON_APP_STORE-> AdsUtils.openAmazonStore(requireContext(),requireContext().packageName)
-            AdsConstants.HUAWEI_APP_GALLERY->{}
-            else ->showToast(requireActivity(),"wrong selected store")
+    private fun checkStore() {
+        when (AdsConstants.selectedStore) {
+            AdsConstants.GOOGLE_PLAY_STORE -> AdsUtils.openPlayStore(
+                requireContext(),
+                requireContext().packageName
+            )
+
+            AdsConstants.AMAZON_APP_STORE -> AdsUtils.openAmazonStore(
+                requireContext(),
+                requireContext().packageName
+            )
+
+            AdsConstants.HUAWEI_APP_GALLERY -> {}
+            else -> showToast(requireActivity(), "wrong selected store")
         }
     }
 

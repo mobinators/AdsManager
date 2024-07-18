@@ -53,6 +53,7 @@
             android:id="@+id/mainLayoutRoot"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -75,6 +76,7 @@
                     tools:ignore="ContentDescription" />
 
                 <TextView
+                    android:id="@+id/rateTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -87,6 +89,7 @@
                     tools:ignore="HardcodedText" />
 
                 <TextView
+                    android:id="@+id/rateDescText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -139,8 +142,10 @@
                 android:id="@+id/exitBannerLayout"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_50sdp"
+                android:layout_gravity="center"
                 android:layout_margin="@dimen/_10sdp"
                 android:background="@drawable/shadow"
+                android:gravity="center_vertical|center_horizontal"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -151,7 +156,10 @@
                 <FrameLayout
                     android:id="@+id/exitBannerFrame"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_margin="@dimen/_5sdp"
+                    android:gravity="center_vertical|center_horizontal" />
 
                 <TextView
                     android:id="@+id/adsLoadingText"

@@ -3,19 +3,12 @@ package com.mobinators.ads.manager.applications
 import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import com.applovin.sdk.AppLovinMediationProvider
-import com.applovin.sdk.AppLovinSdk
-import com.applovin.sdk.AppLovinSdkConfiguration
-import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
-import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.android.gms.ads.initialization.AdapterStatus
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.mbridge.msdk.MBridgeConstans
@@ -28,16 +21,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pak.developer.app.managers.extensions.logD
-import pak.developer.app.managers.extensions.logException
 import pak.developer.app.managers.extensions.preferenceUtils
-import java.util.Collections
-import java.util.concurrent.Executors
 
 object AdsApplication : Application() {
     private var admobLimit = "false"
     private var handler = Handler(Looper.getMainLooper())
     var applyLimitOnAdmob = false
-    private var firebaseAnalytics: FirebaseAnalytics? = null
     private var onFetchRemoteCallbackListener: FetchRemoteCallback? = null
     private var adsModel: AdsModel? = null
     private val backgroundScope = CoroutineScope(Dispatchers.IO)
@@ -165,32 +154,6 @@ object AdsApplication : Application() {
     fun canShow(context: Context, key: String, delaySecond: Long): Boolean {
         return System.currentTimeMillis() >= context.preferenceUtils.getIntegerValue(key) + delaySecond * 1000
     }
-
-    fun setAnalytics(analytics: FirebaseAnalytics) {
-        this.firebaseAnalytics = analytics
-    }
-
-    fun getFirebaseAnalytics(): FirebaseAnalytics? {
-        return this.firebaseAnalytics
-    }
-
-    fun analyticsEvent(key: String, value: String) {
-        try {
-            if (key.isEmpty() || key.isBlank()) {
-                logD("Your Firebase Analytics Event key is null or blank")
-                return
-            }
-            this.firebaseAnalytics?.let {
-                it.logEvent(AdsConstants.FIREBASE_ANALYTICS_KEY, Bundle().apply {
-                    putString(key, value)
-                })
-            } ?: logD("calling setAnalytics method first ")
-        } catch (error: Exception) {
-            logException("Firebase Analytics Error : ${error.localizedMessage}")
-        }
-
-    }
-
     private fun checkOpenAddIsEnable(remoteConfig: FirebaseRemoteConfig) {
         AdsConstants.isAppOpenAdEnable =
             remoteConfig.getBoolean(AdsConstants.ADMOB_OPEN_AD_ENABLE_KEY)

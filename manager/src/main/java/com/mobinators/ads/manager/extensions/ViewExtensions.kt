@@ -20,8 +20,6 @@ import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.bumptech.glide.Glide
-import com.facebook.ads.AdSettings
-import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.InstallState
@@ -43,36 +41,35 @@ import com.mobinators.ads.manager.ui.fragments.ExitBottomSheetFragment
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.logException
 import pak.developer.app.managers.extensions.preferenceUtils
-import java.util.Collections
-import java.util.concurrent.Executors
 
 
 private var appUpdateManager: AppUpdateManager? = null
 fun Application.updateManifest(adsModel: AdsModel, onConfig: (String) -> Unit = {}) {
     try {
-        adsModel.admobAppID?.let {
-            if (AdsConstants.testMode.not()) {
-                if (it == AdsConstants.TEST_ADMOB_APP_ID) {
-                    logD("found test App id")
-                    return
+        if (adsModel.strategy.toInt() == AdsConstants.AD_MOB) {
+            logD("STRATEGY : Ads Mob  : ${adsModel.strategy}")
+            adsModel.admobAppID?.let {
+                if (AdsConstants.testMode.not()) {
+                    if (it == AdsConstants.TEST_ADMOB_APP_ID) {
+                        logD("Found AdMob Test App id : $it")
+                        return
+                    }
                 }
-            }
-            val applicationInfo: ApplicationInfo =
-                packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
-            val bundle: Bundle = applicationInfo.metaData
-            val appKey: String? = bundle.getString(AdsConstants.ADMOB_META_KEY)
-            logD("Name Found ADMOB : $appKey")
-            applicationInfo.metaData.putString(AdsConstants.ADMOB_META_KEY, it)
-            val apiKey: String? = bundle.getString(AdsConstants.ADMOB_META_KEY)
-            logD("Name Found ADMOB : $apiKey")
-            if (adsModel.strategy.toInt() == AdsConstants.AD_MOB) {
+                val applicationInfo: ApplicationInfo =
+                    packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+                val bundle: Bundle = applicationInfo.metaData
+                val appKey: String? = bundle.getString(AdsConstants.ADMOB_META_KEY)
+                logD("Name Found ADMOB : $appKey")
+                applicationInfo.metaData.putString(AdsConstants.ADMOB_META_KEY, it)
+                val apiKey: String? = bundle.getString(AdsConstants.ADMOB_META_KEY)
+                logD("Name Found ADMOB : $apiKey")
                 onConfig("AdMOb")
             }
         }
-        adsModel.maxAppId?.let {
-            try {
-                if (adsModel.strategy.toInt() == AdsConstants.MAX_MEDIATION) {
-                    logD("Max Mediation STRATEGY : ${adsModel.strategy}")
+        if (adsModel.strategy.toInt() == AdsConstants.MAX_MEDIATION) {
+            logD("STRATEGY : Max Mediation : ${adsModel.strategy}")
+            adsModel.maxAppId?.let {
+                try {
                     if (it.isEmpty() || it.isBlank()) {
                         logD("Null AppLoving Sdk key")
                         return
@@ -80,13 +77,14 @@ fun Application.updateManifest(adsModel: AdsModel, onConfig: (String) -> Unit = 
                     initMaxMediation(it) {
                         onConfig("AppLoving")
                     }
-                } else {
-                    logD("Ads Strategy is wrong")
+                } catch (error: Exception) {
+                    logException("Failed to load AppLoving Meta-Data, SDK key Error : ${error.localizedMessage}")
                 }
-            } catch (error: Exception) {
-                logException("Failed to load AppLoving Meta-Data, SDK key Error : ${error.localizedMessage}")
             }
+        } else {
+            logD("Ads Strategy is wrong")
         }
+
     } catch (error: PackageManager.NameNotFoundException) {
         logException("Failed to load meta-data, NameNotFound: ${error.localizedMessage}")
     } catch (error: NullPointerException) {
@@ -95,21 +93,12 @@ fun Application.updateManifest(adsModel: AdsModel, onConfig: (String) -> Unit = 
 }
 
 private fun Application.initMaxMediation(sdkKey: String, onConfig: () -> Unit = {}) {
-    try {
-        val executor = Executors.newSingleThreadExecutor()
-        executor.execute {
-            // Make sure to set the mediation provider value to "max" to ensure proper functionality
-            val initConfig = AppLovinSdkInitializationConfiguration.builder(sdkKey, this)
-                .setMediationProvider(AppLovinMediationProvider.MAX)
-                .build()
-            AppLovinSdk.getInstance(this).initialize(initConfig) { sdkConfig ->
-                logD("AppLoving Sdk : $sdkConfig")
-                onConfig()
-            }
-            executor.shutdown()
-        }
-    } catch (error: Exception) {
-        logException("Max Mediation Error : ${error.message}")
+    val initConfig = AppLovinSdkInitializationConfiguration.builder(sdkKey, this)
+        .setMediationProvider(AppLovinMediationProvider.MAX)
+        .build()
+    AppLovinSdk.getInstance(this).initialize(initConfig) { sdkConfig ->
+        logD("AppLoving Sdk : $sdkConfig")
+        onConfig()
     }
 }
 

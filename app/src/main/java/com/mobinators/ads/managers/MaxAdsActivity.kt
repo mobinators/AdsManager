@@ -11,6 +11,7 @@ import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import com.mobinators.ads.manager.ui.commons.utils.AnalyticsManager
+import com.mobinators.ads.manager.ui.commons.utils.AppPurchaseUtils
 import com.mobinators.ads.managers.databinding.ActivityMaxAdsBinding
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.ui.commons.base.BaseActivity
@@ -19,7 +20,6 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
     override fun getActivityView() = ActivityMaxAdsBinding.inflate(layoutInflater)
 
     override fun initView(savedInstanceState: Bundle?) {
-//        AdsUtils.maxTestAds(this)
         MediationRewardedAd.loadRewardAds(
             this,
             false,
@@ -42,6 +42,7 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
                     }
                 }
             })
+
         binding.maxBanner.setOnClickListener(this)
         binding.maxNative.setOnClickListener(this)
         binding.maxNativeBanner.setOnClickListener(this)
@@ -290,5 +291,10 @@ class MaxAdsActivity : BaseActivity<ActivityMaxAdsBinding>(), View.OnClickListen
                     }
                 }
             })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MediationNativeAds.onDestroy()
     }
 }

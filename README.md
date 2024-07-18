@@ -16,7 +16,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.2.7'
+  implementation 'com.github.mobinators:AdsManager:1.2.8'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -121,7 +121,6 @@
 
                 }
             })
-        AdsApplication.setAnalytics(FirebaseAnalytics.getInstance(this))
         
         This app register in Manifest file
 ```

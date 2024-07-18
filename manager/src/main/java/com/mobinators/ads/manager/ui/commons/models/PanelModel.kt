@@ -16,5 +16,7 @@ data class PanelModel(
     var desc: String? = null,
     var rateButtonColor: Int? = null,
     var rateButtonBgColor: Int? = null,
-    var rateTextColor: Int? = null
+    var rateTextColor: Int? = null,
+    var rateDescTextColor: Int? = null,
+    var rateTittleTextColor: Int? = null
 )

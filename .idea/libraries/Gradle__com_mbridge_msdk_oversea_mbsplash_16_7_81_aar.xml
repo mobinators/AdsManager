@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.mbridge.msdk.oversea:mbsplash:16.7.81@aar" external-system-id="GRADLE">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/6fdb8fdfd77baf402abad1c3550ad17c/transformed/jetified-mbsplash-16.7.81/jars/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/6fdb8fdfd77baf402abad1c3550ad17c/transformed/jetified-mbsplash-16.7.81/jars/libs/classes-2.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/6fdb8fdfd77baf402abad1c3550ad17c/transformed/jetified-mbsplash-16.7.81/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/6fdb8fdfd77baf402abad1c3550ad17c/transformed/jetified-mbsplash-16.7.81/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
