@@ -147,11 +147,7 @@ object BannerAdMediation {
     }
 
     private fun maxBannerAds() {
-        this.appLovingKey = if (AdsConstants.testMode) {
-            AdsConstants.TEST_MAX_BANNER_ADS_ID
-        } else {
-            modelClass!!.maxBannerID
-        }
+        this.appLovingKey = modelClass!!.maxBannerID
         if (this.appLovingKey!!.isEmpty() || this.appLovingKey!!.isBlank()) {
             this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.ADS_ID_NULL)
             return
@@ -161,11 +157,9 @@ object BannerAdMediation {
             this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.NETWORK_OFF)
             return
         }
-        if (AdsConstants.testMode.not()) {
-            if (this.appLovingKey == AdsConstants.TEST_MAX_BANNER_ADS_ID) {
-                this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.TEST_ADS_ID)
-                return
-            }
+        if (this.appLovingKey == AdsConstants.TEST_MAX_BANNER_ADS_ID) {
+            this.bannerAdListener!!.onAdsState(adsShowState = AdsShowState.TEST_ADS_ID)
+            return
         }
         logD("Banner Ads Unit ID: ${this.appLovingKey}")
         val maxBannerView = MaxAdView(this.appLovingKey, MaxAdFormat.BANNER, this.activity)

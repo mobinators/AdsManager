@@ -52,11 +52,7 @@ object MediationAdInterstitial {
                 AdsApplication.getAdsModel()!!.admobInterstitialID
             }
         }
-        this.maxKey = if (AdsConstants.testMode) {
-            AdsConstants.TEST_MAX_INTERSTITIAL_ADS_ID
-        } else {
-            AdsApplication.getAdsModel()!!.maxInterstitialID
-        }
+        this.maxKey = AdsApplication.getAdsModel()!!.maxInterstitialID
         if (AdsUtils.isOnline(this.contextRef!!).not()) {
             this.adsLoadCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
             return
@@ -119,11 +115,9 @@ object MediationAdInterstitial {
             this.adsLoadCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
             return
         }
-        if (AdsConstants.testMode.not()) {
-            if (this.maxKey == AdsConstants.TEST_MAX_INTERSTITIAL_ADS_ID) {
-                this.adsLoadCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
-                return
-            }
+        if (this.maxKey == AdsConstants.TEST_MAX_INTERSTITIAL_ADS_ID) {
+            this.adsLoadCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
+            return
         }
         logD("Interstitial Ads : $maxKey")
         this.maxInterstitialAds = MaxInterstitialAd(this.maxKey, this.contextRef!!)

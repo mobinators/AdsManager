@@ -170,20 +170,14 @@ object MediationNativeAds {
     }
 
     private fun initMaxNativeAds() {
-        this.maxNativeAdsKey = if (AdsConstants.testMode) {
-            AdsConstants.TEST_MAX_Native_ADS_ID
-        } else {
-            AdsApplication.getAdsModel()!!.maxNativeID
-        }
+        this.maxNativeAdsKey = AdsApplication.getAdsModel()!!.maxNativeID
         if (this.maxNativeAdsKey.isNullOrEmpty() || this.maxNativeAdsKey.isNullOrBlank()) {
             this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
             return
         }
-        if (AdsConstants.testMode.not()) {
-            if (this.maxNativeAdsKey == AdsConstants.TEST_MAX_Native_ADS_ID) {
-                this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
-                return
-            }
+        if (this.maxNativeAdsKey == AdsConstants.TEST_MAX_Native_ADS_ID) {
+            this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
+            return
         }
         logD("NativeAds Key : $maxNativeAdsKey")
         this.maxNativeAds =

@@ -119,20 +119,14 @@ object MediationOpenAd {
     }
 
     private fun initMaxAppOpenAds() {
-        this.maxAppOpenAdsId = if (AdsConstants.testMode) {
-            AdsConstants.TEST_MAX_APP_OPEN_ADS_ID
-        } else {
-            AdsApplication.getAdsModel()!!.maxAppOpenID
-        }
+        this.maxAppOpenAdsId = AdsApplication.getAdsModel()!!.maxAppOpenID
         if (this.maxAppOpenAdsId.isNullOrEmpty() || this.maxAppOpenAdsId.isNullOrBlank()) {
             this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
             return
         }
-        if (AdsConstants.testMode.not()) {
-            if (this.maxAppOpenAdsId == AdsConstants.TEST_MAX_APP_OPEN_ADS_ID) {
-                this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
-                return
-            }
+        if (this.maxAppOpenAdsId == AdsConstants.TEST_MAX_APP_OPEN_ADS_ID) {
+            this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
+            return
         }
         logD("AppOpenAds key : $maxAppOpenAdsId")
         AdsApplication.getAdsModel()?.isAppOpenAdd?.then {
