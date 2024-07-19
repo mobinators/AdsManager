@@ -186,7 +186,8 @@ object MediationNativeAds {
             }
         }
         logD("NativeAds Key : $maxNativeAdsKey")
-        this.maxNativeAds = MaxNativeAdLoader(this.maxNativeAdsKey!!, this.contextRef!!)
+        this.maxNativeAds =
+            MaxNativeAdLoader(this.maxNativeAdsKey!!, this.activityRef ?: this.contextRef!!)
         this.maxNativeAds!!.setRevenueListener { ad ->
             logD("NativeAds Revenue : ${ad.revenue}")
             val adjustAdRevenue = AdjustAdRevenue(AdjustConfig.AD_REVENUE_APPLOVIN_MAX)

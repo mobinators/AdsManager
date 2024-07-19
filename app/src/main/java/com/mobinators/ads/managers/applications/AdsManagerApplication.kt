@@ -172,7 +172,6 @@ class AdsManagerApplication : Application() {
                         AdsLoadingState.ADS_LOAD_FAILED -> logD("RewardInterstitialAds Ads : Ads  load failed")
                     }
                 }
-
             })
     }
 
