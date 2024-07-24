@@ -11,7 +11,6 @@ import android.net.Uri
 import android.os.Build
 import android.text.TextUtils
 import com.applovin.sdk.AppLovinSdk
-import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.logException
 
 
@@ -108,22 +107,6 @@ object AdsUtils {
             )
         }
     }
-
-    fun findIntegerValueInMap(key: String, map: Map<String, Int>): Int {
-        val updateKey = key.toUpperCase(java.util.Locale.ROOT)
-        var value = 1
-        for (entry in map.entries) {
-            logD("findValueInMap:  ${entry.key}")
-            if ((entry.key == key.lowercase())) {
-                value = entry.value
-                logD("findValueInMap:  $value")
-                break
-            }
-        }
-        return value
-    }
-
-
     fun isOnline(context: Context): Boolean {
         return try {
             val manager: ConnectivityManager? =

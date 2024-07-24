@@ -51,11 +51,11 @@ object MediationCollapsibleBanner {
     private fun collapseBannerSelected() {
         try {
             when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-                AdsConstants.ADS_OFF -> this.bannerListener!!.onAdsShowState(adsShowState = AdsShowState.ADS_OFF)
+                AdsConstants.ADS_OFF -> this.bannerListener?.onAdsShowState(adsShowState = AdsShowState.ADS_OFF)
                 AdsConstants.AD_MOB_MEDIATION -> {}
                 AdsConstants.AD_MOB -> collapseBannerAdsInt()
                 AdsConstants.MAX_MEDIATION -> {}
-                else -> this.bannerListener!!.onAdsShowState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
+                else -> this.bannerListener?.onAdsShowState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
             }
 
         } catch (error: Exception) {
@@ -88,6 +88,7 @@ object MediationCollapsibleBanner {
                     return
                 }
             }
+            logD("Admob Collapse Banner Ads Unit ID: ${this.admobCollapseBannerKey}")
             val collapseBannerView = AdView(this.mainActivity!!)
             collapseBannerView.adUnitId = this.admobCollapseBannerKey!!
             collapseBannerView.setAdSize(getCollapseBannerSize())

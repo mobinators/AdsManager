@@ -43,11 +43,11 @@ object MediationRewardedAd {
         this.activityRef = context
         this.loadedCallback = listener
         if (isPurchased) {
-            this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.APP_PURCHASED)
+            this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.APP_PURCHASED)
             return
         }
         if (AdsUtils.isOnline(this.activityRef!!).not()) {
-            this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
+            this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
             return
         }
         initSelectedRewardAds()
@@ -57,7 +57,7 @@ object MediationRewardedAd {
         this.activityRef = activity
         this.showRewardLoadCallback = listener
         if (isPurchased) {
-            this.showRewardLoadCallback!!.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
+            this.showRewardLoadCallback?.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
             return
         }
         showSelectedRewardAds()
@@ -65,11 +65,11 @@ object MediationRewardedAd {
 
     private fun initSelectedRewardAds() {
         when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-            AdsConstants.ADS_OFF -> this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_OFF)
+            AdsConstants.ADS_OFF -> this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_OFF)
             AdsConstants.AD_MOB_MEDIATION -> initRewardAds()
             AdsConstants.AD_MOB -> initRewardAds()
             AdsConstants.MAX_MEDIATION -> initMaxRewardAds()
-            else -> this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_STRATEGY_WRONG)
+            else -> this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_STRATEGY_WRONG)
         }
     }
 
@@ -84,15 +84,16 @@ object MediationRewardedAd {
             }
         }
         if (this.admobRewardKey.isNullOrEmpty() || this.admobRewardKey.isNullOrBlank()) {
-            this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
+            this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
             return
         }
         if (AdsConstants.testMode.not()) {
             if (this.admobRewardKey == AdsConstants.TEST_ADMOB_REWARDED_ID) {
-                this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
+                this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
                 return
             }
         }
+        logD("Admob initRewardAds ads Key: $admobRewardKey")
         RewardedAd.load(
             this.activityRef!!,
             this.admobRewardKey!!,
@@ -113,7 +114,7 @@ object MediationRewardedAd {
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     super.onAdFailedToLoad(p0)
-                    logException("Reward Ads Load Failed Error : ${p0.message}")
+                    logException("AdMob Reward Ads Load Failed Error : ${p0.message}")
                     this@MediationRewardedAd.admobRewardAds = null
                     this@MediationRewardedAd.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
                 }
@@ -127,14 +128,14 @@ object MediationRewardedAd {
             return
         }
         if (this.maxRewardKey == AdsConstants.TEST_MAX_REWARD_ADS_ID) {
-            this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
+            this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
             return
         }
         logD("initMaxRewardAds ads Key: $maxRewardKey")
         this.maxRewardedAd = MaxRewardedAd.getInstance(this.maxRewardKey!!, this.activityRef!!)
         this.maxRewardedAd!!.setListener(object : MaxRewardedAdListener {
             override fun onAdLoaded(p0: MaxAd) {
-                this@MediationRewardedAd.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
+                this@MediationRewardedAd.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
             }
 
             override fun onAdDisplayed(p0: MaxAd) {
@@ -153,7 +154,7 @@ object MediationRewardedAd {
 
             override fun onAdLoadFailed(p0: String, p1: MaxError) {
                 logException("Max Reward Ads Load Failed : Error Code: ${p1.code}")
-                this@MediationRewardedAd.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
+                this@MediationRewardedAd.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
             }
 
             override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
@@ -190,11 +191,11 @@ object MediationRewardedAd {
 
     private fun showSelectedRewardAds() {
         when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-            AdsConstants.ADS_OFF -> this.showRewardLoadCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_OFF)
+            AdsConstants.ADS_OFF -> this.showRewardLoadCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_OFF)
             AdsConstants.AD_MOB_MEDIATION -> showRewardedAds()
             AdsConstants.AD_MOB -> showRewardedAds()
             AdsConstants.MAX_MEDIATION -> showMaxRewardedAds()
-            else -> this.showRewardLoadCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
+            else -> this.showRewardLoadCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
         }
     }
 
@@ -267,6 +268,12 @@ object MediationRewardedAd {
         } ?: run {
             initSelectedRewardAds()
         }
+    }
+
+    fun onDestroy() {
+        admobRewardAds?.fullScreenContentCallback = null
+        maxRewardedAd?.setListener(null)
+        maxRewardedAd?.setRevenueListener(null)
     }
 
     interface RewardLoadCallback {

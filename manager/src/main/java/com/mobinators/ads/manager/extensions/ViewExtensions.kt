@@ -7,28 +7,26 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.View
-import android.widget.ImageView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
-import com.bumptech.glide.Glide
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.InstallState
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.review.ReviewManagerFactory
-import com.google.gson.Gson
 import com.mobinators.ads.manager.ui.commons.listener.AppListener
 import com.mobinators.ads.manager.ui.commons.listener.AppRateUsCallback
 import com.mobinators.ads.manager.ui.commons.listener.AppUpdateState
@@ -40,7 +38,6 @@ import com.mobinators.ads.manager.ui.commons.utils.AdsConstants
 import com.mobinators.ads.manager.ui.fragments.ExitBottomSheetFragment
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.extensions.logException
-import pak.developer.app.managers.extensions.preferenceUtils
 
 
 private var appUpdateManager: AppUpdateManager? = null
@@ -81,10 +78,7 @@ fun Application.updateManifest(adsModel: AdsModel, onConfig: (String) -> Unit = 
                     logException("Failed to load AppLoving Meta-Data, SDK key Error : ${error.localizedMessage}")
                 }
             }
-        } else {
-            logD("Ads Strategy is wrong")
         }
-
     } catch (error: PackageManager.NameNotFoundException) {
         logException("Failed to load meta-data, NameNotFound: ${error.localizedMessage}")
     } catch (error: NullPointerException) {
@@ -100,54 +94,6 @@ private fun Application.initMaxMediation(sdkKey: String, onConfig: () -> Unit = 
         logD("AppLoving Sdk : $sdkConfig")
         onConfig()
     }
-}
-
-inline fun <reified T> T.convertToJson(
-    context: Context, obj: T, isPreference: Boolean, key: String
-): String? {
-    val gson = Gson()
-    return try {
-        return if (isPreference) {
-            if (TextUtils.isEmpty(key).not()) {
-                logD("Json obj: ${gson.toJson(obj)}")
-                val result = context.preferenceUtils.setStringValue(key, gson.toJson(obj))
-                return if (result) {
-                    "Save Value"
-                } else {
-                    "Save Value Failed"
-                }
-            } else {
-                "your value is not save in preference because key is empty"
-            }
-        } else {
-            gson.toJson(obj)
-        }
-    } catch (error: Exception) {
-        logException("convertToJson Error : ${error.localizedMessage}")
-        "convertToJson Error : ${error.localizedMessage}"
-    }
-}
-
-inline fun <reified T> Application.convertToModel(
-    json: String? = null, isPreference: Boolean = false, key: String? = null
-): T? {
-    return try {
-        val dataJson = if (isPreference) {
-            key?.let {
-                preferenceUtils.getStringValue(it)
-            }
-        } else {
-            json
-        }
-        Gson().fromJson(dataJson, T::class.java)
-    } catch (error: Exception) {
-        logException("convertToModel Error : ${error.localizedMessage}")
-        null
-    }
-}
-
-fun ImageView.createThumbNail(context: Context, imageUri: String) = apply {
-    Glide.with(context).load(Uri.parse(imageUri)).into(this)
 }
 
 fun View.setBackgroundColors(context: Context, @ColorRes colorId: Int) = apply {
@@ -210,7 +156,10 @@ fun Activity.appRateUs(listener: AppRateUsCallback) {
     }
 }
 
-fun Activity.appUpdate(listener: AppListener, requestCode: Int) {
+fun Activity.appUpdate(
+    listener: AppListener,
+    resultLauncher: ActivityResultLauncher<IntentSenderRequest>
+) {
     when (AdsConstants.selectedStore) {
         AdsConstants.GOOGLE_PLAY_STORE -> {
             appUpdateManager = AppUpdateManagerFactory.create(this)
@@ -234,9 +183,8 @@ fun Activity.appUpdate(listener: AppListener, requestCode: Int) {
                 ) {
                     appUpdateManager!!.startUpdateFlowForResult(
                         it,
-                        AppUpdateType.FLEXIBLE,
-                        this,
-                        requestCode
+                        resultLauncher,
+                        AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build()
                     )
                 } else {
                     listener.onNoUpdateAvailable()
@@ -252,7 +200,6 @@ fun Activity.appUpdate(listener: AppListener, requestCode: Int) {
         AdsConstants.HUAWEI_APP_GALLERY -> listener.onStore(updateState = AppUpdateState.HUAWEI_STORE)
         else -> listener.onStore(updateState = AppUpdateState.WRONG_STORE)
     }
-
 }
 
 

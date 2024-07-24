@@ -1,6 +1,7 @@
 package com.mobinators.ads.managers
 
 
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -108,7 +109,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                     "AppUpdate",
                     "onDownload"
                 )
-                logD("onDownload")
+                logD("AppUpdate : onDownload")
             }
 
             override fun onInstalled() {
@@ -117,7 +118,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                     "AppUpdate",
                     "onInstalled"
                 )
-                logD("onInstalled")
+                logD("AppUpdate : onInstalled")
             }
 
             override fun onCancel() {
@@ -126,7 +127,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                     "AppUpdate",
                     "onCancel"
                 )
-                logD("onCancel")
+                logD("AppUpdate : onCancel")
             }
 
             override fun onFailure(error: Exception) {
@@ -135,7 +136,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                     "AppUpdate",
                     "onFailure: $error"
                 )
-                logD("onFailure : $error")
+                logD("AppUpdate : onFailure : $error")
             }
 
             override fun onNoUpdateAvailable() {
@@ -144,7 +145,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                     "AppUpdate",
                     "onNoUpdateAvailable"
                 )
-                logD("onNoUpdateAvailable")
+                logD("AppUpdate : onNoUpdateAvailable")
             }
 
             override fun onStore(updateState: AppUpdateState) {
@@ -154,12 +155,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                     "Store Type : ${updateState.name}"
                 )
                 when (updateState) {
-                    AppUpdateState.WRONG_STORE -> logD("Wrong Selected Store ID")
-                    AppUpdateState.AMAZON_STORE -> logD("Amazon Store Selected")
-                    AppUpdateState.HUAWEI_STORE -> logD("Huawei Store Selected")
+                    AppUpdateState.WRONG_STORE -> logD("AppUpdate : Wrong Selected Store ID")
+                    AppUpdateState.AMAZON_STORE -> logD("AppUpdate : Amazon Store Selected")
+                    AppUpdateState.HUAWEI_STORE -> logD("AppUpdate : Huawei Store Selected")
                 }
             }
-        }, 1)
+        }, launcher)
         inAppPurchased()
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -197,12 +198,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                 })
             }
         })
-        DeviceInfoUtils.getLocalIpAddress(this) {
-            logD(" Local Ip Address : $it")
-        }
-
+        logD(" Device Info  : ${DeviceInfoUtils.getDeviceInfo()}")
     }
 
+
+    private val launcher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_CANCELED -> logD("RESULT_CANCELED")
+                Activity.RESULT_OK -> logD("RESULT_OK")
+            }
+        }
 
     override fun onClick(itemId: View?) {
         when (itemId!!.id) {
@@ -423,6 +429,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), View.OnClickListener {
                     )
                     logD("MainActivity Reward Interstitial Ads Reward : $item")
                 }
+
                 override fun onAdsDismiss(item: RewardItem) {
                     AnalyticsManager.getInstance().setAnalyticsEvent(
                         resources.getString(R.string.app_name),

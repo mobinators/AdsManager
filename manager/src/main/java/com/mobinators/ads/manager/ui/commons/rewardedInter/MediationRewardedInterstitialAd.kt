@@ -40,18 +40,14 @@ object MediationRewardedInterstitialAd {
         this.contextRef = activity
         this.rewardedLoadAds = listener
         if (isPurchased) {
-            this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.APP_PURCHASED)
+            this.rewardedLoadAds?.onAdsLoadState(adsLoadingState = AdsLoadingState.APP_PURCHASED)
             return
         }
         if (AdsUtils.isOnline(this.contextRef!!).not()) {
-            this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
+            this.rewardedLoadAds?.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
             return
         }
-        this.admobRewardedInterKey = if (AdsConstants.testMode) {
-            AdsConstants.TEST_ADMOB_REWARDED_INTERSTITIAL_ID
-        } else {
-            AdsApplication.getAdsModel()!!.admobRewardedInterstitialID
-        }
+
         if (AdsApplication.isAdmobInLimit()) {
             if (AdsApplication.applyLimitOnAdmob) {
                 logE("admob limit is applied")
@@ -64,26 +60,33 @@ object MediationRewardedInterstitialAd {
 
     private fun initSelectedRewardedInterstitialAds() {
         when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-            AdsConstants.ADS_OFF -> this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_OFF)
+            AdsConstants.ADS_OFF -> this.rewardedLoadAds?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_OFF)
             AdsConstants.AD_MOB_MEDIATION -> {}
             AdsConstants.AD_MOB -> initRewardedInterstitialAds()
             AdsConstants.MAX_MEDIATION -> {}
-            else -> this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_STRATEGY_WRONG)
+            else -> this.rewardedLoadAds?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_STRATEGY_WRONG)
         }
     }
 
     private fun initRewardedInterstitialAds() {
+        this.admobRewardedInterKey = if (AdsConstants.testMode) {
+            AdsConstants.TEST_ADMOB_REWARDED_INTERSTITIAL_ID
+        } else {
+            AdsApplication.getAdsModel()!!.admobRewardedInterstitialID
+        }
         if (this.admobRewardedInterKey!!.isEmpty() || this.admobRewardedInterKey!!.isBlank()) {
-            this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
+            this.rewardedLoadAds?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
             return
         }
         if (AdsConstants.testMode.not()) {
             if (this.admobRewardedInterKey == AdsConstants.TEST_ADMOB_REWARDED_INTERSTITIAL_ID) {
-                this.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
+                this.rewardedLoadAds?.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
                 return
             }
         }
-        RewardedInterstitialAd.load(this.contextRef!!, this.admobRewardedInterKey!!,
+        logD("Admob initRewardedInterstitialAds ads Key: $admobRewardedInterKey")
+        RewardedInterstitialAd.load(this.contextRef ?: this.currentActivity!!,
+            this.admobRewardedInterKey!!,
             AdsApplication.getAdRequest(),
             object : RewardedInterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: RewardedInterstitialAd) {
@@ -92,11 +95,15 @@ object MediationRewardedInterstitialAd {
                         .setCustomData("SAMPLE_CUSTOM_DATA_STRING")
                         .build()
                     rewardedInterstitialAd!!.setServerSideVerificationOptions(options)
-                    this@MediationRewardedInterstitialAd.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
+                    this@MediationRewardedInterstitialAd.rewardedLoadAds?.onAdsLoadState(
+                        adsLoadingState = AdsLoadingState.ADS_LOADED
+                    )
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
-                    this@MediationRewardedInterstitialAd.rewardedLoadAds!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
+                    this@MediationRewardedInterstitialAd.rewardedLoadAds?.onAdsLoadState(
+                        adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED
+                    )
                     rewardedInterstitialAd = null
                 }
             })
@@ -110,7 +117,7 @@ object MediationRewardedInterstitialAd {
         this.currentActivity = activity
         this.showRewardCallback = listener
         if (isPurchase) {
-            this.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
+            this.showRewardCallback?.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
             return
         }
         showSelectedRewardedInterstitial()
@@ -119,11 +126,11 @@ object MediationRewardedInterstitialAd {
 
     private fun showSelectedRewardedInterstitial() {
         when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-            AdsConstants.ADS_OFF -> this.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_OFF)
+            AdsConstants.ADS_OFF -> this.showRewardCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_OFF)
             AdsConstants.AD_MOB_MEDIATION -> {}
             AdsConstants.AD_MOB -> admobRewardInterstitialAdShow()
             AdsConstants.MAX_MEDIATION -> {}
-            else -> this.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
+            else -> this.showRewardCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
         }
     }
 
@@ -140,7 +147,9 @@ object MediationRewardedInterstitialAd {
                     object : FullScreenContentCallback() {
                         override fun onAdClicked() {
                             super.onAdClicked()
-                            this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_CLICKED)
+                            this@MediationRewardedInterstitialAd.showRewardCallback?.onAdsShowState(
+                                adsShowState = AdsShowState.ADS_CLICKED
+                            )
                         }
 
                         override fun onAdDismissedFullScreenContent() {
@@ -155,18 +164,24 @@ object MediationRewardedInterstitialAd {
                         override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                             super.onAdFailedToShowFullScreenContent(p0)
                             this@MediationRewardedInterstitialAd.isAdsShow = false
-                            this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_DISPLAY_FAILED)
+                            this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsShowState(
+                                adsShowState = AdsShowState.ADS_DISPLAY_FAILED
+                            )
                         }
 
                         override fun onAdImpression() {
                             super.onAdImpression()
-                            this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_IMPRESS)
+                            this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsShowState(
+                                adsShowState = AdsShowState.ADS_IMPRESS
+                            )
                         }
 
                         override fun onAdShowedFullScreenContent() {
                             super.onAdShowedFullScreenContent()
                             this@MediationRewardedInterstitialAd.isAdsShow = true
-                            this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_DISPLAY)
+                            this@MediationRewardedInterstitialAd.showRewardCallback!!.onAdsShowState(
+                                adsShowState = AdsShowState.ADS_DISPLAY
+                            )
                         }
                     }
                 initSelectedRewardedInterstitialAds()

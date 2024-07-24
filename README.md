@@ -16,7 +16,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.2.9'
+  implementation 'com.github.mobinators:AdsManager:1.2.11'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -707,7 +707,16 @@
                 }
             }
 
-        }, 1) // 1 or Any Update Key
+        }, launcher) 
+        
+        
+        private val launcher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_CANCELED -> logD("RESULT_CANCELED")
+                Activity.RESULT_OK -> logD("RESULT_OK")
+            }
+        }
 
 ```
 
@@ -935,11 +944,4 @@ therefore create the new function for those ads
 ```
     // get short device info
     DeviceInfoUtils.getDeviceInfo() 
-
-   // get local IP Address 
-
-   DeviceInfoUtils.getLocalIpAddress(this) {
-            logD(" Local Ip Address : $it")
-        }
-
 ```

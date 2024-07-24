@@ -11,7 +11,6 @@ import com.mobinators.ads.manager.ui.commons.openad.MediationOpenAd
 import com.mobinators.ads.manager.ui.commons.rewarded.MediationRewardedAd
 import com.mobinators.ads.manager.ui.commons.utils.AdsUtils
 import com.mobinators.ads.manager.ui.commons.utils.AnalyticsManager
-import com.mobinators.ads.manager.ui.commons.utils.AppPurchaseUtils
 import com.mobinators.ads.managers.databinding.ActivityMaxAdsBinding
 import pak.developer.app.managers.extensions.logD
 import pak.developer.app.managers.ui.commons.base.BaseActivity

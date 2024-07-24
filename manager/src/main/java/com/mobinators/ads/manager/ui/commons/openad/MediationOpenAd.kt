@@ -42,11 +42,11 @@ object MediationOpenAd {
         this.contextRef = activity
         this.loadedCallback = listener
         if (isPurchased) {
-            this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.APP_PURCHASED)
+            this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.APP_PURCHASED)
             return
         }
         if (AdsUtils.isOnline(this.contextRef!!).not()) {
-            this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
+            this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
             return
         }
         if (AdsApplication.getAdsModel()!!.isAppOpenAdd.not()) {
@@ -60,7 +60,7 @@ object MediationOpenAd {
         this.activityRef = activity
         this.showCallback = listener
         if (isPurchased) {
-            this.showCallback!!.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
+            this.showCallback?.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
             return
         }
         showSelectedAppOpenAds()
@@ -69,11 +69,11 @@ object MediationOpenAd {
 
     private fun initSelectedAppOPenAds() {
         when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-            AdsConstants.ADS_OFF -> this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_OFF)
+            AdsConstants.ADS_OFF -> this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_OFF)
             AdsConstants.AD_MOB_MEDIATION -> logD("No Admob Mediation For App OPen Ads")
             AdsConstants.AD_MOB -> initAppOpenAds()
             AdsConstants.MAX_MEDIATION -> initMaxAppOpenAds()
-            else -> this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_STRATEGY_WRONG)
+            else -> this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_STRATEGY_WRONG)
         }
     }
 
@@ -90,13 +90,14 @@ object MediationOpenAd {
         }
         if (AdsConstants.testMode.not()) {
             if (this.admobAppOpenAdsID == AdsConstants.TEST_ADMOB_OPEN_APP_ID) {
-                this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
+                this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
                 return
             }
         }
+        logD("Admob AppOpenAds Ads Unit key : $admobAppOpenAdsID")
         AdsApplication.getAdsModel()?.isAppOpenAdd?.then {
             AppOpenAd.load(
-                this.contextRef!!,
+                this.contextRef ?: this.activityRef!!,
                 this.admobAppOpenAdsID!!,
                 AdsApplication.getAdRequest(),
                 AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
@@ -104,13 +105,14 @@ object MediationOpenAd {
                     override fun onAdLoaded(p0: AppOpenAd) {
                         super.onAdLoaded(p0)
                         this@MediationOpenAd.admobAppOPenAd = p0
-                        this@MediationOpenAd.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
+                        this@MediationOpenAd.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
                     }
 
                     override fun onAdFailedToLoad(p0: LoadAdError) {
                         super.onAdFailedToLoad(p0)
+                        logD("Admob App Open Ads Failed : $p0")
                         this@MediationOpenAd.admobAppOPenAd = null
-                        this@MediationOpenAd.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
+                        this@MediationOpenAd.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
                     }
                 })
         } ?: run {
@@ -121,19 +123,20 @@ object MediationOpenAd {
     private fun initMaxAppOpenAds() {
         this.maxAppOpenAdsId = AdsApplication.getAdsModel()!!.maxAppOpenID
         if (this.maxAppOpenAdsId.isNullOrEmpty() || this.maxAppOpenAdsId.isNullOrBlank()) {
-            this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
+            this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
             return
         }
         if (this.maxAppOpenAdsId == AdsConstants.TEST_MAX_APP_OPEN_ADS_ID) {
-            this.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
+            this.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
             return
         }
         logD("AppOpenAds key : $maxAppOpenAdsId")
         AdsApplication.getAdsModel()?.isAppOpenAdd?.then {
-            this.maxAppOpenAds = MaxAppOpenAd(this.maxAppOpenAdsId!!, this.contextRef!!)
+            this.maxAppOpenAds =
+                MaxAppOpenAd(this.maxAppOpenAdsId!!, this.contextRef ?: this.activityRef!!)
             this.maxAppOpenAds!!.setListener(object : MaxAdListener {
                 override fun onAdLoaded(p0: MaxAd) {
-                    this@MediationOpenAd.loadedCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
+                    this@MediationOpenAd.loadedCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
                 }
 
                 override fun onAdDisplayed(p0: MaxAd) {
@@ -177,11 +180,11 @@ object MediationOpenAd {
 
     private fun showSelectedAppOpenAds() {
         when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-            AdsConstants.ADS_OFF -> this.showCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_OFF)
+            AdsConstants.ADS_OFF -> this.showCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_OFF)
             AdsConstants.AD_MOB_MEDIATION -> logD("No Admob Mediation For App OPen Ads")
             AdsConstants.AD_MOB -> showAdmobAppOpenAds()
             AdsConstants.MAX_MEDIATION -> showMaxAppOpenAds()
-            else -> this.showCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
+            else -> this.showCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_STRATEGY_WRONG)
         }
     }
 
@@ -197,7 +200,7 @@ object MediationOpenAd {
                         object : FullScreenContentCallback() {
                             override fun onAdClicked() {
                                 super.onAdClicked()
-                                this@MediationOpenAd.showCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_CLICKED)
+                                this@MediationOpenAd.showCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_CLICKED)
                             }
 
                             override fun onAdShowedFullScreenContent() {
@@ -208,18 +211,18 @@ object MediationOpenAd {
                             override fun onAdDismissedFullScreenContent() {
                                 super.onAdDismissedFullScreenContent()
                                 this@MediationOpenAd.isShowingAd = false
-                                this@MediationOpenAd.showCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_DISMISS)
+                                this@MediationOpenAd.showCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_DISMISS)
                             }
 
                             override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                                 super.onAdFailedToShowFullScreenContent(p0)
                                 this@MediationOpenAd.isShowingAd = false
-                                this@MediationOpenAd.showCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_DISPLAY_FAILED)
+                                this@MediationOpenAd.showCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_DISPLAY_FAILED)
                             }
 
                             override fun onAdImpression() {
                                 super.onAdImpression()
-                                this@MediationOpenAd.showCallback!!.onAdsShowState(adsShowState = AdsShowState.ADS_IMPRESS)
+                                this@MediationOpenAd.showCallback?.onAdsShowState(adsShowState = AdsShowState.ADS_IMPRESS)
                             }
                         }
                     initSelectedAppOPenAds()
@@ -234,16 +237,14 @@ object MediationOpenAd {
 
     private fun showMaxAppOpenAds() {
         AdsApplication.getAdsModel()?.isAppOpenAdd?.then {
-            if (this.maxAppOpenAds!!.isReady) {
+            this.maxAppOpenAds?.isReady?.then {
                 if (MediationRewardedAd.isAdsShow || MediationAdInterstitial.isAdsShow || MediationRewardedInterstitialAd.isAdsShow || isShowingAd) {
                     logD("Ads Loaded Other")
                 } else {
                     this.maxAppOpenAds!!.showAd()
                     initSelectedAppOPenAds()
                 }
-            } else {
-                initSelectedAppOPenAds()
-            }
+            } ?: initSelectedAppOPenAds()
         } ?: run {
             logD("App Open Ads is not enable")
         }

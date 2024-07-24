@@ -51,11 +51,11 @@ object MediationNativeAds {
         this.contextRef = context
         this.loadAdsCallback = listener
         if (isPurchased) {
-            this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.APP_PURCHASED)
+            this.loadAdsCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.APP_PURCHASED)
             return
         }
         if (AdsUtils.isOnline(this.contextRef!!).not()) {
-            this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
+            this.loadAdsCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.NETWORK_OFF)
             return
         }
         initSelectedNativeAds()
@@ -73,7 +73,7 @@ object MediationNativeAds {
         this.isCustomAdsView = isCustomView
         this.containerView = containerView
         if (isPurchased) {
-            this.showAdsCallback!!.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
+            this.showAdsCallback?.onAdsShowState(adsShowState = AdsShowState.APP_PURCHASED)
             return
         }
         showSelectedNativeAds()
@@ -81,14 +81,14 @@ object MediationNativeAds {
 
     private fun initSelectedNativeAds() {
         when (AdsApplication.getAdsModel()?.strategy?.toInt() ?: 0) {
-            AdsConstants.ADS_OFF -> this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_OFF)
+            AdsConstants.ADS_OFF -> this.loadAdsCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_OFF)
             AdsConstants.AD_MOB_MEDIATION -> initAdmobNativeAds()
             AdsConstants.AD_MOB -> initAdmobNativeAds()
             AdsConstants.MAX_MEDIATION -> {
 //                initMaxNativeAds()
             }
 
-            else -> this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_STRATEGY_WRONG)
+            else -> this.loadAdsCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_STRATEGY_WRONG)
         }
     }
 
@@ -112,7 +112,8 @@ object MediationNativeAds {
                 return
             }
         }
-        val builder = AdLoader.Builder(this.contextRef!!, this.nativeAdsKey!!)
+        logD("Admob NativeAds Ads Unit Key : $nativeAdsKey")
+        val builder = AdLoader.Builder(this.contextRef ?: this.activityRef!!, this.nativeAdsKey!!)
         builder.forNativeAd {
             try {
                 val activityDestroy = this.activityRef!!.isDestroyed
@@ -133,12 +134,13 @@ object MediationNativeAds {
         val adLoader = builder.withAdListener(object : AdListener() {
             override fun onAdLoaded() {
                 super.onAdLoaded()
-                this@MediationNativeAds.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
+                this@MediationNativeAds.loadAdsCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOADED)
             }
 
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 super.onAdFailedToLoad(p0)
-                this@MediationNativeAds.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
+                logD("Admob NativeAds : Error Code : $p0")
+                this@MediationNativeAds.loadAdsCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
             }
 
             override fun onAdClicked() {
@@ -172,11 +174,11 @@ object MediationNativeAds {
     private fun initMaxNativeAds() {
         this.maxNativeAdsKey = AdsApplication.getAdsModel()!!.maxNativeID
         if (this.maxNativeAdsKey.isNullOrEmpty() || this.maxNativeAdsKey.isNullOrBlank()) {
-            this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
+            this.loadAdsCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_ID_NULL)
             return
         }
         if (this.maxNativeAdsKey == AdsConstants.TEST_MAX_Native_ADS_ID) {
-            this.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
+            this.loadAdsCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.TEST_ADS_ID)
             return
         }
         logD("NativeAds Key : $maxNativeAdsKey")
@@ -209,7 +211,7 @@ object MediationNativeAds {
                 logD("NativeAds onNativeAdLoadFailed : ${p1.message} : code : ${p1.code}")
                 super.onNativeAdLoadFailed(p0, p1)
                 this@MediationNativeAds.containerView?.gone()
-                this@MediationNativeAds.loadAdsCallback!!.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
+                this@MediationNativeAds.loadAdsCallback?.onAdsLoadState(adsLoadingState = AdsLoadingState.ADS_LOAD_FAILED)
             }
 
             override fun onNativeAdClicked(p0: MaxAd) {
@@ -431,12 +433,11 @@ object MediationNativeAds {
     }
 
     fun onDestroy() {
-        if (this.admobNativeAd != null) {
-            this.admobNativeAd!!.destroy()
+        this.admobNativeAd?.destroy()
+        if (this.maxNativeAd != null) {
+            maxNativeAds?.destroy(this.maxNativeAd!!)
         }
-        if (this.maxNativeAds != null) {
-            this.maxNativeAds!!.destroy()
-        }
+        this.maxNativeAds?.destroy()
     }
 
     interface NativeLoadAdsCallback {
