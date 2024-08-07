@@ -14,8 +14,8 @@ android {
         applicationId "com.mobinators.ads.managers"
         minSdk 21
         targetSdk 34
-        versionCode 26
-        versionName "1.2.11"
+        versionCode 27
+        versionName "1.2.12"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

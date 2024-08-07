@@ -165,10 +165,6 @@
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-dynamic-links-ktx:22.1.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-dynamic-links:22.1.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-auth-interop:20.0.0@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.bumptech.glide:glide:4.16.0@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.bumptech.glide:gifdecoder:4.16.0@aar" level="project" />
-    <orderEntry type="library" name="Gradle: androidx.exifinterface:exifinterface:1.3.6@aar" level="project" />
-    <orderEntry type="library" name="Gradle: androidx.tracing:tracing:1.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.ads.mediation:mintegral:16.7.81.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbbid:16.7.81@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:same:16.7.81@aar" level="project" />
@@ -185,13 +181,23 @@
     <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:newinterstitial:16.7.81@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:interstitialvideo:16.7.81@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:mbsplash:16.7.81@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.ads.mediation:applovin:12.5.0.1@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.applovin:applovin-sdk:12.5.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.ads.mediation:applovin:12.6.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.applovin:applovin-sdk:12.6.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-process:2.8.2@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.intuit.sdp:sdp-android:1.0.6@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.applovin.mediation:facebook-adapter:6.17.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.applovin.mediation:mintegral-adapter:16.7.51.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.mbridge.msdk.oversea:interstitial:16.7.51@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.applovin.mediation:unityads-adapter:4.12.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.unity3d.ads:unity-ads:4.12.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.activity:activity-ktx:1.9.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-runtime-ktx-android:2.8.2@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.savedstate:savedstate-ktx:1.2.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.datastore:datastore:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.work:work-runtime-ktx:2.7.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-cronet:18.0.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: org.chromium.net:cronet-api:72.3626.96@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.play:app-update-ktx:2.1.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.play:app-update:2.1.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.play:core-common:2.0.3@aar" level="project" />
@@ -202,10 +208,6 @@
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-places-placereport:17.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.billingclient:billing-ktx:7.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.activity:activity-compose:1.9.0@aar" level="project" />
-    <orderEntry type="library" name="Gradle: androidx.activity:activity-ktx:1.9.0@aar" level="project" />
-    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-runtime-ktx-android:2.8.2@aar" level="project" />
-    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2@aar" level="project" />
-    <orderEntry type="library" name="Gradle: androidx.savedstate:savedstate-ktx:1.2.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.compose.runtime:runtime-android:1.6.8@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.compose.runtime:runtime-saveable-android:1.6.8@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.compose.ui:ui-android:1.6.8@aar" level="project" />
@@ -249,16 +251,18 @@
     <orderEntry type="library" name="Gradle: javax.inject:javax.inject:1" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-encoders:17.0.0" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-encoders-proto:16.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.9.1" level="project" />
     <orderEntry type="library" name="Gradle: com.google.guava:guava:31.1-android" level="project" />
     <orderEntry type="library" name="Gradle: com.google.guava:failureaccess:1.0.1" level="project" />
     <orderEntry type="library" name="Gradle: com.google.code.findbugs:jsr305:3.0.2" level="project" />
     <orderEntry type="library" name="Gradle: org.checkerframework:checker-qual:3.12.0" level="project" />
     <orderEntry type="library" name="Gradle: com.google.errorprone:error_prone_annotations:2.26.0" level="project" />
     <orderEntry type="library" name="Gradle: com.google.j2objc:j2objc-annotations:1.3" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.bumptech.glide:disklrucache:4.16.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.bumptech.glide:annotations:4.16.0" level="project" />
     <orderEntry type="library" name="Gradle: com.adjust.sdk:adjust-android:4.28.7" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.datastore:datastore-core:1.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp:3.12.13" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.15.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.protobuf:protobuf-kotlin-lite:3.21.12" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.protobuf:protobuf-javalite:3.21.12" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-crashlytics-buildtools:3.0.2" level="project" />
   </component>
 </module>

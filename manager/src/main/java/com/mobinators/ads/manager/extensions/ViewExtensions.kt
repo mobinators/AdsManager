@@ -43,7 +43,7 @@ import pak.developer.app.managers.extensions.logException
 private var appUpdateManager: AppUpdateManager? = null
 fun Application.updateManifest(adsModel: AdsModel, onConfig: (String) -> Unit = {}) {
     try {
-        if (adsModel.strategy.toInt() == AdsConstants.AD_MOB) {
+        if (adsModel.strategy.toInt() == AdsConstants.AD_MOB  || adsModel.strategy.toInt() == AdsConstants.AD_MOB_MEDIATION) {
             logD("STRATEGY : Ads Mob  : ${adsModel.strategy}")
             adsModel.admobAppID?.let {
                 if (AdsConstants.testMode.not()) {

@@ -4,7 +4,11 @@
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/modules-2/files-2.1/com.adjust.sdk/adjust-android/4.28.7/fc732fbcc2dad5a289f8fd85c548edd7645c88e1/adjust-android-4.28.7.jar!/" />
     </CLASSES>
-    <JAVADOC />
-    <SOURCES />
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/modules-2/files-2.1/com.adjust.sdk/adjust-android/4.28.7/fd5c5f3cf630976110c37531ea1b964671dd151/adjust-android-4.28.7-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/modules-2/files-2.1/com.adjust.sdk/adjust-android/4.28.7/85682a6975ae77fa131813f3464bef4557fa5ded/adjust-android-4.28.7-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>
