@@ -1,10 +1,12 @@
 <component name="libraryTable">
   <library name="Gradle: com.google.firebase:firebase-config-ktx:22.0.0@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/1530a22a9a434255967ba2688673fda8/transformed/jetified-firebase-config-ktx-22.0.0/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/1530a22a9a434255967ba2688673fda8/transformed/jetified-firebase-config-ktx-22.0.0/AndroidManifest.xml" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/120086d5c6ddc3492e7894f1eb14e42d/transformed/jetified-firebase-config-ktx-22.0.0/AndroidManifest.xml" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/120086d5c6ddc3492e7894f1eb14e42d/transformed/jetified-firebase-config-ktx-22.0.0/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/modules-2/files-2.1/com.google.firebase/firebase-config-ktx/22.0.0/51c256bd0dbb5303239824bca2c8a76fe1127e1d/firebase-config-ktx-22.0.0-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

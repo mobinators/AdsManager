@@ -1,13 +1,15 @@
 <component name="libraryTable">
   <library name="Gradle: com.google.firebase:firebase-config:22.0.0@aar" external-system-id="GRADLE">
     <ANNOTATIONS>
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/4a11e4dd0d3284cbb7ffc8fb9d308b69/transformed/jetified-firebase-config-22.0.0/annotations.zip!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/d73ce8b6feacea4eab2456f243153768/transformed/jetified-firebase-config-22.0.0/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/4a11e4dd0d3284cbb7ffc8fb9d308b69/transformed/jetified-firebase-config-22.0.0/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/4a11e4dd0d3284cbb7ffc8fb9d308b69/transformed/jetified-firebase-config-22.0.0/AndroidManifest.xml" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/d73ce8b6feacea4eab2456f243153768/transformed/jetified-firebase-config-22.0.0/AndroidManifest.xml" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/d73ce8b6feacea4eab2456f243153768/transformed/jetified-firebase-config-22.0.0/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/modules-2/files-2.1/com.google.firebase/firebase-config/22.0.0/652891c6045de8fefe972d91c4875dae5668af1e/firebase-config-22.0.0-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

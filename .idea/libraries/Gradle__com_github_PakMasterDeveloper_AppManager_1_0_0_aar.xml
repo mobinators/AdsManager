@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.github.PakMasterDeveloper:AppManager:1.0.0@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/023f657710178fc0505750d9b5f9c28b/transformed/jetified-AppManager-1.0.0/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-3/023f657710178fc0505750d9b5f9c28b/transformed/jetified-AppManager-1.0.0/AndroidManifest.xml" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1b6bdac5fb551e177d71ed9c1f6651b5/transformed/jetified-AppManager-1.0.0/AndroidManifest.xml" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1b6bdac5fb551e177d71ed9c1f6651b5/transformed/jetified-AppManager-1.0.0/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

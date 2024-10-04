@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.mbridge.msdk.oversea:newinterstitial:16.8.51@aar" external-system-id="GRADLE">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/90176d1e0599242e14311eacfd59ba78/transformed/jetified-newinterstitial-16.8.51/jars/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/90176d1e0599242e14311eacfd59ba78/transformed/jetified-newinterstitial-16.8.51/jars/libs/classes-2.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/90176d1e0599242e14311eacfd59ba78/transformed/jetified-newinterstitial-16.8.51/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

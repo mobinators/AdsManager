@@ -48,11 +48,11 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
     @SuppressLint("ResourceAsColor", "ResourceType")
     override fun initView() {
         binding.cancelButton.setOnClickListener {
-            listener!!.onCancel()
+            listener?.onCancel()
             dismiss()
         }
         binding.exitButton.setOnClickListener {
-            listener!!.onExit()
+            listener?.onExit()
             dismiss()
             requireActivity().finishAffinity()
         }
@@ -251,12 +251,12 @@ class ExitBottomSheetFragment : BaseBottomSheet<FragmentExitBottomSheetBinding>(
     override fun onClick(itemId: View?) {
         when (itemId!!.id) {
             binding.cancelButton.id -> {
-                listener!!.onCancel()
+                listener?.onCancel()
                 dismiss()
             }
 
             binding.exitButton.id -> {
-                listener!!.onExit()
+                listener?.onExit()
                 dismiss()
                 requireActivity().finishAffinity()
             }

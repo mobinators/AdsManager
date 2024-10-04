@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.3@aar" external-system-id="GRADLE">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1ef515bb20769a90895e22cdae4a699d/transformed/jetified-lifecycle-viewmodel-savedstate-2.8.3/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1ef515bb20769a90895e22cdae4a699d/transformed/jetified-lifecycle-viewmodel-savedstate-2.8.3/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1ef515bb20769a90895e22cdae4a699d/transformed/jetified-lifecycle-viewmodel-savedstate-2.8.3/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

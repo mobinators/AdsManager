@@ -5,6 +5,8 @@
       <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/modules-2/files-2.1/androidx.annotation/annotation-jvm/1.8.0/b8a16fe526014b7941c1debaccaf9c5153692dbb/annotation-jvm-1.8.0.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/modules-2/files-2.1/androidx.annotation/annotation-jvm/1.8.0/38ef8b544da94401882fb3abac556f26f46bc046/annotation-jvm-1.8.0-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

@@ -14,8 +14,8 @@ android {
         applicationId "com.mobinators.ads.managers"
         minSdk 21
         targetSdk 34
-        versionCode 27
-        versionName "1.2.12"
+        versionCode 28
+        versionName "1.2.13"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -70,11 +70,11 @@ dependencies {
 
 
     // Compose
-    implementation("androidx.activity:activity-compose:1.9.0")
-    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    implementation("androidx.activity:activity-compose:1.9.2")  // 1.9.0
+    implementation(platform("androidx.compose:compose-bom:2024.09.03"))  // 2024.06.00
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended:1.6.8")
+    implementation("androidx.compose.material:material-icons-extended:1.7.3")  // 1.6.8
 }

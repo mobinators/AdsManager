@@ -93,7 +93,7 @@ object MediationRewardedAd {
                 return
             }
         }
-        logD("Admob initRewardAds ads Key: $admobRewardKey")
+
         RewardedAd.load(
             this.activityRef!!,
             this.admobRewardKey!!,
@@ -169,13 +169,13 @@ object MediationRewardedAd {
                 )
             }
 
-            override fun onRewardedVideoStarted(p0: MaxAd) {
+          /*  override fun onRewardedVideoStarted(p0: MaxAd) {
                 logD("onRewardedVideoStarted")
             }
 
             override fun onRewardedVideoCompleted(p0: MaxAd) {
                 logD("onRewardedVideoCompleted")
-            }
+            }*/
         })
         this.maxRewardedAd!!.setRevenueListener { ad ->
             logD("setRevenueListener : ${ad.revenue}")

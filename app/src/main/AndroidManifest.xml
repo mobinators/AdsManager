@@ -48,6 +48,7 @@
         <!--  <meta-data
               android:name="google_analytics_automatic_screen_reporting_enabled"
               android:value="true" />-->
+
     </application>
 
 </manifest>
