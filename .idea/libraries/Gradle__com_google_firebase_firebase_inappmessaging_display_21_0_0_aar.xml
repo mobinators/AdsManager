@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: com.google.firebase:firebase-inappmessaging-display:21.0.0@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/5ac1ab19cbf5bcddcc4fdeedd26cfe7b/transformed/jetified-firebase-inappmessaging-display-21.0.0/AndroidManifest.xml" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/5ac1ab19cbf5bcddcc4fdeedd26cfe7b/transformed/jetified-firebase-inappmessaging-display-21.0.0/res" />
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/5ac1ab19cbf5bcddcc4fdeedd26cfe7b/transformed/jetified-firebase-inappmessaging-display-21.0.0/jars/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/3945e5466b3b0e2fd9b61f0b02fc89a8/transformed/jetified-firebase-inappmessaging-display-21.0.0/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/3945e5466b3b0e2fd9b61f0b02fc89a8/transformed/jetified-firebase-inappmessaging-display-21.0.0/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/3945e5466b3b0e2fd9b61f0b02fc89a8/transformed/jetified-firebase-inappmessaging-display-21.0.0/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

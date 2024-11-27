@@ -16,7 +16,7 @@
 -> add module level gradle
 
 ```add module lvel gradle
-  implementation 'com.github.mobinators:AdsManager:1.2.13'
+  implementation 'com.github.mobinators:AdsManager:1.2.14'
 ```
 
 -> add Firebase classpath in Project level gradle
@@ -525,6 +525,11 @@
                      binding.bannerContainer,
                      CollapseBannerState.BOTTOM,
             object : MediationCollapsibleBanner.BannerAdListener {
+        
+                 override fun onAdsLoaded() {
+                     logD("CollapseBannerActivity Ads onAdsLoaded")
+                 }
+                
                  override fun onAdsShowState(adsShowState: AdsShowState) {
                     when (adsShowState) {
                         APP_PURCHASED -> logD("CollapseBannerActivity Ads You have purchased")

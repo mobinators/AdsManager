@@ -1,12 +1,12 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.webkit:webkit:1.11.0-alpha02@aar" external-system-id="GRADLE">
     <ANNOTATIONS>
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/2b81bfc08a3850b3d196fcf8705cfb0a/transformed/webkit-1.11.0-alpha02/annotations.zip!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/5d4bfccf10e30d1684055bf53573235f/transformed/webkit-1.11.0-alpha02/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/2b81bfc08a3850b3d196fcf8705cfb0a/transformed/webkit-1.11.0-alpha02/AndroidManifest.xml" />
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/2b81bfc08a3850b3d196fcf8705cfb0a/transformed/webkit-1.11.0-alpha02/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/2b81bfc08a3850b3d196fcf8705cfb0a/transformed/webkit-1.11.0-alpha02/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/5d4bfccf10e30d1684055bf53573235f/transformed/webkit-1.11.0-alpha02/res" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/5d4bfccf10e30d1684055bf53573235f/transformed/webkit-1.11.0-alpha02/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/5d4bfccf10e30d1684055bf53573235f/transformed/webkit-1.11.0-alpha02/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

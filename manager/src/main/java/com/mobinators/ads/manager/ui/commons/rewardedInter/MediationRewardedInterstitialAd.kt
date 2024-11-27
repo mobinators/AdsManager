@@ -193,7 +193,6 @@ object MediationRewardedInterstitialAd {
 
 
     interface RewardedLoadAds {
-
         fun onAdsLoadState(adsLoadingState: AdsLoadingState)
     }
 

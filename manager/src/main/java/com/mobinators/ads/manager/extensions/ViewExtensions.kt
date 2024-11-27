@@ -90,6 +90,7 @@ private fun Application.initMaxMediation(sdkKey: String, onConfig: () -> Unit = 
     val initConfig = AppLovinSdkInitializationConfiguration.builder(sdkKey, this)
         .setMediationProvider(AppLovinMediationProvider.MAX)
         .build()
+
     AppLovinSdk.getInstance(this).initialize(initConfig) { sdkConfig ->
         logD("AppLoving Sdk : $sdkConfig")
         onConfig()

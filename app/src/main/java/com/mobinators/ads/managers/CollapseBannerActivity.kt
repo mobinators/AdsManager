@@ -30,6 +30,10 @@ class CollapseBannerActivity : BaseActivity<ActivityCollapseBannerBinding>() {
             binding.bannerContainer,
             CollapseBannerState.BOTTOM,
             object : MediationCollapsibleBanner.BannerAdListener {
+                override fun onAdsLoaded() {
+                    logD("CollapseBannerActivity Ads onAdsLoaded")
+                }
+
                 override fun onAdsShowState(adsShowState: AdsShowState) {
                     when (adsShowState) {
                         APP_PURCHASED -> logD("CollapseBannerActivity Ads You have purchased")
@@ -51,6 +55,4 @@ class CollapseBannerActivity : BaseActivity<ActivityCollapseBannerBinding>() {
 
             })
     }
-
-
 }

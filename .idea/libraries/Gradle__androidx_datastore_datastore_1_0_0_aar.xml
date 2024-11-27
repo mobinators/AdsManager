@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.datastore:datastore:1.0.0@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/da8d72203c974ba43862051f621eb50a/transformed/jetified-datastore-1.0.0/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/da8d72203c974ba43862051f621eb50a/transformed/jetified-datastore-1.0.0/res" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/da8d72203c974ba43862051f621eb50a/transformed/jetified-datastore-1.0.0/AndroidManifest.xml" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/208f2b8dd6b739ba4deebdefb2abe5ea/transformed/jetified-datastore-1.0.0/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/208f2b8dd6b739ba4deebdefb2abe5ea/transformed/jetified-datastore-1.0.0/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/208f2b8dd6b739ba4deebdefb2abe5ea/transformed/jetified-datastore-1.0.0/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

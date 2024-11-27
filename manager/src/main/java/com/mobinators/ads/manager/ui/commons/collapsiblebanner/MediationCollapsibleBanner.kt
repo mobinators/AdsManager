@@ -5,9 +5,11 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.ViewGroup
 import com.google.ads.mediation.admob.AdMobAdapter
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
 import com.mobinators.ads.manager.applications.AdsApplication
 import com.mobinators.ads.manager.extensions.sdk30AndUp
 import com.mobinators.ads.manager.ui.commons.enums.AdsShowState
@@ -103,7 +105,51 @@ object MediationCollapsibleBanner {
                 })
                 .build()
             collapseBannerView.loadAd(adRequest)
-            this.collapseBannerContainer!!.addView(collapseBannerView)
+            collapseBannerView.adListener = object : AdListener() {
+                override fun onAdClicked() {
+                    super.onAdClicked()
+                    this@MediationCollapsibleBanner.bannerListener?.onAdsShowState(adsShowState = AdsShowState.ADS_CLICKED)
+                }
+
+                override fun onAdClosed() {
+                    super.onAdClosed()
+                    this@MediationCollapsibleBanner.bannerListener?.onAdsShowState(adsShowState = AdsShowState.ADS_CLOSED)
+                }
+
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+                    super.onAdFailedToLoad(p0)
+                    logD("Admob onAdFailedToLoad : $p0")
+                    this@MediationCollapsibleBanner.bannerListener?.onAdsShowState(adsShowState = AdsShowState.ADS_LOAD_FAILED)
+                    if (AdsApplication.isAdmobInLimit()) {
+                        AdsApplication.applyLimitOnAdmob = true
+                    }
+                }
+
+                override fun onAdImpression() {
+                    super.onAdImpression()
+                    this@MediationCollapsibleBanner.bannerListener?.onAdsShowState(adsShowState = AdsShowState.ADS_IMPRESS)
+                }
+
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+                    if (collapseBannerContainer!!.parent != null) {
+                        collapseBannerContainer!!.removeAllViews()
+                    }
+                    collapseBannerContainer!!.addView(collapseBannerView)
+                    bannerListener?.onAdsLoaded()
+                }
+
+                override fun onAdOpened() {
+                    super.onAdOpened()
+                    bannerListener?.onAdsShowState(adsShowState = AdsShowState.ADS_OPEN)
+                }
+
+                override fun onAdSwipeGestureClicked() {
+                    super.onAdSwipeGestureClicked()
+                    logD("onAdSwipeGestureClicked")
+                }
+            }
+//            this.collapseBannerContainer!!.addView(collapseBannerView)
         } catch (error: Exception) {
             logException("Collapse Banner Init Error : ${error.localizedMessage}")
         }
@@ -129,6 +175,7 @@ object MediationCollapsibleBanner {
     }
 
     interface BannerAdListener {
+        fun onAdsLoaded()
         fun onAdsShowState(adsShowState: AdsShowState)
     }
 }

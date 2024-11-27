@@ -168,17 +168,6 @@ object MediationRewardedAd {
                     type = p1.label
                 )
             }
-
-
-
-
-          /*  override fun onRewardedVideoStarted(p0: MaxAd) {
-                logD("onRewardedVideoStarted")
-            }
-
-            override fun onRewardedVideoCompleted(p0: MaxAd) {
-                logD("onRewardedVideoCompleted")
-            }*/
         })
         this.maxRewardedAd!!.setRevenueListener { ad ->
             logD("setRevenueListener : ${ad.revenue}")

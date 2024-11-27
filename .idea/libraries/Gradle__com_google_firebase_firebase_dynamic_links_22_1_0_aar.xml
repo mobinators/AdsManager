@@ -1,11 +1,11 @@
 <component name="libraryTable">
   <library name="Gradle: com.google.firebase:firebase-dynamic-links:22.1.0@aar" external-system-id="GRADLE">
     <ANNOTATIONS>
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/ad280880785be6d27112559e8415dacd/transformed/jetified-firebase-dynamic-links-22.1.0/annotations.zip!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/558de2c0bb5c3550e99f7749dfcccd1f/transformed/jetified-firebase-dynamic-links-22.1.0/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/ad280880785be6d27112559e8415dacd/transformed/jetified-firebase-dynamic-links-22.1.0/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/ad280880785be6d27112559e8415dacd/transformed/jetified-firebase-dynamic-links-22.1.0/AndroidManifest.xml" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/558de2c0bb5c3550e99f7749dfcccd1f/transformed/jetified-firebase-dynamic-links-22.1.0/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/558de2c0bb5c3550e99f7749dfcccd1f/transformed/jetified-firebase-dynamic-links-22.1.0/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
