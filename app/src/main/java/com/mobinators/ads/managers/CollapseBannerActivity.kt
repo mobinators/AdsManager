@@ -52,7 +52,6 @@ class CollapseBannerActivity : BaseActivity<ActivityCollapseBannerBinding>() {
                         ADS_OPEN -> logD("CollapseBannerActivity Ads Open")
                     }
                 }
-
             })
     }
 }
