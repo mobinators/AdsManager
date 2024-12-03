@@ -116,7 +116,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.mobinators'
                 artifactId = 'managers'
-                version = '1.2.16'
+                version = '1.2.17'
             }
         }
     }
