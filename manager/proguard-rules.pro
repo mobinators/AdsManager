@@ -28,4 +28,3 @@
 #-keep class com.google.ads.mediation.AdUrlAdapter {
 #    *;
 #}
--dontwarn java.lang.invoke.StringConcatFactory
