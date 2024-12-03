@@ -13,8 +13,8 @@ android {
         applicationId "com.mobinators.ads.managers"
         minSdk 24
         targetSdk 34
-        versionCode 30
-        versionName "1.2.15"
+        versionCode 31
+        versionName "1.2.16"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -44,7 +44,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.10"  //1.5.1
     }
     packaging {
         resources {

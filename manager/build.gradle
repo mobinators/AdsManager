@@ -34,7 +34,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
     packaging {
         resources {
@@ -116,7 +116,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.mobinators'
                 artifactId = 'managers'
-                version = '1.2.15'
+                version = '1.2.16'
             }
         }
     }
