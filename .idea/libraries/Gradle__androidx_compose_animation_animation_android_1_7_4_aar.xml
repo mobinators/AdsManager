@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.compose.animation:animation-android:1.7.4@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/8a6322a3f7c82588efdc3b586459a91e/transformed/jetified-animation-release/res" />
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/8a6322a3f7c82588efdc3b586459a91e/transformed/jetified-animation-release/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/8a6322a3f7c82588efdc3b586459a91e/transformed/jetified-animation-release/AndroidManifest.xml" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/130e9b2a7b385d7e3b686ce70339adbd/transformed/jetified-animation-release/AndroidManifest.xml" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/130e9b2a7b385d7e3b686ce70339adbd/transformed/jetified-animation-release/res" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/130e9b2a7b385d7e3b686ce70339adbd/transformed/jetified-animation-release/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

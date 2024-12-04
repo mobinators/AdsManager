@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: com.google.android.gms:play-services-ads:23.3.0@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/f79b3f63fbae6accd638dd7fcde5d5da/transformed/jetified-play-services-ads-23.3.0/AndroidManifest.xml" />
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/f79b3f63fbae6accd638dd7fcde5d5da/transformed/jetified-play-services-ads-23.3.0/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/f79b3f63fbae6accd638dd7fcde5d5da/transformed/jetified-play-services-ads-23.3.0/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/fef790c49a12a8b1d630bcc16deb0153/transformed/jetified-play-services-ads-23.3.0/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/fef790c49a12a8b1d630bcc16deb0153/transformed/jetified-play-services-ads-23.3.0/AndroidManifest.xml" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/fef790c49a12a8b1d630bcc16deb0153/transformed/jetified-play-services-ads-23.3.0/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

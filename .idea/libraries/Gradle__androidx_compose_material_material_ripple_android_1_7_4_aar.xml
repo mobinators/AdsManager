@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.compose.material:material-ripple-android:1.7.4@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/4edc669b6877ef0ea3e8fce81e387c59/transformed/jetified-material-ripple-release/AndroidManifest.xml" />
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/4edc669b6877ef0ea3e8fce81e387c59/transformed/jetified-material-ripple-release/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/4edc669b6877ef0ea3e8fce81e387c59/transformed/jetified-material-ripple-release/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/46a8ae1333258e8fcfd2fdb45d13e8e7/transformed/jetified-material-ripple-release/res" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/46a8ae1333258e8fcfd2fdb45d13e8e7/transformed/jetified-material-ripple-release/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/46a8ae1333258e8fcfd2fdb45d13e8e7/transformed/jetified-material-ripple-release/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.compose.ui:ui-text-android:1.7.4@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/e5891558b9e469b22bd774db5f33f936/transformed/jetified-ui-text-release/AndroidManifest.xml" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/e5891558b9e469b22bd774db5f33f936/transformed/jetified-ui-text-release/res" />
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/e5891558b9e469b22bd774db5f33f936/transformed/jetified-ui-text-release/jars/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/84d1cf15a8318eda70eab070b69a43a5/transformed/jetified-ui-text-release/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/84d1cf15a8318eda70eab070b69a43a5/transformed/jetified-ui-text-release/AndroidManifest.xml" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/84d1cf15a8318eda70eab070b69a43a5/transformed/jetified-ui-text-release/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

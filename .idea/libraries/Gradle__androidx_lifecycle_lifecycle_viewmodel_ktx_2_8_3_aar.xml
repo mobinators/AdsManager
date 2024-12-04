@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/dff3d3613b6f485f8a289570c393b67e/transformed/jetified-lifecycle-viewmodel-ktx-2.8.3/res" />
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/dff3d3613b6f485f8a289570c393b67e/transformed/jetified-lifecycle-viewmodel-ktx-2.8.3/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/dff3d3613b6f485f8a289570c393b67e/transformed/jetified-lifecycle-viewmodel-ktx-2.8.3/AndroidManifest.xml" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/2a497332f87884e15e512b55711fa2ed/transformed/jetified-lifecycle-viewmodel-ktx-2.8.3/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/2a497332f87884e15e512b55711fa2ed/transformed/jetified-lifecycle-viewmodel-ktx-2.8.3/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/2a497332f87884e15e512b55711fa2ed/transformed/jetified-lifecycle-viewmodel-ktx-2.8.3/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

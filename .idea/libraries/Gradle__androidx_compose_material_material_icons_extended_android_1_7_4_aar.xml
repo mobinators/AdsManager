@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.compose.material:material-icons-extended-android:1.7.4@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1819798c53377f1259424db6f5c85b5f/transformed/jetified-material-icons-extended-release/AndroidManifest.xml" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1819798c53377f1259424db6f5c85b5f/transformed/jetified-material-icons-extended-release/res" />
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1819798c53377f1259424db6f5c85b5f/transformed/jetified-material-icons-extended-release/jars/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/3dbc59e4fa830d72832a833a3917253e/transformed/jetified-material-icons-extended-release/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/3dbc59e4fa830d72832a833a3917253e/transformed/jetified-material-icons-extended-release/AndroidManifest.xml" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/3dbc59e4fa830d72832a833a3917253e/transformed/jetified-material-icons-extended-release/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

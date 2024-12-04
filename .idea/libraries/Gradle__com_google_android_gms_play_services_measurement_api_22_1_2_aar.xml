@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: com.google.android.gms:play-services-measurement-api:22.1.2@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/c920eaacfc8bb8cac341262b7eac49ca/transformed/jetified-play-services-measurement-api-22.1.2/res" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/c920eaacfc8bb8cac341262b7eac49ca/transformed/jetified-play-services-measurement-api-22.1.2/AndroidManifest.xml" />
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/c920eaacfc8bb8cac341262b7eac49ca/transformed/jetified-play-services-measurement-api-22.1.2/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/b1e28de866f9f999c1a8c1b27da92872/transformed/jetified-play-services-measurement-api-22.1.2/res" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/b1e28de866f9f999c1a8c1b27da92872/transformed/jetified-play-services-measurement-api-22.1.2/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/b1e28de866f9f999c1a8c1b27da92872/transformed/jetified-play-services-measurement-api-22.1.2/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

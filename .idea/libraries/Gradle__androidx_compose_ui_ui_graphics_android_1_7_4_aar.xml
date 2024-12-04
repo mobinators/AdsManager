@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.compose.ui:ui-graphics-android:1.7.4@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/4a4408c99933dce87346013ecb1ebf7e/transformed/jetified-ui-graphics-release/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/4a4408c99933dce87346013ecb1ebf7e/transformed/jetified-ui-graphics-release/res" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/4a4408c99933dce87346013ecb1ebf7e/transformed/jetified-ui-graphics-release/AndroidManifest.xml" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/bc1b531d2dcbb47869ffcb838ecf8eab/transformed/jetified-ui-graphics-release/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/bc1b531d2dcbb47869ffcb838ecf8eab/transformed/jetified-ui-graphics-release/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/bc1b531d2dcbb47869ffcb838ecf8eab/transformed/jetified-ui-graphics-release/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

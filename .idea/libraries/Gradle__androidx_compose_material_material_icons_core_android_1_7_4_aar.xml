@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.compose.material:material-icons-core-android:1.7.4@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/38557b04702c511158c141f883510c19/transformed/jetified-material-icons-core-release/AndroidManifest.xml" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/38557b04702c511158c141f883510c19/transformed/jetified-material-icons-core-release/res" />
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/38557b04702c511158c141f883510c19/transformed/jetified-material-icons-core-release/jars/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/1d0616cb657a6929f1fedfd0514f37ae/transformed/jetified-material-icons-core-release/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/1d0616cb657a6929f1fedfd0514f37ae/transformed/jetified-material-icons-core-release/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/1d0616cb657a6929f1fedfd0514f37ae/transformed/jetified-material-icons-core-release/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

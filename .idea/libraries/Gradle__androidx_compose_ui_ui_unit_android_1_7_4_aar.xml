@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.compose.ui:ui-unit-android:1.7.4@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/eb17235a56ba57a662f669216efe22f0/transformed/jetified-ui-unit-release/res" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/eb17235a56ba57a662f669216efe22f0/transformed/jetified-ui-unit-release/AndroidManifest.xml" />
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/eb17235a56ba57a662f669216efe22f0/transformed/jetified-ui-unit-release/jars/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/ead7efcd980a1af1d19b370582cdc3cc/transformed/jetified-ui-unit-release/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/ead7efcd980a1af1d19b370582cdc3cc/transformed/jetified-ui-unit-release/AndroidManifest.xml" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/ead7efcd980a1af1d19b370582cdc3cc/transformed/jetified-ui-unit-release/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

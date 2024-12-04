@@ -1,12 +1,12 @@
 <component name="libraryTable">
   <library name="Gradle: com.mbridge.msdk.oversea:mbridge_android_sdk:16.8.81@aar" external-system-id="GRADLE">
     <ANNOTATIONS>
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1b6ad6ed0068f35f8096fc772f4a794f/transformed/jetified-mbridge_android_sdk-16.8.81/annotations.zip!/" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/531f215e036bc0ea23746850035b7c4c/transformed/jetified-mbridge_android_sdk-16.8.81/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1b6ad6ed0068f35f8096fc772f4a794f/transformed/jetified-mbridge_android_sdk-16.8.81/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1b6ad6ed0068f35f8096fc772f4a794f/transformed/jetified-mbridge_android_sdk-16.8.81/res" />
-      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/8.9/transforms/1b6ad6ed0068f35f8096fc772f4a794f/transformed/jetified-mbridge_android_sdk-16.8.81/AndroidManifest.xml" />
+      <root url="jar://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/531f215e036bc0ea23746850035b7c4c/transformed/jetified-mbridge_android_sdk-16.8.81/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/531f215e036bc0ea23746850035b7c4c/transformed/jetified-mbridge_android_sdk-16.8.81/res" />
+      <root url="file://$PROJECT_DIR$/../../Android setup/.gradle/caches/transforms-4/531f215e036bc0ea23746850035b7c4c/transformed/jetified-mbridge_android_sdk-16.8.81/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
